@@ -1,0 +1,99 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<div class="theme-toggle" role="group" aria-label="Color theme">
+  <button class="theme-btn" data-theme-value="light" title="Light mode" aria-pressed="false">
+    <Icon name="lucide:sun" aria-hidden="true" />
+    <span class="sr-only">Light</span>
+  </button>
+  <button class="theme-btn" data-theme-value="dark" title="Dark mode" aria-pressed="false">
+    <Icon name="lucide:moon" aria-hidden="true" />
+    <span class="sr-only">Dark</span>
+  </button>
+  <button class="theme-btn" data-theme-value="auto" title="Auto (system)" aria-pressed="false">
+    <Icon name="lucide:monitor" aria-hidden="true" />
+    <span class="sr-only">Auto</span>
+  </button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'theme';
+
+  function applyTheme(theme: string) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-value]').forEach(btn => {
+      const active = btn.dataset.themeValue === theme;
+      btn.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  const stored = localStorage.getItem(STORAGE_KEY) ?? 'auto';
+  applyTheme(stored);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-value]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.dataset.themeValue ?? 'auto';
+      localStorage.setItem(STORAGE_KEY, theme);
+      applyTheme(theme);
+    });
+  });
+
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem(STORAGE_KEY) ?? 'auto') === 'auto') {
+      applyTheme('auto');
+    }
+  });
+</script>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-full);
+    padding: var(--space-1);
+  }
+
+  .theme-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: none;
+    border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .theme-btn:hover {
+    background-color: var(--color-surface-3);
+    color: var(--color-text-primary);
+  }
+
+  .theme-btn[aria-pressed="true"] {
+    background-color: var(--color-surface-1);
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  [data-astro-cid] svg {
+    width: 1rem;
+    height: 1rem;
+  }
+</style>

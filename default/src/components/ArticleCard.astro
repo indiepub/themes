@@ -1,0 +1,87 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Entry } from '@indiepub/types';
+import { formatDateCompact, isoDate } from '../lib/format.ts';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const detailUrl = `/posts/${entry.slug}`;
+const pubDate = entry.publishedAt ?? entry.createdAt;
+---
+
+<div class="article-card">
+  <h2 class="p-name article-card__title">
+    <a href={detailUrl} class="u-url">
+      {entry.name}
+    </a>
+  </h2>
+  <time class="dt-published article-card__date" datetime={isoDate(pubDate)}>
+    {formatDateCompact(pubDate)}
+  </time>
+  {entry.summary && <p class="p-summary article-card__summary">{entry.summary}</p>}
+  <a
+    href={detailUrl}
+    class="article-card__read-link"
+    aria-label={`Read: ${entry.name ?? 'article'}`}
+  >
+    Read article
+    <Icon name="lucide:arrow-right" aria-hidden="true" />
+  </a>
+</div>
+
+<style>
+  .article-card {
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .article-card__title {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  .article-card__title a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .article-card__title a:hover {
+    color: var(--color-text-link);
+  }
+
+  .article-card__date {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+
+  .article-card__summary {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .article-card__read-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    margin-top: var(--space-1);
+  }
+
+  .article-card__read-link svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    transition: transform var(--transition);
+  }
+
+  .article-card__read-link:hover svg {
+    transform: translateX(2px);
+  }
+</style>

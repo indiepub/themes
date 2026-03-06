@@ -1,0 +1,153 @@
+---
+import { Icon } from 'astro-icon/components';
+import SocialIcon from './SocialIcon.astro';
+import type { Author, IndiePubConfig } from '@indiepub/types';
+
+interface Props {
+  author: Author;
+  config?: IndiePubConfig | undefined;
+  /** 'hero' on home/about, 'compact' in entry cards */
+  variant?: 'hero' | 'compact' | undefined;
+}
+
+const { author, config: _config, variant = 'hero' } = Astro.props;
+const links = author.socialLinks ?? [];
+const photoSize = variant === 'hero' ? 96 : 40;
+---
+
+<div class:list={['h-card', `h-card--${variant}`]}>
+  {author.photo && (
+    <img
+      class="u-photo h-card__photo"
+      src={author.photo}
+      alt={author.name}
+      width={photoSize}
+      height={photoSize}
+    />
+  )}
+  <div class="h-card__body">
+    <a class="p-name u-url h-card__name" href={author.url ?? '/'} rel="me">
+      {author.name}
+    </a>
+    {variant === 'hero' && author.bio && (
+      <p class="p-note h-card__bio">{author.bio}</p>
+    )}
+    {variant === 'hero' && (links.length > 0 || author.url) && (
+      <div class="h-card__links-section">
+        <p class="h-card__links-label">Find me on</p>
+        <div class="h-card__links">
+          {links.length > 0 ? links.map(link => (
+            <a
+              href={link.url}
+              class="h-card__social-link u-url"
+              rel="me noopener"
+              target="_blank"
+              aria-label={link.label}
+            >
+              <SocialIcon icon={link.icon} aria-hidden="true" />
+            </a>
+          )) : (
+            <a href={author.url} class="p-url u-url" rel="me" aria-label="Website">
+              <Icon name="lucide:globe" aria-hidden="true" />
+            </a>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .h-card {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .h-card__photo {
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+    aspect-ratio: 1;
+  }
+
+  .h-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .h-card__name {
+    font-weight: var(--weight-bold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .h-card__name:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .h-card--hero .h-card__name {
+    font-size: var(--text-2xl);
+  }
+
+  .h-card--compact .h-card__name {
+    font-size: var(--text-sm);
+  }
+
+  .h-card__bio {
+    color: var(--color-text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    max-width: var(--max-width-content);
+  }
+
+  .h-card__links-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  .h-card__links-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-tertiary);
+  }
+
+  .h-card__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .h-card__social-link,
+  .p-url {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: color var(--transition), background-color var(--transition);
+  }
+
+  .h-card__social-link:hover,
+  .p-url:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-2);
+    text-decoration: none;
+  }
+
+  .h-card__social-link svg,
+  .p-url svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+</style>

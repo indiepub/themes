@@ -1,0 +1,129 @@
+---
+import Base from './Base.astro';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+import SocialIcon from '../components/SocialIcon.astro';
+
+interface Props {
+  title?: string | undefined;
+  description?: string | undefined;
+  canonicalUrl?: string | undefined;
+  ogImage?: string | undefined;
+  /** Suppress sidebar on focused pages like entry detail */
+  hideSidebar?: boolean | undefined;
+}
+
+const { title, description, canonicalUrl, ogImage, hideSidebar = false } = Astro.props;
+
+const author = Astro.locals.indiepub
+  ? await Astro.locals.indiepub.content.getAuthor()
+  : null;
+const socialLinks = author?.socialLinks ?? [];
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl} ogImage={ogImage}>
+  <div class="site-wrapper">
+    <Header />
+    <div class="site-body" data-sidebar={hideSidebar ? 'hidden' : 'visible'}>
+      <main class="site-main">
+        <slot />
+      </main>
+      {!hideSidebar && (
+        <aside class="site-sidebar">
+          <Sidebar />
+        </aside>
+      )}
+    </div>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        {socialLinks.length > 0 && (
+          <nav class="site-footer__social" aria-label="Social links">
+            {socialLinks.map(link => (
+              <a
+                href={link.url}
+                rel="me noopener"
+                target="_blank"
+                aria-label={link.label}
+                class="site-footer__social-link"
+              >
+                <SocialIcon icon={link.icon} aria-hidden="true" />
+              </a>
+            ))}
+          </nav>
+        )}
+        <p class="text-sm text-secondary">
+          Powered by <a href="https://indiepub.dev">IndiePub</a>
+        </p>
+      </div>
+    </footer>
+  </div>
+</Base>
+
+<style>
+  .site-wrapper {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .site-body {
+    flex: 1;
+    width: 100%;
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .site-body[data-sidebar="visible"] {
+      grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
+    }
+  }
+
+  .site-main {
+    min-width: 0;
+  }
+
+  .site-sidebar {
+    min-width: 0;
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+  }
+
+  .site-footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .site-footer__social {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .site-footer__social-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-text-secondary);
+    transition: color var(--transition);
+  }
+
+  .site-footer__social-link:hover {
+    color: var(--color-text-link);
+  }
+
+  .site-footer__social-link svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+</style>

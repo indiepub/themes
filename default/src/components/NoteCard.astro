@@ -1,0 +1,216 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Entry } from '@indiepub/types';
+import Markdown from '@indiepub/astro/components/Markdown';
+import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel';
+import TagList from './TagList.astro';
+import { formatDateCompact, isoDate, hostname } from '../lib/format.ts';
+import { syndicationMeta } from './card-utils.ts';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const detailUrl = `/posts/${entry.slug}`;
+const pubDate = entry.publishedAt ?? entry.createdAt;
+---
+
+<div class="note-card">
+  <header class="note-card__header">
+    {entry.author && (
+      <a href="/about" class="note-card__author p-author h-card" rel="author">
+        {entry.author.photo && (
+          <img
+            class="u-photo note-card__avatar"
+            src={entry.author.photo}
+            alt={entry.author.name}
+            width="36"
+            height="36"
+          />
+        )}
+        <span class="p-name note-card__name">{entry.author.name}</span>
+      </a>
+    )}
+    <a href={detailUrl} class="note-card__time u-url">
+      <time class="dt-published" datetime={isoDate(pubDate)}>
+        {formatDateCompact(pubDate)}
+      </time>
+    </a>
+  </header>
+  {entry.inReplyTo && (
+    <p class="note-card__reply-to">
+      <Icon name="lucide:corner-down-right" aria-hidden="true" />
+      <span class="text-secondary text-sm">in reply to </span>
+      <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">
+        {hostname(entry.inReplyTo)}
+      </a>
+    </p>
+  )}
+  {entry.content && <Markdown content={entry.content} class="e-content note-card__content" />}
+  {entry.attachments && entry.attachments.length > 0 && (
+    <PhotoCarousel
+      attachments={entry.attachments}
+      fallbackAlt={entry.summary ?? ''}
+      sizes="(min-width: 640px) 50vw, 100vw"
+      class="note-card__media"
+    />
+  )}
+  <footer class="note-card__footer">
+    <TagList tags={entry.tags} />
+    {entry.syndicationUrls && entry.syndicationUrls.length > 0 && (
+      <div class="note-card__syndication">
+        <span class="note-card__syndication-label">Also on</span>
+        {entry.syndicationUrls.map((url: string) => {
+          const { icon, label } = syndicationMeta(url);
+          return (
+            <a
+              href={url}
+              class="syndication-link u-syndication"
+              rel="syndication noopener"
+              target="_blank"
+              aria-label={`${label} (opens in new tab)`}
+            >
+              <Icon name={icon} aria-hidden="true" />
+              <span class="syndication-link__name">{label}</span>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </footer>
+</div>
+
+<style>
+  .note-card {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .note-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .note-card__author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+  }
+
+  .note-card__author:hover {
+    text-decoration: none;
+  }
+
+  .note-card__avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .note-card__name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  .note-card__time {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .note-card__time:hover {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .note-card__reply-to {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .note-card__reply-to svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .note-card__content {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-primary);
+    word-break: break-word;
+  }
+
+  .note-card__media {
+    border-radius: var(--radius-md);
+  }
+
+  .note-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .note-card__syndication {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .note-card__syndication-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+
+  .syndication-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0.2rem var(--space-2);
+    border-radius: var(--radius-md);
+    color: var(--color-text-tertiary);
+    background-color: var(--color-surface-2);
+    text-decoration: none;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    transition:
+      color var(--transition),
+      background-color var(--transition);
+  }
+
+  .syndication-link:hover {
+    color: var(--color-text-link);
+    background-color: var(--color-brand-muted);
+    text-decoration: none;
+  }
+
+  .syndication-link svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .syndication-link__name {
+    line-height: 1;
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import Page from '../layouts/Page.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { content } = Astro.locals.indiepub;
+const author = await content.getAuthor();
+---
+
+<Page title="About" narrow>
+  <article class="about-page h-card">
+    {author?.photo && (
+      <img
+        src={author.photo}
+        alt={author.name}
+        width="120"
+        height="120"
+        class="about-page__photo u-photo"
+      />
+    )}
+
+    <h1 class="about-page__name p-name">{author?.name ?? 'About'}</h1>
+
+    {author?.bio && (
+      <div class="about-page__bio p-note">
+        <p>{author.bio}</p>
+      </div>
+    )}
+
+    <a href="/subscribe" class="about-page__subscribe-btn">
+      Subscribe to my newsletter
+    </a>
+  </article>
+</Page>
+
+<style>
+  .about-page {
+    padding-block: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .about-page__photo {
+    width: 120px;
+    height: 120px;
+    aspect-ratio: 1;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+  }
+
+  .about-page__name {
+    font-size: var(--text-4xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.02em;
+  }
+
+  .about-page__bio {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .about-page__subscribe-btn {
+    display: inline-block;
+    padding: var(--space-3) var(--space-6);
+    background-color: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition);
+    align-self: flex-start;
+  }
+
+  .about-page__subscribe-btn:hover {
+    background-color: var(--color-accent-hover);
+    text-decoration: none;
+    color: var(--color-text-on-accent);
+  }
+</style>

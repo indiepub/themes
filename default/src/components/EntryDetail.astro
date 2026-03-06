@@ -1,0 +1,314 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Entry, InteractionCounts, WebMention } from '@indiepub/types';
+import Markdown from '@indiepub/astro/components/Markdown';
+import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel';
+import TagList from './TagList.astro';
+import HCard from './HCard.astro';
+import { formatDate, isoDate, hostname } from '../lib/format.ts';
+
+interface Props {
+  entry: Entry;
+  webmentions: WebMention[];
+  interactions: InteractionCounts;
+}
+
+const { entry, webmentions, interactions } = Astro.props;
+const pubDate = entry.publishedAt ?? entry.createdAt;
+const config = Astro.locals.indiepub?.config;
+
+const attachments = entry.attachments?.length
+  ? entry.attachments
+  : entry.photo
+    ? [{ id: '', url: entry.photo, contentType: 'image/*', displayOrder: 0 }]
+    : [];
+---
+
+<article class="entry-detail h-entry">
+  <header class="entry-detail__header">
+    {entry.name && (
+      <h1 class="p-name entry-detail__title">{entry.name}</h1>
+    )}
+    <div class="entry-detail__meta">
+      <a href={`/posts/${entry.slug}`} class="u-url entry-detail__permalink">
+        <time class="dt-published" datetime={isoDate(pubDate)}>
+          {formatDate(pubDate)}
+        </time>
+      </a>
+      {entry.updatedAt && entry.updatedAt > pubDate && (
+        <span class="entry-detail__updated text-sm text-secondary">
+          Updated <time class="dt-updated" datetime={isoDate(entry.updatedAt)}>{formatDate(entry.updatedAt)}</time>
+        </span>
+      )}
+    </div>
+
+    {entry.inReplyTo && (
+      <p class="entry-detail__reply-to">
+        <Icon name="lucide:corner-down-right" aria-hidden="true" />
+        <span>in reply to </span>
+        <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">{hostname(entry.inReplyTo)}</a>
+      </p>
+    )}
+  </header>
+
+  {attachments.length > 0 && (
+    <PhotoCarousel
+      attachments={attachments}
+      fallbackAlt={entry.summary ?? entry.name ?? ''}
+      sizes="(min-width: 768px) 65ch, 100vw"
+      class="entry-detail__media"
+    />
+  )}
+
+  {entry.content && (
+    <Markdown content={entry.content} class="e-content entry-detail__content prose" />
+  )}
+
+  <footer class="entry-detail__footer">
+    <TagList tags={entry.tags} />
+
+    {entry.syndicationUrls && entry.syndicationUrls.length > 0 && (
+      <div class="entry-detail__syndication">
+        <p class="text-sm text-secondary">Syndicated to:</p>
+        <ul>
+          {entry.syndicationUrls.map((url: string) => (
+            <li>
+              <a href={url} class="u-syndication" rel="syndication noopener" target="_blank">
+                {hostname(url)}
+                <Icon name="lucide:external-link" aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {(interactions.likes > 0 || interactions.comments > 0 || interactions.reposts > 0) && (
+      <div class="entry-detail__counts">
+        {interactions.likes > 0 && (
+          <span class="interaction-count">
+            <Icon name="lucide:heart" aria-hidden="true" />
+            {interactions.likes} {interactions.likes === 1 ? 'like' : 'likes'}
+          </span>
+        )}
+        {interactions.reposts > 0 && (
+          <span class="interaction-count">
+            <Icon name="lucide:repeat-2" aria-hidden="true" />
+            {interactions.reposts} {interactions.reposts === 1 ? 'repost' : 'reposts'}
+          </span>
+        )}
+        {interactions.comments > 0 && (
+          <span class="interaction-count">
+            <Icon name="lucide:message-square" aria-hidden="true" />
+            {interactions.comments} {interactions.comments === 1 ? 'comment' : 'comments'}
+          </span>
+        )}
+      </div>
+    )}
+
+    {entry.author && (
+      <div class="entry-detail__author">
+        <HCard author={entry.author} config={config} variant="compact" />
+      </div>
+    )}
+  </footer>
+</article>
+
+{webmentions.length > 0 && (
+  <section class="webmentions" aria-labelledby="webmentions-heading">
+    <h2 id="webmentions-heading" class="webmentions__heading">
+      Webmentions <span class="webmentions__count">({webmentions.length})</span>
+    </h2>
+    <ul class="webmentions__list">
+      {webmentions.map(wm => (
+        <li class="webmention">
+          {wm.authorPhoto && (
+            <img class="webmention__photo" src={wm.authorPhoto} alt={wm.authorName ?? ''} width="32" height="32" />
+          )}
+          <div class="webmention__body">
+            <a href={wm.authorUrl ?? wm.source} class="webmention__author" rel="noopener" target="_blank">
+              {wm.authorName ?? hostname(wm.source)}
+            </a>
+            {wm.content && (
+              <p class="webmention__content">{wm.content}</p>
+            )}
+            <a href={wm.source} class="webmention__source text-xs text-secondary" rel="noopener" target="_blank">
+              {hostname(wm.source)}
+            </a>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .entry-detail {
+    max-width: var(--max-width-content);
+  }
+
+  .entry-detail__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  .entry-detail__title {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    color: var(--color-text-primary);
+  }
+
+  .entry-detail__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .entry-detail__permalink {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .entry-detail__permalink:hover {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .entry-detail__reply-to {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .entry-detail__reply-to svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .entry-detail__media {
+    margin-bottom: var(--space-6);
+    border-radius: var(--radius-lg);
+  }
+
+  .entry-detail__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .entry-detail__syndication ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  .entry-detail__syndication a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .entry-detail__syndication svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .entry-detail__counts {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .interaction-count {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .interaction-count svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Webmentions */
+  .webmentions {
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .webmentions__heading {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-6);
+  }
+
+  .webmentions__count {
+    font-weight: var(--weight-normal);
+    color: var(--color-text-secondary);
+  }
+
+  .webmentions__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .webmention {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+
+  .webmention__photo {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .webmention__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .webmention__author {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .webmention__author:hover { color: var(--color-text-link); }
+
+  .webmention__content {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .webmention__source {
+    text-decoration: none;
+  }
+
+  .webmention__source:hover { color: var(--color-text-link) !important; }
+</style>

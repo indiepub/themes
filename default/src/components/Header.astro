@@ -1,0 +1,302 @@
+---
+import { Icon } from 'astro-icon/components';
+import ThemeToggle from './ThemeToggle.astro';
+import MobileNav from './MobileNav.astro';
+
+const config = Astro.locals.indiepub?.config;
+const siteTitle = config?.title ?? 'My Site';
+const currentPath = Astro.url.pathname;
+const member = Astro.locals.member ?? null;
+const isAdmin = Astro.locals.isAdmin ?? false;
+
+const nav = [
+  { href: '/notes',     label: 'Notes',     icon: 'lucide:message-circle' },
+  { href: '/articles',  label: 'Articles',  icon: 'lucide:file-text' },
+  { href: '/photos',    label: 'Photos',    icon: 'lucide:image' },
+  { href: '/bookmarks', label: 'Bookmarks', icon: 'lucide:bookmark' },
+];
+
+const authAction = isAdmin
+  ? 'admin' as const
+  : member
+    ? 'member' as const
+    : config?.subscriptions?.enabled
+      ? 'login' as const
+      : null;
+---
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="/" class="site-header__logo" aria-label={siteTitle}>
+      <span class="site-header__logo-text">{siteTitle}</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+      <ul class="site-nav__list">
+        {nav.map(({ href, label, icon }) => (
+          <li>
+            <a
+              href={href}
+              class="site-nav__link"
+              aria-current={currentPath.startsWith(href) ? 'page' : undefined}
+            >
+              <Icon name={icon} aria-hidden="true" />
+              <span>{label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <ThemeToggle />
+
+      {authAction === 'admin' && (
+        <a href="/admin" class="admin-link">
+          <Icon name="lucide:lock" aria-hidden="true" />
+          <span>Admin</span>
+        </a>
+      )}
+      {authAction === 'member' && member && (
+        <form method="post" action="/auth/logout" class="member-logout">
+          <span class="member-email" title={member.email}>{member.email}</span>
+          <button type="submit" class="member-logout-btn" aria-label="Log out">
+            <Icon name="lucide:log-out" aria-hidden="true" />
+          </button>
+        </form>
+      )}
+      {authAction === 'login' && (
+        <a href="/login" class="member-login-link">
+          <Icon name="lucide:user" aria-hidden="true" />
+          <span>Login</span>
+        </a>
+      )}
+
+      <button
+        class="site-header__menu-btn"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        aria-label="Toggle menu"
+      >
+        <Icon name="lucide:menu" aria-hidden="true" class="icon-menu" />
+        <Icon name="lucide:x"    aria-hidden="true" class="icon-close" />
+      </button>
+    </div>
+  </div>
+
+  <MobileNav nav={nav} currentPath={currentPath} />
+</header>
+
+<script>
+  const menuBtn = document.querySelector<HTMLButtonElement>('.site-header__menu-btn');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  menuBtn?.addEventListener('click', () => {
+    const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+    menuBtn.setAttribute('aria-expanded', String(!expanded));
+    if (mobileNav) mobileNav.setAttribute('aria-hidden', String(expanded));
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-surface-1);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .site-header__inner {
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    padding: 0 var(--space-4);
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .site-header__logo {
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .site-header__logo:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .site-nav {
+    flex: 1;
+  }
+
+  .site-nav__list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: var(--space-1);
+  }
+
+  .site-nav__list li {
+    display: flex;
+    align-items: center;
+  }
+
+  .site-nav__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .site-nav__link:hover,
+  .site-nav__link[aria-current="page"] {
+    background-color: var(--color-brand-muted);
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .site-nav__link svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-left: auto;
+  }
+
+  .site-header__menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .site-header__menu-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .icon-close { display: none; }
+
+  [aria-expanded="true"] .icon-menu  { display: none; }
+  [aria-expanded="true"] .icon-close { display: block; }
+
+  .member-logout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .member-email {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .member-logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .member-logout-btn:hover {
+    background-color: var(--color-brand-muted);
+    color: var(--color-text-link);
+  }
+
+  .member-logout-btn svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .admin-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-link);
+    background-color: var(--color-brand-muted);
+    text-decoration: none;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .admin-link:hover {
+    background-color: var(--color-brand-muted);
+    opacity: 0.8;
+    text-decoration: none;
+  }
+
+  .admin-link svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .member-login-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .member-login-link:hover {
+    background-color: var(--color-brand-muted);
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .member-login-link svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 639px) {
+    .site-nav { display: none; }
+    .site-header__menu-btn { display: flex; }
+    .member-email { display: none; }
+  }
+</style>

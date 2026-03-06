@@ -1,0 +1,143 @@
+---
+import Page from '../layouts/Page.astro';
+import HCard from '../components/HCard.astro';
+import EntryCard from '../components/EntryCard.astro';
+import FeedLinks from '../components/FeedLinks.astro';
+import NoteComposer from '../components/NoteComposer.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { content, config } = Astro.locals.indiepub;
+
+const memberTier = Astro.locals.member?.tier ?? null;
+const [author, recentArticles, recentNotes] = await Promise.all([
+  content.getAuthor(),
+  content.getEntries('article', { memberTier, limit: 5 }),
+  content.getEntries('note', { memberTier, limit: 10 }),
+]);
+
+Astro.response.headers.set(
+  'Cache-Control',
+  Astro.locals.isAdmin ? 'no-store' : 'public, s-maxage=60, stale-while-revalidate=3600',
+);
+---
+
+<Page hideSidebar>
+  <div class="landing">
+
+    <section class="landing__hero">
+      <HCard author={author} config={config} variant="hero" />
+    </section>
+
+    <NoteComposer />
+
+    <div class="landing__grid">
+      <div class="landing__primary">
+        {recentArticles.length > 0 && (
+          <section class="landing__section" aria-labelledby="articles-heading">
+            <div class="landing__section-header">
+              <h2 id="articles-heading">Writing</h2>
+              <a href="/articles" class="landing__see-all">All articles →</a>
+            </div>
+            <div class="entry-list">
+              {recentArticles.map(entry => (
+                <EntryCard entry={entry} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      <div class="landing__secondary">
+        {recentNotes.length > 0 && (
+          <section class="landing__section" aria-labelledby="notes-heading">
+            <div class="landing__section-header">
+              <h2 id="notes-heading">Notes</h2>
+              <a href="/notes" class="landing__see-all">All notes →</a>
+            </div>
+            <div class="entry-list entry-list--notes">
+              {recentNotes.map(entry => (
+                <EntryCard entry={entry} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section class="landing__section landing__subscribe" aria-labelledby="subscribe-heading">
+          <h2 id="subscribe-heading">Follow</h2>
+          <p class="text-sm text-secondary">Stay up to date with new posts via your feed reader.</p>
+          <FeedLinks />
+        </section>
+      </div>
+    </div>
+
+  </div>
+</Page>
+
+<style>
+  .landing {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .landing__hero {
+    padding: var(--space-8) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .landing__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .landing__grid {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+  }
+
+  .landing__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .landing__section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .landing__section-header h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+  }
+
+  .landing__see-all {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .landing__secondary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .landing__subscribe {
+    gap: var(--space-3);
+  }
+
+  .entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+</style>
