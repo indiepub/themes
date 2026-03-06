@@ -1,0 +1,47 @@
+---
+import Page from '../../layouts/Page.astro';
+import EntryCard from '../../components/EntryCard.astro';
+import NoteComposer from '../../components/NoteComposer.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const memberTier = Astro.locals.member?.tier ?? null;
+const photos = await Astro.locals.indiepub.content.getEntries('photo', { memberTier, limit: 30 });
+
+Astro.response.headers.set(
+  'Cache-Control',
+  Astro.locals.isAdmin ? 'no-store' : 'public, s-maxage=60, stale-while-revalidate=3600',
+);
+---
+
+<Page title="Photos">
+  <div class="page-header">
+    <h1>Photos</h1>
+  </div>
+
+  <NoteComposer defaultType="photo" lockedType />
+
+  {photos.length > 0 ? (
+    <div class="h-feed photo-grid" aria-label="Photos feed">
+      {photos.map(entry => (
+        <EntryCard entry={entry} />
+      ))}
+    </div>
+  ) : (
+    <p class="text-secondary">No photos yet.</p>
+  )}
+</Page>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+  }
+</style>

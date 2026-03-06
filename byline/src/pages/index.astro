@@ -1,0 +1,240 @@
+---
+import Page from '../layouts/Page.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { content, config } = Astro.locals.indiepub;
+
+const memberTier = Astro.locals.member?.tier ?? null;
+const [author, articles] = await Promise.all([
+  content.getAuthor(),
+  content.getEntries('article', { memberTier, limit: 6 }),
+]);
+
+const pubName = config.title ?? 'My Publication';
+
+Astro.response.headers.set(
+  'Cache-Control',
+  Astro.locals.isAdmin ? 'no-store' : 'public, s-maxage=60, stale-while-revalidate=3600',
+);
+
+function formatDate(d: Date | undefined) {
+  if (!d) return '';
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+interface ArticleRow {
+  slug: string;
+  title: string;
+  summary: string | null | undefined;
+  date: string;
+  isoDate: string | undefined;
+}
+
+const articleRows: ArticleRow[] = articles.map(entry => ({
+  slug: entry.slug,
+  title: entry.name ?? 'Untitled',
+  summary: entry.summary,
+  date: formatDate(entry.publishedAt),
+  isoDate: entry.publishedAt?.toISOString(),
+}));
+---
+
+<Page>
+  <!-- Publication masthead -->
+  <section class="pub-header">
+    <h1>{pubName}</h1>
+    {author?.bio && <p>{author.bio}</p>}
+    <a href="/subscribe">
+      Subscribe — it's free
+    </a>
+  </section>
+
+  <hr />
+
+  <!-- Chronicle — recent articles -->
+  {articleRows.length > 0 ? (
+    <section class="chronicle" aria-label="Recent articles">
+      <ol>
+        {articleRows.map(row => (
+          <li>
+            <article>
+              <div class="meta">
+                {row.isoDate && (
+                  <time datetime={row.isoDate}>{row.date}</time>
+                )}
+              </div>
+              <div class="body">
+                <h2>
+                  <a href={`/posts/${row.slug}`}>
+                    {row.title}
+                  </a>
+                </h2>
+                {row.summary && (
+                  <p>{row.summary}</p>
+                )}
+                <a href={`/posts/${row.slug}`} class="read-more" aria-hidden="true" tabindex="-1">
+                  Read &rarr;
+                </a>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ol>
+      <div class="footer">
+        <a href="/articles">All articles &rarr;</a>
+      </div>
+    </section>
+  ) : (
+    <p class="text-secondary">No articles yet.</p>
+  )}
+</Page>
+
+<style>
+  /* ── Publication header ── */
+  .pub-header {
+    padding: var(--space-16) 0 var(--space-12);
+    text-align: center;
+    max-width: var(--max-width-prose);
+    margin-inline: auto;
+  }
+
+  .pub-header h1 {
+    font-size: clamp(var(--text-4xl), 6vw, var(--text-5xl));
+    font-weight: var(--weight-bold);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-5);
+  }
+
+  .pub-header p {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-8);
+  }
+
+  .pub-header a {
+    display: inline-block;
+    padding: var(--space-3) var(--space-8);
+    background-color: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition);
+  }
+
+  .pub-header a:hover {
+    background-color: var(--color-accent-hover);
+    text-decoration: none;
+    color: var(--color-text-on-accent);
+  }
+
+  /* ── Chronicle list ── */
+  .chronicle ol {
+    list-style: none;
+    padding: 0;
+  }
+
+  .chronicle li {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .chronicle article {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    padding: var(--space-8) 0;
+  }
+
+  @media (min-width: 640px) {
+    .chronicle article {
+      grid-template-columns: 12ch 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+  }
+
+  .meta {
+    padding-top: 0.4em;
+  }
+
+  .meta time {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    font-family: var(--font-sans);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 640px) {
+    .meta time {
+      text-align: right;
+      display: block;
+    }
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .body h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+  }
+
+  .body h2 a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .body h2 a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .body p {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .read-more {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-link);
+    text-decoration: none;
+    transition: color var(--transition);
+    align-self: flex-start;
+  }
+
+  .read-more:hover {
+    color: var(--color-text-link-hover);
+    text-decoration: none;
+  }
+
+  .footer {
+    padding: var(--space-6) 0;
+    text-align: right;
+  }
+
+  .footer a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .footer a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+</style>

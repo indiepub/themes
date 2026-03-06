@@ -1,0 +1,51 @@
+---
+import Page from '../../layouts/Page.astro';
+import EntryCard from '../../components/EntryCard.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { tag } = Astro.params;
+if (!tag) return new Response('Not found', { status: 404 });
+
+const decodedTag = decodeURIComponent(tag);
+const memberTier = Astro.locals.member?.tier ?? null;
+const entries = await Astro.locals.indiepub.content.getEntries(undefined, {
+  tag: decodedTag,
+  memberTier,
+  limit: 50,
+});
+
+if (entries.length === 0) return new Response('Not found', { status: 404 });
+
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+---
+
+<Page title={`#${decodedTag}`}>
+  <div class="page-header">
+    <h1>#{decodedTag}</h1>
+    <p class="text-secondary">{entries.length} {entries.length === 1 ? 'post' : 'posts'}</p>
+  </div>
+
+  <div class="h-feed entry-feed" aria-label={`Posts tagged ${decodedTag}`}>
+    {entries.map(entry => (
+      <EntryCard entry={entry} />
+    ))}
+  </div>
+</Page>
+
+<style>
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+
+  .entry-feed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+</style>

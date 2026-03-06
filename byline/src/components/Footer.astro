@@ -1,0 +1,125 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const config = Astro.locals.indiepub?.config;
+const siteTitle = config?.title ?? 'My Publication';
+
+const author = Astro.locals.indiepub
+  ? await Astro.locals.indiepub.content.getAuthor()
+  : null;
+
+const socialLinks = author?.socialLinks ?? [];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <span class="site-footer__title font-serif">{siteTitle}</span>
+    </div>
+
+    <nav class="site-footer__nav" aria-label="Footer navigation">
+      <a href="/archive" class="footer-link">Archive</a>
+      <a href="/about"   class="footer-link">About</a>
+      <a href="/subscribe" class="footer-link">Subscribe</a>
+    </nav>
+
+    {socialLinks.length > 0 && (
+      <nav class="site-footer__social" aria-label="Social links">
+        {socialLinks.map(link => (
+          <a
+            href={link.url}
+            rel="me noopener"
+            target="_blank"
+            aria-label={link.label}
+            class="social-link"
+          >
+            <Icon name={`simple-icons:${link.icon}`} aria-hidden="true" width="16" height="16" />
+          </a>
+        ))}
+      </nav>
+    )}
+
+    <p class="site-footer__credit text-xs text-secondary">
+      &copy; {year} {author?.name ?? siteTitle} &middot;
+      Powered by <a href="https://indiepub.dev" class="footer-link" target="_blank" rel="noopener">IndiePub</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-alt);
+    padding: var(--space-12) var(--space-6);
+    margin-top: var(--space-16);
+  }
+
+  .site-footer__inner {
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    text-align: center;
+  }
+
+  .site-footer__title {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    color: var(--color-text-primary);
+  }
+
+  .site-footer__nav {
+    display: flex;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .footer-link {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .footer-link:hover {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .site-footer__social {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-text-tertiary);
+    transition: color var(--transition);
+  }
+
+  .social-link:hover {
+    color: var(--color-text-secondary);
+  }
+
+  .site-footer__credit {
+    color: var(--color-text-tertiary);
+  }
+
+  .site-footer__credit a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .site-footer__credit a:hover {
+    color: var(--color-text-secondary);
+  }
+</style>

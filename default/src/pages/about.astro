@@ -1,0 +1,113 @@
+---
+import Page from '../layouts/Page.astro';
+import HCard from '../components/HCard.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { content, config } = Astro.locals.indiepub;
+const author = await content.getAuthor();
+
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+---
+
+<Page title="About">
+  <article class="about-page">
+    <HCard author={author} config={config} variant="hero" />
+
+    <div class="about-page__body">
+      {author.bio && (
+        <section aria-labelledby="bio-heading">
+          <h2 id="bio-heading">About</h2>
+          <p>{author.bio}</p>
+        </section>
+      )}
+
+      <section aria-labelledby="elsewhere-heading">
+        <h2 id="elsewhere-heading">Elsewhere</h2>
+        <ul class="about-page__links">
+          {author.url && (
+            <li>
+              <a href={author.url} class="u-url" rel="me noopener" target="_blank">
+                {new URL(author.url).hostname}
+              </a>
+            </li>
+          )}
+          {config?.syndication?.bluesky && (
+            <li>
+              <a
+                href={`https://bsky.app/profile/${config.syndication.bluesky.handle}`}
+                class="u-url"
+                rel="me noopener"
+                target="_blank"
+              >
+                Bluesky — @{config.syndication.bluesky.handle}
+              </a>
+            </li>
+          )}
+          {config?.syndication?.mastodon && (
+            <li>
+              <a
+                href={`https://${config.syndication.mastodon.instance}/@${config.syndication.mastodon.handle}`}
+                class="u-url"
+                rel="me noopener"
+                target="_blank"
+              >
+                Mastodon — @{config.syndication.mastodon.handle}@{config.syndication.mastodon.instance}
+              </a>
+            </li>
+          )}
+        </ul>
+      </section>
+
+      <section aria-labelledby="site-heading">
+        <h2 id="site-heading">This site</h2>
+        <p>
+          Built with <a href="https://indiepub.dev">IndiePub</a> and hosted on Cloudflare.
+          Posts are available via <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a>,
+          and <a href="/feed.json">JSON Feed</a>.
+          <a href="https://en.wikipedia.org/wiki/Webmention">Webmentions</a> are supported.
+        </p>
+      </section>
+    </div>
+  </article>
+</Page>
+
+<style>
+  .about-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    max-width: var(--max-width-content);
+  }
+
+  .about-page__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .about-page__body h2 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+  }
+
+  .about-page__body p {
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .about-page__links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .about-page__links a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+</style>

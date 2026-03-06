@@ -1,0 +1,249 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const config = Astro.locals.indiepub?.config;
+const siteTitle = config?.title ?? 'My Publication';
+const isAdmin = Astro.locals.isAdmin ?? false;
+
+const currentPath = Astro.url.pathname;
+const isActive = (path: string) => currentPath === path || currentPath.startsWith(path + '/');
+---
+
+<header>
+  <div class="inner">
+    <!-- Masthead -->
+    <div class="brand">
+      <a href="/" aria-label="Go to homepage">
+        {siteTitle}
+      </a>
+    </div>
+
+    <!-- Primary nav -->
+    <nav aria-label="Primary navigation">
+      <a href="/articles" aria-current={isActive('/articles') ? 'page' : undefined}>
+        Articles
+      </a>
+      <a href="/notes" aria-current={isActive('/notes') ? 'page' : undefined}>
+        Notes
+      </a>
+      <a href="/about" aria-current={isActive('/about') ? 'page' : undefined}>
+        About
+      </a>
+      {isAdmin && (
+        <a href="/write" class="admin" aria-label="Write" aria-current={isActive('/write') ? 'page' : undefined}>
+          <Icon name="lucide:pencil" aria-hidden="true" width="16" height="16" />
+          <span class="sr-only">Write</span>
+        </a>
+      )}
+      {isAdmin && (
+        <a href="/admin" class="admin" aria-label="Admin settings" aria-current={isActive('/admin') ? 'page' : undefined}>
+          <Icon name="lucide:settings" aria-hidden="true" width="16" height="16" />
+          <span class="sr-only">Admin</span>
+        </a>
+      )}
+    </nav>
+
+    <!-- Subscribe CTA -->
+    <a href="/subscribe" class="subscribe-btn">
+      Subscribe
+    </a>
+
+    <!-- Mobile menu toggle -->
+    <button aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+      <Icon name="lucide:menu" aria-hidden="true" width="20" height="20" />
+    </button>
+  </div>
+
+  <!-- Mobile nav (hidden by default) -->
+  <nav id="mobile-nav" aria-label="Mobile navigation" hidden>
+    <a href="/articles">Articles</a>
+    <a href="/notes">Notes</a>
+    <a href="/about">About</a>
+    <a href="/subscribe" class="cta">Subscribe</a>
+    {isAdmin && <a href="/write">Write</a>}
+    {isAdmin && <a href="/admin">Admin settings</a>}
+  </nav>
+</header>
+
+<script is:inline>
+  (function () {
+    var toggle = document.querySelector('header button[aria-controls="mobile-nav"]');
+    var nav = document.getElementById('mobile-nav');
+    if (!toggle || !nav) return;
+    toggle.addEventListener('click', function () {
+      var open = nav.hasAttribute('hidden');
+      if (open) {
+        nav.removeAttribute('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-label', 'Close menu');
+      } else {
+        nav.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open menu');
+      }
+    });
+  })();
+</script>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .inner {
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    padding: var(--space-4) var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .brand {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .brand a {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+
+  .brand a:hover {
+    text-decoration: none;
+    color: var(--color-text-primary);
+  }
+
+  nav:not(#mobile-nav) {
+    display: none;
+    align-items: center;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 640px) {
+    nav:not(#mobile-nav) {
+      display: flex;
+    }
+  }
+
+  nav:not(#mobile-nav) a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  nav:not(#mobile-nav) a:hover,
+  nav:not(#mobile-nav) a[aria-current] {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  nav:not(#mobile-nav) a.admin {
+    color: var(--color-text-tertiary);
+  }
+
+  .subscribe-btn {
+    display: none;
+    padding: var(--space-2) var(--space-5);
+    background-color: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .subscribe-btn:hover {
+    background-color: var(--color-accent-hover);
+    text-decoration: none;
+    color: var(--color-text-on-accent);
+  }
+
+  @media (min-width: 480px) {
+    .subscribe-btn {
+      display: inline-block;
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: color var(--transition);
+    margin-left: auto;
+  }
+
+  button:hover {
+    color: var(--color-text-primary);
+  }
+
+  @media (min-width: 640px) {
+    button {
+      display: none;
+    }
+  }
+
+  #mobile-nav {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-4) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  #mobile-nav[hidden] {
+    display: none;
+  }
+
+  #mobile-nav a {
+    display: block;
+    padding: var(--space-3) var(--space-2);
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    transition: color var(--transition);
+  }
+
+  #mobile-nav a:last-child {
+    border-bottom: none;
+  }
+
+  #mobile-nav a:hover {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  #mobile-nav a.cta {
+    font-weight: var(--weight-semibold);
+    color: var(--color-accent);
+  }
+
+  #mobile-nav a.cta:hover {
+    color: var(--color-accent-hover);
+  }
+</style>

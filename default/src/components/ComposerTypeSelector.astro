@@ -1,0 +1,38 @@
+---
+interface TypeOption {
+  value: string;
+  icon: string;
+  label: string;
+  extraField: string;
+}
+
+interface Props {
+  types: TypeOption[];
+  currentType: TypeOption;
+}
+
+const { types, currentType } = Astro.props;
+---
+
+<div class="composer__type-selector" id="type-selector">
+  <button type="button" class="composer__type-btn" id="type-toggle" aria-haspopup="listbox" aria-expanded="false">
+    <span id="type-icon">{currentType.icon}</span>
+    <span id="type-label">{currentType.label}</span>
+    <span class="composer__chevron">▾</span>
+  </button>
+  <div class="composer__type-dropdown" id="type-dropdown" role="listbox" hidden>
+    {types.map(t => (
+      <button
+        type="button"
+        class="composer__type-option"
+        role="option"
+        data-value={t.value}
+        data-icon={t.icon}
+        data-label={t.label}
+        data-extra={t.extraField}
+      >
+        {t.icon} {t.label}
+      </button>
+    ))}
+  </div>
+</div>

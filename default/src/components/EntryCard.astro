@@ -1,0 +1,38 @@
+---
+import type { Entry } from '@indiepub/types';
+import NoteCard from './NoteCard.astro';
+import ArticleCard from './ArticleCard.astro';
+import PhotoCard from './PhotoCard.astro';
+import BookmarkCard from './BookmarkCard.astro';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+---
+
+<article
+  class:list={['entry-card', `entry-card--${entry.type}`]}
+  itemscope
+  itemtype="http://schema.org/BlogPosting"
+>
+  {entry.type === 'article' ? (
+    <ArticleCard entry={entry} />
+  ) : entry.type === 'photo' && (entry.attachments?.length ?? 0) > 0 ? (
+    <PhotoCard entry={entry} />
+  ) : entry.type === 'bookmark' && entry.bookmarkOf ? (
+    <BookmarkCard entry={entry} />
+  ) : (
+    <NoteCard entry={entry} />
+  )}
+</article>
+
+<style>
+  .entry-card {
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+</style>

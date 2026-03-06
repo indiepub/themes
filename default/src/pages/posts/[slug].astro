@@ -1,0 +1,125 @@
+---
+import Page from '../../layouts/Page.astro';
+import EntryDetail from '../../components/EntryDetail.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { slug } = Astro.params;
+if (!slug) return new Response('Not found', { status: 404 });
+
+const { content } = Astro.locals.indiepub;
+
+const entry = await content.getEntry(slug);
+if (!entry) return new Response('Not found', { status: 404 });
+
+// Private entries are never accessible via the web
+if (entry.visibility === 'private') return new Response('Not found', { status: 404 });
+
+// Members-only entries require an active session
+if (entry.visibility === 'members' && !Astro.locals.member) {
+  return Response.redirect(new URL(`/login?next=${encodeURIComponent(Astro.url.pathname)}`, Astro.request.url), 302);
+}
+
+// Paid entries require a paid member session
+let isPaidLocked = false;
+if (entry.visibility === 'paid') {
+  if (!Astro.locals.member) {
+    return Response.redirect(new URL(`/login?next=${encodeURIComponent(Astro.url.pathname)}`, Astro.request.url), 302);
+  }
+  if (Astro.locals.member.tier !== 'paid') {
+    isPaidLocked = true;
+  }
+}
+
+const [webmentions, interactions] = await Promise.all([
+  content.getWebmentions(entry.id),
+  content.getInteractionCounts(entry.id),
+]);
+
+const pageTitle = entry.name ?? (entry.content ? entry.content.replace(/<[^>]*>/g, '').slice(0, 60) : 'Post');
+const pageDescription = entry.summary ?? undefined;
+const ogImage = `/og/${entry.slug}`;
+
+// Light cache — entries are SSR but public content can be cached briefly
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=300');
+
+const typeLabels: Record<string, string> = {
+  note: 'Notes',
+  article: 'Articles',
+  photo: 'Photos',
+  bookmark: 'Bookmarks',
+};
+const backLabel = typeLabels[entry.type] ?? 'Back';
+---
+
+<Page title={pageTitle} description={pageDescription} ogImage={ogImage} hideSidebar>
+  <nav class="back-nav">
+    <a href={`/${entry.type}s`} class="back-link">← {backLabel}</a>
+  </nav>
+
+  {isPaidLocked ? (
+    <article class="paywall">
+      {entry.name && <h1>{entry.name}</h1>}
+      {entry.summary && <p class="paywall-summary">{entry.summary}</p>}
+      <div class="paywall-cta">
+        <p>This post is for paid subscribers only.</p>
+        <a href="/stripe/checkout" class="paywall-btn">Subscribe to unlock</a>
+      </div>
+    </article>
+  ) : (
+    <EntryDetail
+      entry={entry}
+      webmentions={webmentions}
+      interactions={interactions}
+    />
+  )}
+</Page>
+
+<style>
+  .back-nav {
+    margin-bottom: var(--space-6);
+  }
+
+  .back-link {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .back-link:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .paywall-summary {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  .paywall-cta {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    background: var(--color-surface);
+  }
+
+  .paywall-cta p {
+    margin: 0 0 var(--space-4);
+    color: var(--color-text-secondary);
+  }
+
+  .paywall-btn {
+    display: inline-block;
+    padding: var(--space-2) var(--space-6);
+    background: var(--color-accent);
+    color: var(--color-on-accent, #fff);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: var(--weight-medium);
+  }
+</style>

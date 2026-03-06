@@ -1,0 +1,679 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Entry, InteractionCounts, WebMention } from '@indiepub/types';
+import Markdown from '@indiepub/astro/components/Markdown';
+import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel';
+import { formatDate, isoDate, hostname } from '../lib/format.ts';
+
+interface Props {
+  entry: Entry;
+  webmentions: WebMention[];
+  counts: InteractionCounts;
+}
+
+const { entry, webmentions, counts } = Astro.props;
+const pubDate = entry.publishedAt ?? entry.createdAt;
+const detailUrl = `/posts/${entry.slug}`;
+
+// Partition webmentions by type
+const likes    = webmentions.filter(wm => wm.type === 'like');
+const reposts  = webmentions.filter(wm => wm.type === 'repost');
+const replies  = webmentions.filter(wm => wm.type === 'reply' || wm.type === 'mention');
+
+const isArticle = entry.type === 'article';
+
+// Back link destination
+const backHref =
+  entry.type === 'note'     ? '/notes'     :
+  entry.type === 'article'  ? '/articles'  :
+  entry.type === 'photo'    ? '/photos'    :
+  entry.type === 'bookmark' ? '/bookmarks' : '/';
+const backLabel =
+  entry.type === 'note'     ? 'Notes'     :
+  entry.type === 'article'  ? 'Articles'  :
+  entry.type === 'photo'    ? 'Photos'    :
+  entry.type === 'bookmark' ? 'Bookmarks' : 'Feed';
+---
+
+<article class="post-detail h-entry">
+  <nav class="post-detail__back">
+    <a href={backHref} class="back-link">← {backLabel}</a>
+  </nav>
+
+  {/* ── Article prose layout ────────────────────────────── */}
+  {isArticle && (
+    <div class="post-detail__article">
+      {entry.name && (
+        <h1 class="p-name post-detail__title">{entry.name}</h1>
+      )}
+      <div class="post-detail__byline">
+        <a href={detailUrl} class="u-url post-detail__permalink">
+          <time class="dt-published" datetime={isoDate(pubDate)}>
+            {formatDate(pubDate)}
+          </time>
+        </a>
+        {entry.updatedAt && entry.updatedAt > pubDate && (
+          <span class="post-detail__updated text-sm text-secondary">
+            Updated <time class="dt-updated" datetime={isoDate(entry.updatedAt)}>
+              {formatDate(entry.updatedAt)}
+            </time>
+          </span>
+        )}
+      </div>
+      {entry.summary && (
+        <p class="p-summary post-detail__lead">{entry.summary}</p>
+      )}
+      {entry.content && (
+        <Markdown content={entry.content} class="e-content post-detail__prose prose" />
+      )}
+    </div>
+  )}
+
+  {/* ── Non-article: enlarged card layout ───────────────── */}
+  {!isArticle && (
+    <div class="post-detail__card">
+      {entry.inReplyTo && (
+        <p class="reply-to">
+          <Icon name="lucide:corner-down-right" aria-hidden="true" />
+          <span class="text-secondary text-sm">in reply to </span>
+          <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">
+            {hostname(entry.inReplyTo)}
+          </a>
+        </p>
+      )}
+
+      {(entry.attachments && entry.attachments.length > 0) ? (
+        <PhotoCarousel
+          attachments={entry.attachments}
+          fallbackAlt={entry.summary ?? entry.name ?? ''}
+          sizes="(min-width: 768px) 600px, 100vw"
+          class="post-detail__media"
+        />
+      ) : entry.photo ? (
+        <PhotoCarousel
+          attachments={[{ id: '', url: entry.photo, contentType: 'image/*', displayOrder: 0 }]}
+          fallbackAlt={entry.summary ?? entry.name ?? ''}
+          sizes="(min-width: 768px) 600px, 100vw"
+          class="post-detail__media"
+        />
+      ) : null}
+
+      {entry.name && (
+        <h1 class="p-name post-detail__name">{entry.name}</h1>
+      )}
+
+      {entry.content && (
+        <Markdown content={entry.content} class="e-content post-detail__content" />
+      )}
+
+      {/* Like target */}
+      {entry.likeOf && (
+        <blockquote class="interaction-target">
+          <span class="text-secondary text-sm">liked </span>
+          <a href={entry.likeOf} class="u-like-of" rel="noopener" target="_blank">
+            {hostname(entry.likeOf)}
+          </a>
+        </blockquote>
+      )}
+
+      {/* Repost target */}
+      {entry.repostOf && (
+        <blockquote class="interaction-target">
+          <span class="text-secondary text-sm">reposted </span>
+          <a href={entry.repostOf} class="u-repost-of" rel="noopener" target="_blank">
+            {hostname(entry.repostOf)}
+          </a>
+        </blockquote>
+      )}
+
+      {/* Bookmark target */}
+      {entry.bookmarkOf && (
+        <p class="bookmark-of">
+          <Icon name="lucide:bookmark" aria-hidden="true" />
+          <a href={entry.bookmarkOf} class="u-bookmark-of" rel="noopener" target="_blank">
+            {entry.name ?? hostname(entry.bookmarkOf)}
+            <Icon name="lucide:external-link" aria-hidden="true" />
+          </a>
+        </p>
+      )}
+
+      <div class="post-detail__byline">
+        <a href={detailUrl} class="u-url post-detail__permalink">
+          <time class="dt-published" datetime={isoDate(pubDate)}>
+            {formatDate(pubDate)}
+          </time>
+        </a>
+      </div>
+    </div>
+  )}
+
+  <!-- Tags + syndication + counts footer -->
+  <footer class="post-detail__footer">
+    {entry.tags && entry.tags.length > 0 && (
+      <ul class="tag-list" aria-label="Tags">
+        {entry.tags.map((tag: string) => (
+          <li>
+            <a href={`/tags/${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {entry.syndicationUrls && entry.syndicationUrls.length > 0 && (
+      <div class="syndication-list">
+        <p class="syndication-list__label text-xs text-secondary">Syndicated to</p>
+        <ul>
+          {entry.syndicationUrls.map((url: string) => (
+            <li>
+              <a href={url} class="syndication-link u-syndication" rel="syndication noopener" target="_blank">
+                <Icon name="lucide:external-link" aria-hidden="true" />
+                {hostname(url)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {(counts.likes > 0 || counts.reposts > 0 || counts.comments > 0) && (
+      <div class="interaction-bar">
+        {counts.likes > 0 && (
+          <span class="interaction-count">
+            <Icon name="lucide:heart" aria-hidden="true" />
+            {counts.likes} {counts.likes === 1 ? 'like' : 'likes'}
+          </span>
+        )}
+        {counts.reposts > 0 && (
+          <span class="interaction-count">
+            <Icon name="lucide:repeat-2" aria-hidden="true" />
+            {counts.reposts} {counts.reposts === 1 ? 'repost' : 'reposts'}
+          </span>
+        )}
+        {counts.comments > 0 && (
+          <span class="interaction-count">
+            <Icon name="lucide:message-square" aria-hidden="true" />
+            {counts.comments} {counts.comments === 1 ? 'comment' : 'comments'}
+          </span>
+        )}
+      </div>
+    )}
+  </footer>
+</article>
+
+{/* ── Webmentions ─────────────────────────────────────────── */}
+{webmentions.length > 0 && (
+  <section class="webmentions" aria-labelledby="webmentions-heading">
+    <h2 id="webmentions-heading" class="webmentions__heading">
+      Webmentions <span class="webmentions__count">({webmentions.length})</span>
+    </h2>
+
+    {/* Like pile */}
+    {likes.length > 0 && (
+      <div class="wm-pile" aria-label={`${likes.length} ${likes.length === 1 ? 'like' : 'likes'}`}>
+        <p class="wm-pile__label text-sm text-secondary">
+          <Icon name="lucide:heart" aria-hidden="true" />
+          {likes.length} {likes.length === 1 ? 'like' : 'likes'}
+        </p>
+        <div class="wm-pile__avatars">
+          {likes.slice(0, 12).map(wm => (
+            wm.authorPhoto ? (
+              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}>
+                <img
+                  class="wm-pile__avatar"
+                  src={wm.authorPhoto}
+                  alt={wm.authorName ?? ''}
+                  width="32"
+                  height="32"
+                />
+              </a>
+            ) : (
+              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}
+                 class="wm-pile__avatar wm-pile__avatar--placeholder"
+                 aria-label={wm.authorName ?? hostname(wm.source)}
+              >
+                <Icon name="lucide:user" aria-hidden="true" />
+              </a>
+            )
+          ))}
+          {likes.length > 12 && (
+            <span class="wm-pile__overflow">+{likes.length - 12}</span>
+          )}
+        </div>
+      </div>
+    )}
+
+    {/* Repost pile */}
+    {reposts.length > 0 && (
+      <div class="wm-pile" aria-label={`${reposts.length} ${reposts.length === 1 ? 'repost' : 'reposts'}`}>
+        <p class="wm-pile__label text-sm text-secondary">
+          <Icon name="lucide:repeat-2" aria-hidden="true" />
+          {reposts.length} {reposts.length === 1 ? 'repost' : 'reposts'}
+        </p>
+        <div class="wm-pile__avatars">
+          {reposts.slice(0, 12).map(wm => (
+            wm.authorPhoto ? (
+              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}>
+                <img
+                  class="wm-pile__avatar"
+                  src={wm.authorPhoto}
+                  alt={wm.authorName ?? ''}
+                  width="32"
+                  height="32"
+                />
+              </a>
+            ) : (
+              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}
+                 class="wm-pile__avatar wm-pile__avatar--placeholder"
+                 aria-label={wm.authorName ?? hostname(wm.source)}
+              >
+                <Icon name="lucide:user" aria-hidden="true" />
+              </a>
+            )
+          ))}
+          {reposts.length > 12 && (
+            <span class="wm-pile__overflow">+{reposts.length - 12}</span>
+          )}
+        </div>
+      </div>
+    )}
+
+    {/* Replies */}
+    {replies.length > 0 && (
+      <div class="wm-replies" aria-label="Replies">
+        <p class="wm-replies__label text-sm text-secondary">
+          <Icon name="lucide:message-square" aria-hidden="true" />
+          {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+        </p>
+        <ul class="wm-replies__list">
+          {replies.map(wm => (
+            <li class="wm-reply">
+              {wm.authorPhoto && (
+                <img class="wm-reply__photo" src={wm.authorPhoto} alt={wm.authorName ?? ''} width="36" height="36" />
+              )}
+              <div class="wm-reply__body">
+                <a href={wm.authorUrl ?? wm.source} class="wm-reply__author" rel="noopener" target="_blank">
+                  {wm.authorName ?? hostname(wm.source)}
+                </a>
+                {wm.content && (
+                  <p class="wm-reply__content text-sm">{wm.content}</p>
+                )}
+                <a href={wm.source} class="wm-reply__source text-xs text-secondary" rel="noopener" target="_blank">
+                  {hostname(wm.source)}
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </section>
+)}
+
+<style>
+  /* ── Back nav ───────────────────────────────────────────── */
+  .post-detail__back {
+    margin-bottom: var(--space-6);
+  }
+
+  .back-link {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .back-link:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  /* ── Article layout ─────────────────────────────────────── */
+  .post-detail__article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  .post-detail__title {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .post-detail__byline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .post-detail__permalink {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .post-detail__permalink:hover {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .post-detail__lead {
+    font-size: var(--text-lg);
+    font-style: italic;
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* ── Non-article card layout ────────────────────────────── */
+  .post-detail__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    padding: var(--space-5);
+  }
+
+  .post-detail__name {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  .post-detail__media {
+    margin: calc(var(--space-5) * -1);
+    margin-bottom: 0;
+    border-radius: 0;
+    max-height: 480px;
+    object-fit: cover;
+  }
+
+  /* Reply to / interaction targets */
+  .reply-to {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .reply-to svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .interaction-target {
+    border-left: 3px solid var(--color-border-strong);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background-color: var(--color-surface-2);
+    font-style: normal;
+  }
+
+  .bookmark-of {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .bookmark-of svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .bookmark-of a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  .post-detail__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-2);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-link);
+    background-color: var(--color-brand-muted);
+    padding: 0.2em 0.6em;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: background-color var(--transition);
+  }
+
+  .tag:hover {
+    background-color: var(--color-surface-3);
+    text-decoration: none;
+  }
+
+  .syndication-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .syndication-list__label {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: var(--weight-semibold);
+  }
+
+  .syndication-list ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .syndication-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .syndication-link svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .interaction-bar {
+    display: flex;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .interaction-count {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .interaction-count svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* ── Webmentions ─────────────────────────────────────────── */
+  .webmentions {
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .webmentions__heading {
+    font-size: var(--text-lg);
+  }
+
+  .webmentions__count {
+    font-weight: var(--weight-normal);
+    color: var(--color-text-secondary);
+  }
+
+  /* Like / repost piles */
+  .wm-pile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .wm-pile__label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .wm-pile__label svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .wm-pile__avatars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: center;
+  }
+
+  .wm-pile__avatar {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 2px solid var(--color-bg);
+    margin-left: -0.375rem;
+    transition: transform var(--transition);
+    text-decoration: none;
+  }
+
+  .wm-pile__avatars a:first-child .wm-pile__avatar,
+  .wm-pile__avatars a:first-child {
+    margin-left: 0;
+  }
+
+  .wm-pile__avatar:hover {
+    transform: translateY(-2px);
+    z-index: 1;
+    position: relative;
+  }
+
+  .wm-pile__avatar--placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface-2);
+    color: var(--color-text-tertiary);
+  }
+
+  .wm-pile__avatar--placeholder :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .wm-pile__overflow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    margin-left: var(--space-2);
+  }
+
+  /* Reply list */
+  .wm-replies {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .wm-replies__label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .wm-replies__label svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .wm-replies__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .wm-reply {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+
+  .wm-reply__photo {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .wm-reply__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .wm-reply__author {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .wm-reply__author:hover { color: var(--color-text-link); }
+
+  .wm-reply__content {
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .wm-reply__source {
+    text-decoration: none;
+  }
+
+  .wm-reply__source:hover { color: var(--color-text-link) !important; }
+</style>

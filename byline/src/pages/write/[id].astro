@@ -1,0 +1,682 @@
+---
+import Page from '../../layouts/Page.astro';
+import { Icon } from 'astro-icon/components';
+import { createDb } from '@indiepub/astro/lib/db';
+import { entries, tags, entryTags } from '@indiepub/db/schema';
+import { eq } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
+import type { D1Database } from '@cloudflare/workers-types';
+
+if (!Astro.locals.isAdmin) return Astro.redirect('/');
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/write');
+
+const indiepub = Astro.locals.indiepub;
+if (!indiepub) return new Response('Service unavailable', { status: 503 });
+
+const d1BindingName = indiepub.config.d1BindingName ?? 'DB';
+const runtime = (Astro.locals as unknown as Record<string, unknown>)['runtime'] as
+  | { env: Record<string, unknown> }
+  | undefined;
+const d1 = runtime?.env?.[d1BindingName] as D1Database;
+const db = createDb(d1);
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+// ── POST: save or publish ─────────────────────────────────────
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const name = (form.get('name') as string)?.trim() || null;
+  const content = (form.get('content') as string)?.trim() || null;
+  const summary = (form.get('summary') as string)?.trim() || null;
+  const visibility = (form.get('visibility') as string) || 'public';
+  const action = (form.get('action') as string) || 'save';
+  const status = action === 'publish' ? 'published' : 'draft';
+  const type = name ? 'article' : 'note';
+  const tagsRaw = (form.get('tags') as string) || '';
+  const tagNames = tagsRaw.split(',').map((t) => t.trim()).filter(Boolean);
+  const now = new Date();
+
+  await db
+    .update(entries)
+    .set({
+      name,
+      content,
+      summary,
+      visibility,
+      type,
+      status,
+      updatedAt: now,
+      ...(status === 'published' ? { publishedAt: now } : {}),
+    })
+    .where(eq(entries.id, id));
+
+  await db.delete(entryTags).where(eq(entryTags.entryId, id));
+  for (const tagName of tagNames) {
+    const tagSlug = slugify(tagName) || nanoid(8);
+    await db.insert(tags).values({ id: nanoid(), name: tagName, slug: tagSlug }).onConflictDoNothing();
+    const [tagRow] = await db.select({ id: tags.id }).from(tags).where(eq(tags.name, tagName)).limit(1);
+    if (tagRow) {
+      await db.insert(entryTags).values({ entryId: id, tagId: tagRow.id }).onConflictDoNothing();
+    }
+  }
+
+  return Astro.redirect(
+    action === 'publish' ? `/posts/${form.get('slug') ?? id}` : `/write/${id}`,
+  );
+}
+
+// ── GET: fetch entry + tags ───────────────────────────────────
+const [entry] = await db.select().from(entries).where(eq(entries.id, id)).limit(1);
+if (!entry) return new Response('Entry not found', { status: 404 });
+
+const entryTagRows = await db
+  .select({ name: tags.name })
+  .from(entryTags)
+  .innerJoin(tags, eq(entryTags.tagId, tags.id))
+  .where(eq(entryTags.entryId, id));
+
+const currentTags = entryTagRows.map((r) => r.name).join(', ');
+
+const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit post');
+---
+
+<Page title={pageTitle} fullBleed>
+  <div class="write-page">
+    <a href="/write" class="back">
+      <Icon name="lucide:arrow-left" aria-hidden="true" width="14" height="14" />
+      Write
+    </a>
+
+    <form method="post" id="write-form">
+      <input type="hidden" name="slug" value={entry.slug} />
+
+      <div class="layout">
+        <!-- ── Editor column ── -->
+        <div class="editor-col">
+          <input
+            type="text"
+            id="title-input"
+            name="name"
+            value={entry.name ?? ''}
+            placeholder="Title (leave blank for a note)"
+            class="title-input"
+            autocomplete="off"
+          />
+
+          <!-- Toolbar -->
+          <div id="toolbar" role="toolbar" aria-label="Formatting">
+            <button type="button" data-action="h2" title="Heading 2">H2</button>
+            <button type="button" data-action="h3" title="Heading 3">H3</button>
+            <span class="sep" aria-hidden="true"></span>
+            <button type="button" data-action="bold" title="Bold"><strong>B</strong></button>
+            <button type="button" data-action="italic" title="Italic"><em>I</em></button>
+            <button type="button" data-action="blockquote" title="Blockquote">
+              <Icon name="lucide:quote" aria-hidden="true" width="13" height="13" />
+            </button>
+            <button type="button" data-action="code" title="Code block">
+              <Icon name="lucide:code" aria-hidden="true" width="13" height="13" />
+            </button>
+            <span class="sep" aria-hidden="true"></span>
+            <button type="button" data-action="link" title="Link">
+              <Icon name="lucide:link" aria-hidden="true" width="13" height="13" />
+            </button>
+            <button type="button" data-action="image" title="Upload image">
+              <Icon name="lucide:image" aria-hidden="true" width="13" height="13" />
+            </button>
+            <button type="button" data-action="hr" title="Horizontal rule">—</button>
+          </div>
+
+          <!-- TipTap mount point -->
+          <div
+            id="editor"
+            data-content={JSON.stringify(entry.content ?? '')}
+          ></div>
+          <input type="hidden" name="content" id="content-input" />
+        </div>
+
+        <!-- ── Sidebar ── -->
+        <aside>
+          <div class="sidebar-inner">
+            <div class="field">
+              <label for="summary">Summary</label>
+              <textarea
+                id="summary"
+                name="summary"
+                placeholder="Optional excerpt shown in feeds"
+                rows="3"
+              >{entry.summary ?? ''}</textarea>
+            </div>
+
+            <div class="field">
+              <label for="tags">Tags</label>
+              <input
+                type="text"
+                id="tags"
+                name="tags"
+                value={currentTags}
+                placeholder="writing, personal"
+              />
+            </div>
+
+            <div class="field">
+              <label for="visibility">Visibility</label>
+              <select id="visibility" name="visibility">
+                <option value="public" selected={entry.visibility === 'public'}>Public</option>
+                <option value="members" selected={entry.visibility === 'members'}>Members only</option>
+                <option value="unlisted" selected={entry.visibility === 'unlisted'}>Unlisted</option>
+                <option value="private" selected={entry.visibility === 'private'}>Private</option>
+              </select>
+            </div>
+
+            <div class="actions">
+              <button type="submit" name="action" value="save" class="btn-save">
+                Save draft
+              </button>
+              <button type="submit" name="action" value="publish" class="btn-publish">
+                {entry.status === 'published' ? 'Update' : 'Publish'}
+              </button>
+            </div>
+
+            {entry.status === 'published' && (
+              <a href={`/posts/${entry.slug}`} class="view-live" target="_blank">
+                View live →
+              </a>
+            )}
+
+            <p class="status-note">
+              {entry.status === 'published' ? 'Published' : 'Draft'}
+              {entry.updatedAt && (
+                <> · Saved {entry.updatedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</>
+              )}
+            </p>
+          </div>
+        </aside>
+      </div>
+    </form>
+  </div>
+</Page>
+
+<script>
+  import { Editor } from '@tiptap/core';
+  import StarterKit from '@tiptap/starter-kit';
+  import Image from '@tiptap/extension-image';
+  import Link from '@tiptap/extension-link';
+  import Placeholder from '@tiptap/extension-placeholder';
+  import { Markdown } from 'tiptap-markdown';
+
+  const editorEl = document.getElementById('editor') as HTMLElement | null;
+  const contentInput = document.getElementById('content-input') as HTMLInputElement | null;
+  const form = document.getElementById('write-form') as HTMLFormElement | null;
+
+  if (editorEl && contentInput && form) {
+    let initialContent = '';
+    try {
+      initialContent = JSON.parse(editorEl.dataset.content ?? '""') as string;
+    } catch {
+      initialContent = '';
+    }
+
+    const editor = new Editor({
+      element: editorEl,
+      extensions: [
+        StarterKit,
+        Image,
+        Link.configure({ openOnClick: false }),
+        Placeholder.configure({ placeholder: 'Start writing…' }),
+        Markdown.configure({ html: false, tightLists: true }),
+      ],
+      content: initialContent,
+      editorProps: {
+        attributes: { class: 'prose-content' },
+      },
+    });
+
+    // Serialize markdown to hidden input on submit
+    form.addEventListener('submit', () => {
+      const mdStorage = editor.storage as unknown as { markdown: { getMarkdown(): string } };
+      contentInput.value = mdStorage.markdown.getMarkdown();
+    });
+
+    // ── Toolbar ──────────────────────────────────────────────
+    const toolbar = document.getElementById('toolbar');
+
+    async function uploadImage(file: File): Promise<string | null> {
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        const res = await fetch('/admin/upload', { method: 'POST', body: fd });
+        if (!res.ok) return null;
+        const { url } = (await res.json()) as { url: string };
+        return url;
+      } catch {
+        return null;
+      }
+    }
+
+    toolbar?.addEventListener('click', async (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+
+      switch (action) {
+        case 'h2':
+          editor.chain().focus().toggleHeading({ level: 2 }).run();
+          break;
+        case 'h3':
+          editor.chain().focus().toggleHeading({ level: 3 }).run();
+          break;
+        case 'bold':
+          editor.chain().focus().toggleBold().run();
+          break;
+        case 'italic':
+          editor.chain().focus().toggleItalic().run();
+          break;
+        case 'blockquote':
+          editor.chain().focus().toggleBlockquote().run();
+          break;
+        case 'code':
+          editor.chain().focus().toggleCodeBlock().run();
+          break;
+        case 'hr':
+          editor.chain().focus().setHorizontalRule().run();
+          break;
+        case 'link': {
+          const href = prompt('Enter URL:');
+          if (href) editor.chain().focus().setLink({ href }).run();
+          break;
+        }
+        case 'image': {
+          const picker = document.createElement('input');
+          picker.type = 'file';
+          picker.accept = 'image/*';
+          picker.addEventListener('change', async () => {
+            const file = picker.files?.[0];
+            if (!file) return;
+            const url = await uploadImage(file);
+            if (url) editor.chain().focus().setImage({ src: url }).run();
+          });
+          picker.click();
+          break;
+        }
+      }
+    });
+
+    // Toolbar active-state sync
+    editor.on('selectionUpdate', () => {
+      toolbar?.querySelectorAll<HTMLButtonElement>('button[data-action]').forEach((btn) => {
+        const a = btn.dataset.action;
+        let active = false;
+        if (a === 'h2') active = editor.isActive('heading', { level: 2 });
+        else if (a === 'h3') active = editor.isActive('heading', { level: 3 });
+        else if (a === 'bold') active = editor.isActive('bold');
+        else if (a === 'italic') active = editor.isActive('italic');
+        else if (a === 'blockquote') active = editor.isActive('blockquote');
+        else if (a === 'code') active = editor.isActive('codeBlock');
+        else if (a === 'link') active = editor.isActive('link');
+        btn.classList.toggle('is-active', active);
+      });
+    });
+
+    // Image drag-and-drop
+    editorEl.addEventListener('dragover', (e) => {
+      if (e.dataTransfer?.types.includes('Files')) e.preventDefault();
+    });
+    editorEl.addEventListener('drop', async (e) => {
+      const file = e.dataTransfer?.files?.[0];
+      if (!file?.type.startsWith('image/')) return;
+      e.preventDefault();
+      const url = await uploadImage(file);
+      if (url) editor.chain().focus().setImage({ src: url }).run();
+    });
+  }
+</script>
+
+<style>
+  .write-page {
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-6) var(--space-16);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    margin-bottom: var(--space-6);
+    transition: color var(--transition);
+  }
+
+  .back:hover {
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Two-column layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 860px) {
+    .layout {
+      grid-template-columns: 1fr 260px;
+    }
+  }
+
+  /* ── Title ── */
+  .title-input {
+    display: block;
+    width: 100%;
+    font-family: var(--font-serif);
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+    font-weight: var(--weight-bold);
+    color: var(--color-text-primary);
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0 0 var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
+  }
+
+  .title-input::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  /* ── Toolbar ── */
+  #toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  #toolbar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition);
+    line-height: 1;
+  }
+
+  #toolbar button:hover {
+    background-color: var(--color-surface-2);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+  }
+
+  #toolbar button.is-active {
+    background-color: var(--color-surface-3);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+  }
+
+  .sep {
+    display: block;
+    width: 1px;
+    height: 1.25rem;
+    background-color: var(--color-border);
+    margin: 0 var(--space-1);
+    flex-shrink: 0;
+  }
+
+  /* ── ProseMirror editor ── */
+  #editor {
+    min-height: 480px;
+    cursor: text;
+  }
+
+  #editor :global(.ProseMirror) {
+    outline: none;
+    min-height: 480px;
+    padding-bottom: var(--space-16);
+  }
+
+  #editor :global(.ProseMirror p.is-editor-empty:first-child::before) {
+    content: attr(data-placeholder);
+    color: var(--color-text-tertiary);
+    pointer-events: none;
+    float: left;
+    height: 0;
+  }
+
+  /* Prose content styles for editor */
+  #editor :global(.prose-content) {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-primary);
+  }
+
+  #editor :global(.prose-content h2) {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    margin: var(--space-8) 0 var(--space-3);
+    letter-spacing: -0.01em;
+  }
+
+  #editor :global(.prose-content h3) {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    margin: var(--space-6) 0 var(--space-3);
+  }
+
+  #editor :global(.prose-content p) {
+    margin-bottom: var(--space-4);
+  }
+
+  #editor :global(.prose-content strong) {
+    font-weight: var(--weight-bold);
+  }
+
+  #editor :global(.prose-content em) {
+    font-style: italic;
+  }
+
+  #editor :global(.prose-content blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-5);
+    margin: var(--space-6) 0;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  #editor :global(.prose-content pre) {
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    overflow-x: auto;
+    margin: var(--space-6) 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  #editor :global(.prose-content code) {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--color-surface-2);
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius-sm);
+  }
+
+  #editor :global(.prose-content pre code) {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  #editor :global(.prose-content ul),
+  #editor :global(.prose-content ol) {
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-4);
+  }
+
+  #editor :global(.prose-content li) {
+    margin-bottom: var(--space-2);
+  }
+
+  #editor :global(.prose-content hr) {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-8) 0;
+  }
+
+  #editor :global(.prose-content a) {
+    color: var(--color-text-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  #editor :global(.prose-content img) {
+    max-width: 100%;
+    border-radius: var(--radius-md);
+    margin: var(--space-6) 0;
+  }
+
+  /* ── Sidebar ── */
+  aside {
+    position: static;
+  }
+
+  @media (min-width: 860px) {
+    aside {
+      position: sticky;
+      top: calc(60px + var(--space-6));
+    }
+  }
+
+  .sidebar-inner {
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .field label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: border-color var(--transition);
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--color-accent);
+  }
+
+  .field textarea {
+    resize: vertical;
+    line-height: var(--leading-relaxed);
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  .btn-publish {
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    font-family: var(--font-sans);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition);
+  }
+
+  .btn-publish:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .btn-save {
+    padding: var(--space-3) var(--space-4);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    font-family: var(--font-sans);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .btn-save:hover {
+    background-color: var(--color-surface-2);
+    color: var(--color-text-primary);
+  }
+
+  .view-live {
+    font-size: var(--text-sm);
+    color: var(--color-text-link);
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .view-live:hover {
+    text-decoration: underline;
+  }
+
+  .status-note {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-align: center;
+    margin: 0;
+  }
+</style>

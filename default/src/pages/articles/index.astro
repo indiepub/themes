@@ -1,0 +1,45 @@
+---
+import Page from '../../layouts/Page.astro';
+import EntryCard from '../../components/EntryCard.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const memberTier = Astro.locals.member?.tier ?? null;
+const articles = await Astro.locals.indiepub.content.getEntries('article', { memberTier, limit: 30 });
+
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+---
+
+<Page title="Articles">
+  <div class="page-header">
+    <h1>Articles</h1>
+    <p class="text-secondary">Long-form writing.</p>
+  </div>
+
+  {articles.length > 0 ? (
+    <div class="h-feed entry-feed" aria-label="Articles feed">
+      {articles.map(entry => (
+        <EntryCard entry={entry} />
+      ))}
+    </div>
+  ) : (
+    <p class="text-secondary">No articles yet.</p>
+  )}
+</Page>
+
+<style>
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+
+  .entry-feed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+</style>

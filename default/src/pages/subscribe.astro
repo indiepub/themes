@@ -1,0 +1,47 @@
+---
+import Page from '../layouts/Page.astro';
+import SubscribeForm from '../components/SubscribeForm.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { config } = Astro.locals.indiepub;
+
+if (!config.subscriptions?.enabled) {
+  return new Response('Not Found', { status: 404 });
+}
+
+const siteTitle = config.title ?? 'this site';
+---
+
+<Page title="Subscribe" description={`Subscribe to ${siteTitle} for updates delivered to your inbox.`} hideSidebar>
+  <div class="subscribe-page">
+    <div class="subscribe-page__header">
+      <h1>Subscribe</h1>
+      <p>Get new posts from {siteTitle} delivered to your inbox. No spam, unsubscribe any time.</p>
+    </div>
+
+    <SubscribeForm />
+  </div>
+</Page>
+
+<style>
+  .subscribe-page {
+    max-width: 28rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .subscribe-page__header h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    margin-bottom: var(--space-3);
+  }
+
+  .subscribe-page__header p {
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+</style>

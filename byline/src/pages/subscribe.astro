@@ -1,0 +1,183 @@
+---
+import Page from '../layouts/Page.astro';
+
+if (!Astro.locals.indiepub) {
+  return new Response('Service unavailable', { status: 503 });
+}
+
+const { config } = Astro.locals.indiepub;
+
+if (!config.subscriptions?.enabled) {
+  return new Response('Not Found', { status: 404 });
+}
+
+const [author, subscriberCount] = await Promise.all([
+  Astro.locals.indiepub.content.getAuthor(),
+  Astro.locals.indiepub.content.getSubscriberCount(),
+]);
+const siteTitle  = config.title ?? 'this publication';
+const authorName = author?.name ?? config.author.name;
+
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
+  return String(n);
+}
+
+// Handle POST subscription
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const email = (form.get('email') as string | null)?.trim() ?? '';
+
+  if (email) {
+    const res = await fetch(new URL('/api/subscribe', Astro.request.url), {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (res.ok) {
+      return Response.redirect(new URL('/subscribe?success=1', Astro.request.url), 303);
+    }
+  }
+}
+
+const success = Astro.url.searchParams.get('success') === '1';
+---
+
+<Page title="Subscribe" description={`Join readers of ${siteTitle}.`}>
+  <div class="subscribe-page">
+    <div class="subscribe-page__header">
+      {author?.photo && (
+        <img
+          src={author.photo}
+          alt={authorName}
+          width="72"
+          height="72"
+          class="subscribe-page__avatar"
+        />
+      )}
+      <h1 class="subscribe-page__title">Subscribe to {siteTitle}</h1>
+      {subscriberCount > 0 && (
+        <p class="subscribe-page__count">
+          Join {formatCount(subscriberCount)} reader{subscriberCount === 1 ? '' : 's'}
+        </p>
+      )}
+      <p class="subscribe-page__desc">
+        New issues delivered to your inbox. Written by {authorName}. No spam, unsubscribe any time.
+      </p>
+    </div>
+
+    {success ? (
+      <div class="subscribe-success">
+        <p>You're subscribed! Check your inbox for a confirmation email.</p>
+      </div>
+    ) : (
+      <form class="subscribe-form" method="POST">
+        <label for="email" class="subscribe-form__label sr-only">Email address</label>
+        <div class="subscribe-form__row">
+          <input
+            id="email"
+            type="email"
+            name="email"
+            required
+            autocomplete="email"
+            placeholder="your@email.com"
+            class="subscribe-form__input"
+          />
+          <button type="submit" class="subscribe-form__btn">Subscribe</button>
+        </div>
+      </form>
+    )}
+  </div>
+</Page>
+
+<style>
+  .subscribe-page {
+    max-width: 36rem;
+    margin-inline: auto;
+    padding-block: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    text-align: center;
+  }
+
+  .subscribe-page__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    margin-inline: auto;
+  }
+
+  .subscribe-page__count {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-accent);
+    letter-spacing: 0.02em;
+  }
+
+  .subscribe-page__title {
+    font-size: clamp(var(--text-3xl), 5vw, var(--text-4xl));
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-5);
+  }
+
+  .subscribe-page__desc {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .subscribe-form__row {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .subscribe-form__input {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    font-family: var(--font-sans);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-1);
+    color: var(--color-text-primary);
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  .subscribe-form__input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-muted);
+  }
+
+  .subscribe-form__btn {
+    padding: var(--space-3) var(--space-6);
+    background-color: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    font-family: var(--font-sans);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition);
+    white-space: nowrap;
+  }
+
+  .subscribe-form__btn:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .subscribe-success {
+    padding: var(--space-6);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+  }
+</style>
