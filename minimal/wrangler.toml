@@ -1,0 +1,17 @@
+name = "my-indiepub-site"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+# Set secrets via the CLI, never commit them:
+#   wrangler secret put INDIEPUB_TOKEN
+
+[[d1_databases]]
+binding = "DB"
+database_name = "indiepub"
+database_id = "YOUR_DATABASE_ID"
+migrations_dir = "node_modules/@indiepub/db/migrations"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "indiepub-media"
