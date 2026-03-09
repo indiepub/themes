@@ -1,0 +1,11 @@
+name = "indiepub-scheduler"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[triggers]
+crons = ["0 */6 * * *"]  # Every 6 hours
+
+[[d1_databases]]
+binding = "DB"
+database_name = "indiepub"
+database_id = ""  # Set to your D1 database ID
