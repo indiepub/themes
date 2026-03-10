@@ -33,8 +33,9 @@ if (entry.visibility === 'paid') {
   }
 }
 
-const [webmentions, interactions] = await Promise.all([
+const [webmentions, interactions, interactionCounts] = await Promise.all([
   content.getWebmentions(entry.id),
+  content.getInteractions(entry.id),
   content.getInteractionCounts(entry.id),
 ]);
 
@@ -73,6 +74,7 @@ const backLabel = typeLabels[entry.type] ?? 'Back';
       entry={entry}
       webmentions={webmentions}
       interactions={interactions}
+      counts={interactionCounts}
     />
   )}
 </Page>
