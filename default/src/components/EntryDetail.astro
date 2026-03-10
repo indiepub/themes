@@ -1,6 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
-import type { Entry, InteractionCounts, WebMention } from '@indiepub/types';
+import type { Entry, Interaction, InteractionCounts, WebMention } from '@indiepub/types';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel.astro';
 import TagList from './TagList.astro';
@@ -10,10 +10,56 @@ import { formatDate, isoDate, hostname } from '../lib/format.ts';
 interface Props {
   entry: Entry;
   webmentions: WebMention[];
-  interactions: InteractionCounts;
+  interactions: Interaction[];
+  counts: InteractionCounts;
 }
 
-const { entry, webmentions, interactions } = Astro.props;
+const { entry, webmentions, interactions, counts } = Astro.props;
+
+// Merge interactions and webmentions into unified response items
+type ResponseItem = {
+  type: 'like' | 'repost' | 'comment';
+  authorName?: string;
+  authorUrl?: string;
+  authorPhoto?: string;
+  content?: string;
+  sourceUrl: string;
+  sourceLabel: string;
+};
+
+const responses: ResponseItem[] = [];
+
+for (const ix of interactions) {
+  if (ix.type !== 'like' && ix.type !== 'repost' && ix.type !== 'comment') continue;
+  responses.push({
+    type: ix.type,
+    authorName: ix.authorName,
+    authorUrl: ix.authorUrl,
+    authorPhoto: ix.authorPhoto,
+    content: ix.content,
+    sourceUrl: ix.externalUrl ?? ix.authorUrl ?? '#',
+    sourceLabel: ix.source === 'bluesky' ? 'Bluesky' : ix.source === 'mastodon' ? 'Mastodon' : ix.source,
+  });
+}
+
+for (const wm of webmentions) {
+  const wmType = wm.type === 'reply' || wm.type === 'mention' ? 'comment' : wm.type === 'like' ? 'like' : wm.type === 'repost' ? 'repost' : null;
+  if (!wmType) continue;
+  responses.push({
+    type: wmType,
+    authorName: wm.authorName,
+    authorUrl: wm.authorUrl,
+    authorPhoto: wm.authorPhoto,
+    content: wm.content,
+    sourceUrl: wm.source,
+    sourceLabel: hostname(wm.source),
+  });
+}
+
+const responseLikes = responses.filter(r => r.type === 'like');
+const responseReposts = responses.filter(r => r.type === 'repost');
+const responseComments = responses.filter(r => r.type === 'comment');
+const hasResponses = responses.length > 0;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 const config = Astro.locals.indiepub?.config;
 
@@ -83,24 +129,24 @@ const attachments = entry.attachments?.length
       </div>
     )}
 
-    {(interactions.likes > 0 || interactions.comments > 0 || interactions.reposts > 0) && (
+    {(counts.likes > 0 || counts.comments > 0 || counts.reposts > 0) && (
       <div class="entry-detail__counts">
-        {interactions.likes > 0 && (
+        {counts.likes > 0 && (
           <span class="interaction-count">
             <Icon name="lucide:heart" aria-hidden="true" />
-            {interactions.likes} {interactions.likes === 1 ? 'like' : 'likes'}
+            {counts.likes} {counts.likes === 1 ? 'like' : 'likes'}
           </span>
         )}
-        {interactions.reposts > 0 && (
+        {counts.reposts > 0 && (
           <span class="interaction-count">
             <Icon name="lucide:repeat-2" aria-hidden="true" />
-            {interactions.reposts} {interactions.reposts === 1 ? 'repost' : 'reposts'}
+            {counts.reposts} {counts.reposts === 1 ? 'repost' : 'reposts'}
           </span>
         )}
-        {interactions.comments > 0 && (
+        {counts.comments > 0 && (
           <span class="interaction-count">
             <Icon name="lucide:message-square" aria-hidden="true" />
-            {interactions.comments} {interactions.comments === 1 ? 'comment' : 'comments'}
+            {counts.comments} {counts.comments === 1 ? 'comment' : 'comments'}
           </span>
         )}
       </div>
@@ -114,31 +160,92 @@ const attachments = entry.attachments?.length
   </footer>
 </article>
 
-{webmentions.length > 0 && (
-  <section class="webmentions" aria-labelledby="webmentions-heading">
-    <h2 id="webmentions-heading" class="webmentions__heading">
-      Webmentions <span class="webmentions__count">({webmentions.length})</span>
+{hasResponses && (
+  <section class="responses" aria-labelledby="responses-heading">
+    <h2 id="responses-heading" class="responses__heading">
+      Responses <span class="responses__count">({responses.length})</span>
     </h2>
-    <ul class="webmentions__list">
-      {webmentions.map(wm => (
-        <li class="webmention">
-          {wm.authorPhoto && (
-            <img class="webmention__photo" src={wm.authorPhoto} alt={wm.authorName ?? ''} width="32" height="32" />
+
+    {responseLikes.length > 0 && (
+      <div class="responses__pile" aria-label={`${responseLikes.length} ${responseLikes.length === 1 ? 'like' : 'likes'}`}>
+        <p class="responses__pile-label text-sm text-secondary">
+          <Icon name="lucide:heart" aria-hidden="true" />
+          {responseLikes.length} {responseLikes.length === 1 ? 'like' : 'likes'}
+        </p>
+        <div class="responses__avatars">
+          {responseLikes.slice(0, 12).map(r => (
+            r.authorPhoto ? (
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
+                <img class="responses__avatar" src={r.authorPhoto} alt={r.authorName ?? ''} width="32" height="32" />
+              </a>
+            ) : (
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
+                 class="responses__avatar responses__avatar--placeholder">
+                <Icon name="lucide:user" aria-hidden="true" />
+              </a>
+            )
+          ))}
+          {responseLikes.length > 12 && (
+            <span class="responses__overflow">+{responseLikes.length - 12}</span>
           )}
-          <div class="webmention__body">
-            <a href={wm.authorUrl ?? wm.source} class="webmention__author" rel="noopener" target="_blank">
-              {wm.authorName ?? hostname(wm.source)}
-            </a>
-            {wm.content && (
-              <p class="webmention__content">{wm.content}</p>
-            )}
-            <a href={wm.source} class="webmention__source text-xs text-secondary" rel="noopener" target="_blank">
-              {hostname(wm.source)}
-            </a>
-          </div>
-        </li>
-      ))}
-    </ul>
+        </div>
+      </div>
+    )}
+
+    {responseReposts.length > 0 && (
+      <div class="responses__pile" aria-label={`${responseReposts.length} ${responseReposts.length === 1 ? 'repost' : 'reposts'}`}>
+        <p class="responses__pile-label text-sm text-secondary">
+          <Icon name="lucide:repeat-2" aria-hidden="true" />
+          {responseReposts.length} {responseReposts.length === 1 ? 'repost' : 'reposts'}
+        </p>
+        <div class="responses__avatars">
+          {responseReposts.slice(0, 12).map(r => (
+            r.authorPhoto ? (
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
+                <img class="responses__avatar" src={r.authorPhoto} alt={r.authorName ?? ''} width="32" height="32" />
+              </a>
+            ) : (
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
+                 class="responses__avatar responses__avatar--placeholder">
+                <Icon name="lucide:user" aria-hidden="true" />
+              </a>
+            )
+          ))}
+          {responseReposts.length > 12 && (
+            <span class="responses__overflow">+{responseReposts.length - 12}</span>
+          )}
+        </div>
+      </div>
+    )}
+
+    {responseComments.length > 0 && (
+      <div class="responses__comments">
+        <p class="responses__comments-label text-sm text-secondary">
+          <Icon name="lucide:message-square" aria-hidden="true" />
+          {responseComments.length} {responseComments.length === 1 ? 'reply' : 'replies'}
+        </p>
+        <ul class="responses__comment-list">
+          {responseComments.map(r => (
+            <li class="response-comment">
+              {r.authorPhoto && (
+                <img class="response-comment__photo" src={r.authorPhoto} alt={r.authorName ?? ''} width="32" height="32" />
+              )}
+              <div class="response-comment__body">
+                <a href={r.authorUrl ?? r.sourceUrl} class="response-comment__author" rel="noopener" target="_blank">
+                  {r.authorName ?? r.sourceLabel}
+                </a>
+                {r.content && (
+                  <p class="response-comment__content">{r.content}</p>
+                )}
+                <a href={r.sourceUrl} class="response-comment__source text-xs text-secondary" rel="noopener" target="_blank">
+                  {r.sourceLabel}
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
   </section>
 )}
 
@@ -245,24 +352,111 @@ const attachments = entry.attachments?.length
     height: 1rem;
   }
 
-  /* Webmentions */
-  .webmentions {
+  /* Responses */
+  .responses {
     margin-top: var(--space-12);
     padding-top: var(--space-8);
     border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
   }
 
-  .webmentions__heading {
+  .responses__heading {
     font-size: var(--text-lg);
-    margin-bottom: var(--space-6);
   }
 
-  .webmentions__count {
+  .responses__count {
     font-weight: var(--weight-normal);
     color: var(--color-text-secondary);
   }
 
-  .webmentions__list {
+  .responses__pile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .responses__pile-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .responses__pile-label svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .responses__avatars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: center;
+  }
+
+  .responses__avatar {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 2px solid var(--color-bg);
+    margin-left: -0.375rem;
+    transition: transform var(--transition);
+  }
+
+  .responses__avatars a:first-child .responses__avatar,
+  .responses__avatars a:first-child {
+    margin-left: 0;
+  }
+
+  .responses__avatar:hover {
+    transform: translateY(-2px);
+    z-index: 1;
+    position: relative;
+  }
+
+  .responses__avatar--placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface-2, var(--color-surface));
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .responses__avatar--placeholder :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .responses__overflow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    margin-left: var(--space-2);
+  }
+
+  .responses__comments {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .responses__comments-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .responses__comments-label svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .responses__comment-list {
     list-style: none;
     padding: 0;
     display: flex;
@@ -270,13 +464,13 @@ const attachments = entry.attachments?.length
     gap: var(--space-4);
   }
 
-  .webmention {
+  .response-comment {
     display: flex;
     gap: var(--space-3);
     align-items: flex-start;
   }
 
-  .webmention__photo {
+  .response-comment__photo {
     width: 2rem;
     height: 2rem;
     border-radius: var(--radius-full);
@@ -284,31 +478,31 @@ const attachments = entry.attachments?.length
     flex-shrink: 0;
   }
 
-  .webmention__body {
+  .response-comment__body {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
     min-width: 0;
   }
 
-  .webmention__author {
+  .response-comment__author {
     font-size: var(--text-sm);
     font-weight: var(--weight-semibold);
     color: var(--color-text-primary);
     text-decoration: none;
   }
 
-  .webmention__author:hover { color: var(--color-text-link); }
+  .response-comment__author:hover { color: var(--color-text-link); }
 
-  .webmention__content {
+  .response-comment__content {
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     line-height: var(--leading-relaxed);
   }
 
-  .webmention__source {
+  .response-comment__source {
     text-decoration: none;
   }
 
-  .webmention__source:hover { color: var(--color-text-link) !important; }
+  .response-comment__source:hover { color: var(--color-text-link) !important; }
 </style>

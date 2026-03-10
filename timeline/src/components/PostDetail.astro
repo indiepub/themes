@@ -1,6 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
-import type { Entry, InteractionCounts, WebMention } from '@indiepub/types';
+import type { Entry, Interaction, InteractionCounts, WebMention } from '@indiepub/types';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel.astro';
 import { formatDate, isoDate, hostname } from '../lib/format.ts';
@@ -8,17 +8,58 @@ import { formatDate, isoDate, hostname } from '../lib/format.ts';
 interface Props {
   entry: Entry;
   webmentions: WebMention[];
+  interactions: Interaction[];
   counts: InteractionCounts;
 }
 
-const { entry, webmentions, counts } = Astro.props;
+const { entry, webmentions, interactions, counts } = Astro.props;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 const detailUrl = `/posts/${entry.slug}`;
 
-// Partition webmentions by type
-const likes    = webmentions.filter(wm => wm.type === 'like');
-const reposts  = webmentions.filter(wm => wm.type === 'repost');
-const replies  = webmentions.filter(wm => wm.type === 'reply' || wm.type === 'mention');
+// Merge interactions + webmentions into a common shape for display
+type ResponseItem = {
+  type: 'like' | 'repost' | 'comment';
+  authorName?: string;
+  authorUrl?: string;
+  authorPhoto?: string;
+  content?: string;
+  sourceUrl: string;
+  sourceLabel: string;
+};
+
+const allResponses: ResponseItem[] = [];
+
+for (const ix of interactions) {
+  if (ix.type !== 'like' && ix.type !== 'repost' && ix.type !== 'comment') continue;
+  allResponses.push({
+    type: ix.type,
+    authorName: ix.authorName,
+    authorUrl: ix.authorUrl,
+    authorPhoto: ix.authorPhoto,
+    content: ix.content,
+    sourceUrl: ix.externalUrl ?? ix.authorUrl ?? '#',
+    sourceLabel: ix.source === 'bluesky' ? 'Bluesky' : ix.source === 'mastodon' ? 'Mastodon' : ix.source,
+  });
+}
+
+for (const wm of webmentions) {
+  const wmType = wm.type === 'reply' || wm.type === 'mention' ? 'comment' : wm.type === 'like' ? 'like' : wm.type === 'repost' ? 'repost' : null;
+  if (!wmType) continue;
+  allResponses.push({
+    type: wmType,
+    authorName: wm.authorName,
+    authorUrl: wm.authorUrl,
+    authorPhoto: wm.authorPhoto,
+    content: wm.content,
+    sourceUrl: wm.source,
+    sourceLabel: hostname(wm.source),
+  });
+}
+
+const likes = allResponses.filter(r => r.type === 'like');
+const reposts = allResponses.filter(r => r.type === 'repost');
+const replies = allResponses.filter(r => r.type === 'comment');
+const hasResponses = allResponses.length > 0;
 
 const isArticle = entry.type === 'article';
 
@@ -200,11 +241,11 @@ const backLabel =
   </footer>
 </article>
 
-{/* ── Webmentions ─────────────────────────────────────────── */}
-{webmentions.length > 0 && (
-  <section class="webmentions" aria-labelledby="webmentions-heading">
-    <h2 id="webmentions-heading" class="webmentions__heading">
-      Webmentions <span class="webmentions__count">({webmentions.length})</span>
+{/* ── Responses (interactions + webmentions) ──────────────── */}
+{hasResponses && (
+  <section class="webmentions" aria-labelledby="responses-heading">
+    <h2 id="responses-heading" class="webmentions__heading">
+      Responses <span class="webmentions__count">({allResponses.length})</span>
     </h2>
 
     {/* Like pile */}
@@ -215,21 +256,21 @@ const backLabel =
           {likes.length} {likes.length === 1 ? 'like' : 'likes'}
         </p>
         <div class="wm-pile__avatars">
-          {likes.slice(0, 12).map(wm => (
-            wm.authorPhoto ? (
-              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}>
+          {likes.slice(0, 12).map(r => (
+            r.authorPhoto ? (
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
                 <img
                   class="wm-pile__avatar"
-                  src={wm.authorPhoto}
-                  alt={wm.authorName ?? ''}
+                  src={r.authorPhoto}
+                  alt={r.authorName ?? ''}
                   width="32"
                   height="32"
                 />
               </a>
             ) : (
-              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
                  class="wm-pile__avatar wm-pile__avatar--placeholder"
-                 aria-label={wm.authorName ?? hostname(wm.source)}
+                 aria-label={r.authorName ?? r.sourceLabel}
               >
                 <Icon name="lucide:user" aria-hidden="true" />
               </a>
@@ -250,21 +291,21 @@ const backLabel =
           {reposts.length} {reposts.length === 1 ? 'repost' : 'reposts'}
         </p>
         <div class="wm-pile__avatars">
-          {reposts.slice(0, 12).map(wm => (
-            wm.authorPhoto ? (
-              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}>
+          {reposts.slice(0, 12).map(r => (
+            r.authorPhoto ? (
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
                 <img
                   class="wm-pile__avatar"
-                  src={wm.authorPhoto}
-                  alt={wm.authorName ?? ''}
+                  src={r.authorPhoto}
+                  alt={r.authorName ?? ''}
                   width="32"
                   height="32"
                 />
               </a>
             ) : (
-              <a href={wm.authorUrl ?? wm.source} rel="noopener" target="_blank" title={wm.authorName ?? undefined}
+              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
                  class="wm-pile__avatar wm-pile__avatar--placeholder"
-                 aria-label={wm.authorName ?? hostname(wm.source)}
+                 aria-label={r.authorName ?? r.sourceLabel}
               >
                 <Icon name="lucide:user" aria-hidden="true" />
               </a>
@@ -285,20 +326,20 @@ const backLabel =
           {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
         </p>
         <ul class="wm-replies__list">
-          {replies.map(wm => (
+          {replies.map(r => (
             <li class="wm-reply">
-              {wm.authorPhoto && (
-                <img class="wm-reply__photo" src={wm.authorPhoto} alt={wm.authorName ?? ''} width="36" height="36" />
+              {r.authorPhoto && (
+                <img class="wm-reply__photo" src={r.authorPhoto} alt={r.authorName ?? ''} width="36" height="36" />
               )}
               <div class="wm-reply__body">
-                <a href={wm.authorUrl ?? wm.source} class="wm-reply__author" rel="noopener" target="_blank">
-                  {wm.authorName ?? hostname(wm.source)}
+                <a href={r.authorUrl ?? r.sourceUrl} class="wm-reply__author" rel="noopener" target="_blank">
+                  {r.authorName ?? r.sourceLabel}
                 </a>
-                {wm.content && (
-                  <p class="wm-reply__content text-sm">{wm.content}</p>
+                {r.content && (
+                  <p class="wm-reply__content text-sm">{r.content}</p>
                 )}
-                <a href={wm.source} class="wm-reply__source text-xs text-secondary" rel="noopener" target="_blank">
-                  {hostname(wm.source)}
+                <a href={r.sourceUrl} class="wm-reply__source text-xs text-secondary" rel="noopener" target="_blank">
+                  {r.sourceLabel}
                 </a>
               </div>
             </li>
