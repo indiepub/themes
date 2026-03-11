@@ -1,12 +1,15 @@
 ---
+import { Icon } from 'astro-icon/components';
 import Feed from '../../layouts/Feed.astro';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
 }
 
+const { content } = Astro.locals.indiepub;
 const memberTier = Astro.locals.member?.tier ?? null;
-const articles = await Astro.locals.indiepub.content.getEntries('article', { memberTier, limit: 50 });
+const articles = await content.getEntries('article', { memberTier, limit: 50 });
+const countsMap = await content.getBatchInteractionCounts(articles.map(e => e.id));
 
 Astro.response.headers.set(
   'Cache-Control',
@@ -47,6 +50,16 @@ Astro.response.headers.set(
                 ))}
               </ul>
             )}
+            {(() => {
+              const c = countsMap.get(entry.id);
+              return c && (c.likes > 0 || c.reposts > 0 || c.comments > 0) ? (
+                <div class="ix-bar">
+                  {c.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{c.likes}</span>}
+                  {c.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{c.reposts}</span>}
+                  {c.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{c.comments}</span>}
+                </div>
+              ) : null;
+            })()}
           </div>
         </li>
       ))}
@@ -147,6 +160,25 @@ Astro.response.headers.set(
   .tag:hover {
     background-color: var(--color-surface-3);
     text-decoration: none;
+  }
+
+  .ix-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .ix-count {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .ix-count :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
   }
 
   .empty-state {
