@@ -7,8 +7,10 @@ if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
 }
 
+const { content } = Astro.locals.indiepub;
 const memberTier = Astro.locals.member?.tier ?? null;
-const notes = await Astro.locals.indiepub.content.getEntries('note', { memberTier, limit: 30 });
+const notes = await content.getEntries('note', { memberTier, limit: 30 });
+const countsMap = await content.getBatchInteractionCounts(notes.map(e => e.id));
 
 Astro.response.headers.set(
   'Cache-Control',
@@ -27,7 +29,7 @@ Astro.response.headers.set(
   {notes.length > 0 ? (
     <div class="h-feed entry-feed" aria-label="Notes feed">
       {notes.map(entry => (
-        <EntryCard entry={entry} />
+        <EntryCard entry={entry} counts={countsMap.get(entry.id)} />
       ))}
     </div>
   ) : (

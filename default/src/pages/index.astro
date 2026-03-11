@@ -18,6 +18,9 @@ const [author, recentArticles, recentNotes] = await Promise.all([
   content.getEntries('note', { memberTier, limit: 10 }),
 ]);
 
+const allIds = [...recentArticles, ...recentNotes].map(e => e.id);
+const countsMap = await content.getBatchInteractionCounts(allIds);
+
 Astro.response.headers.set(
   'Cache-Control',
   Astro.locals.isAdmin ? 'no-store' : 'public, s-maxage=60, stale-while-revalidate=3600',
@@ -43,7 +46,7 @@ Astro.response.headers.set(
             </div>
             <div class="entry-list">
               {recentArticles.map(entry => (
-                <EntryCard entry={entry} />
+                <EntryCard entry={entry} counts={countsMap.get(entry.id)} />
               ))}
             </div>
           </section>
@@ -59,7 +62,7 @@ Astro.response.headers.set(
             </div>
             <div class="entry-list entry-list--notes">
               {recentNotes.map(entry => (
-                <EntryCard entry={entry} />
+                <EntryCard entry={entry} counts={countsMap.get(entry.id)} />
               ))}
             </div>
           </section>

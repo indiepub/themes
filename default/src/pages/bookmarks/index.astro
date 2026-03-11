@@ -6,8 +6,10 @@ if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
 }
 
+const { content } = Astro.locals.indiepub;
 const memberTier = Astro.locals.member?.tier ?? null;
-const bookmarks = await Astro.locals.indiepub.content.getEntries('bookmark', { memberTier, limit: 30 });
+const bookmarks = await content.getEntries('bookmark', { memberTier, limit: 30 });
+const countsMap = await content.getBatchInteractionCounts(bookmarks.map(e => e.id));
 
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
 ---
@@ -21,7 +23,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-re
   {bookmarks.length > 0 ? (
     <div class="h-feed entry-feed" aria-label="Bookmarks feed">
       {bookmarks.map(entry => (
-        <EntryCard entry={entry} />
+        <EntryCard entry={entry} counts={countsMap.get(entry.id)} />
       ))}
     </div>
   ) : (

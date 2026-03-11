@@ -1,13 +1,15 @@
 ---
 import { Icon } from 'astro-icon/components';
-import type { Entry } from '@indiepub/types';
+import type { Entry, InteractionCounts } from '@indiepub/types';
+import InteractionBar from './InteractionBar.astro';
 import { formatDateCompact, isoDate } from '../lib/format.ts';
 
 interface Props {
   entry: Entry;
+  counts?: InteractionCounts;
 }
 
-const { entry } = Astro.props;
+const { entry, counts } = Astro.props;
 const detailUrl = `/posts/${entry.slug}`;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 ---
@@ -22,14 +24,17 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
     {formatDateCompact(pubDate)}
   </time>
   {entry.summary && <p class="p-summary article-card__summary">{entry.summary}</p>}
-  <a
-    href={detailUrl}
-    class="article-card__read-link"
-    aria-label={`Read: ${entry.name ?? 'article'}`}
-  >
-    Read article
-    <Icon name="lucide:arrow-right" aria-hidden="true" />
-  </a>
+  <div class="article-card__actions">
+    <a
+      href={detailUrl}
+      class="article-card__read-link"
+      aria-label={`Read: ${entry.name ?? 'article'}`}
+    >
+      Read article
+      <Icon name="lucide:arrow-right" aria-hidden="true" />
+    </a>
+    {counts && <InteractionBar counts={counts} />}
+  </div>
 </div>
 
 <style>
@@ -66,13 +71,20 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
     line-height: var(--leading-relaxed);
   }
 
+  .article-card__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-1);
+  }
+
   .article-card__read-link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
-    margin-top: var(--space-1);
   }
 
   .article-card__read-link svg {

@@ -1,17 +1,19 @@
 ---
 import { Icon } from 'astro-icon/components';
-import type { Entry } from '@indiepub/types';
+import type { Entry, InteractionCounts } from '@indiepub/types';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel.astro';
 import TagList from './TagList.astro';
+import InteractionBar from './InteractionBar.astro';
 import { formatDateCompact, isoDate, hostname } from '../lib/format.ts';
 import { syndicationMeta } from './card-utils.ts';
 
 interface Props {
   entry: Entry;
+  counts?: InteractionCounts;
 }
 
-const { entry } = Astro.props;
+const { entry, counts } = Astro.props;
 const detailUrl = `/posts/${entry.slug}`;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 ---
@@ -58,6 +60,7 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
   )}
   <footer class="note-card__footer">
     <TagList tags={entry.tags} />
+    {counts && <InteractionBar counts={counts} />}
     {entry.syndicationUrls && entry.syndicationUrls.length > 0 && (
       <div class="note-card__syndication">
         <span class="note-card__syndication-label">Also on</span>

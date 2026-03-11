@@ -11,6 +11,7 @@ const { content } = Astro.locals.indiepub;
 const memberTier = Astro.locals.member?.tier ?? null;
 
 const entries = await content.getEntries(undefined, { memberTier, limit: 50 });
+const countsMap = await content.getBatchInteractionCounts(entries.map(e => e.id));
 
 Astro.response.headers.set(
   'Cache-Control',
@@ -22,7 +23,7 @@ Astro.response.headers.set(
   <NoteComposer />
   <div class="h-feed feed-list" aria-label="All posts">
     {entries.length > 0 ? (
-      entries.map(entry => <FeedCard entry={entry} />)
+      entries.map(entry => <FeedCard entry={entry} counts={countsMap.get(entry.id)} />)
     ) : (
       <p class="empty-state text-secondary">No posts yet.</p>
     )}

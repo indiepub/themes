@@ -1,13 +1,15 @@
 ---
 import { Icon } from 'astro-icon/components';
-import type { Entry } from '@indiepub/types';
+import type { Entry, InteractionCounts } from '@indiepub/types';
+import InteractionBar from './InteractionBar.astro';
 import { formatDateCompact, isoDate, hostname } from '../lib/format.ts';
 
 interface Props {
   entry: Entry;
+  counts?: InteractionCounts;
 }
 
-const { entry } = Astro.props;
+const { entry, counts } = Astro.props;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 ---
 
@@ -20,9 +22,12 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
   </h2>
   <p class="bookmark-card__source text-sm text-secondary">{hostname(entry.bookmarkOf!)}</p>
   {entry.summary && <p class="p-summary bookmark-card__desc">{entry.summary}</p>}
-  <time class="dt-published bookmark-card__date" datetime={isoDate(pubDate)}>
-    {formatDateCompact(pubDate)}
-  </time>
+  <div class="bookmark-card__meta">
+    <time class="dt-published bookmark-card__date" datetime={isoDate(pubDate)}>
+      {formatDateCompact(pubDate)}
+    </time>
+    {counts && <InteractionBar counts={counts} />}
+  </div>
 </div>
 
 <style>
@@ -61,6 +66,12 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
     color: var(--color-text-secondary);
     font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
+  }
+
+  .bookmark-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
   }
 
   .bookmark-card__date {

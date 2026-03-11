@@ -1,5 +1,5 @@
 ---
-import type { Entry } from '@indiepub/types';
+import type { Entry, InteractionCounts } from '@indiepub/types';
 import NoteCard from './NoteCard.astro';
 import ArticleCard from './ArticleCard.astro';
 import PhotoCard from './PhotoCard.astro';
@@ -7,9 +7,10 @@ import BookmarkCard from './BookmarkCard.astro';
 
 interface Props {
   entry: Entry;
+  counts?: InteractionCounts;
 }
 
-const { entry } = Astro.props;
+const { entry, counts } = Astro.props;
 ---
 
 <article
@@ -18,13 +19,13 @@ const { entry } = Astro.props;
   itemtype="http://schema.org/BlogPosting"
 >
   {entry.type === 'article' ? (
-    <ArticleCard entry={entry} />
+    <ArticleCard entry={entry} counts={counts} />
   ) : entry.type === 'photo' && (entry.attachments?.length ?? 0) > 0 ? (
-    <PhotoCard entry={entry} />
+    <PhotoCard entry={entry} counts={counts} />
   ) : entry.type === 'bookmark' && entry.bookmarkOf ? (
-    <BookmarkCard entry={entry} />
+    <BookmarkCard entry={entry} counts={counts} />
   ) : (
-    <NoteCard entry={entry} />
+    <NoteCard entry={entry} counts={counts} />
   )}
 </article>
 

@@ -1,15 +1,17 @@
 ---
-import type { Entry } from '@indiepub/types';
+import type { Entry, InteractionCounts } from '@indiepub/types';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel.astro';
 import TagList from './TagList.astro';
+import InteractionBar from './InteractionBar.astro';
 import { formatDateCompact, isoDate } from '../lib/format.ts';
 
 interface Props {
   entry: Entry;
+  counts?: InteractionCounts;
 }
 
-const { entry } = Astro.props;
+const { entry, counts } = Astro.props;
 const detailUrl = `/posts/${entry.slug}`;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 ---
@@ -28,6 +30,7 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
     ) : null}
     <div class="photo-card__meta">
       <TagList tags={entry.tags} />
+      {counts && <InteractionBar counts={counts} />}
       <a href={detailUrl} class="u-url photo-card__permalink">
         <time class="dt-published" datetime={isoDate(pubDate)}>
           {formatDateCompact(pubDate)}

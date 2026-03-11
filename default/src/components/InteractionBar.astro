@@ -1,0 +1,55 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { InteractionCounts } from '@indiepub/types';
+
+interface Props {
+  counts: InteractionCounts;
+}
+
+const { counts } = Astro.props;
+const hasAny = counts.likes > 0 || counts.reposts > 0 || counts.comments > 0;
+---
+
+{hasAny && (
+  <div class="interaction-bar">
+    {counts.likes > 0 && (
+      <span class="interaction-count">
+        <Icon name="lucide:heart" aria-hidden="true" />
+        {counts.likes}
+      </span>
+    )}
+    {counts.reposts > 0 && (
+      <span class="interaction-count">
+        <Icon name="lucide:repeat-2" aria-hidden="true" />
+        {counts.reposts}
+      </span>
+    )}
+    {counts.comments > 0 && (
+      <span class="interaction-count">
+        <Icon name="lucide:message-square" aria-hidden="true" />
+        {counts.comments}
+      </span>
+    )}
+  </div>
+)}
+
+<style>
+  .interaction-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .interaction-count {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .interaction-count :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+</style>
