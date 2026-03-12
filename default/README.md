@@ -65,16 +65,14 @@ Required variables:
 | `INDIEPUB_NPM_TOKEN` | Your IndiePub license token (from [indiepub.dev/account](https://indiepub.dev/account)) |
 | `INDIEPUB_TOKEN` | A secret token for Micropub and admin authentication — choose something random and secure |
 
-Optional variables (depending on features enabled during scaffolding):
+Optional variables (add as needed):
 
 | Variable | Description |
 |---|---|
-| `BSKY_APP_PASSWORD` | Bluesky app password (for cross-posting) |
-| `MASTODON_ACCESS_TOKEN` | Mastodon access token (for cross-posting) |
-| `ACTIVITYPUB_PRIVATE_KEY` | RSA private key PEM (for ActivityPub HTTP Signatures) |
-| `ACTIVITYPUB_PUBLIC_KEY` | RSA public key PEM (served in Actor document) |
 | `RESEND_API_KEY` | [Resend](https://resend.com) API key (for email subscriptions) |
 | `RESEND_FROM_EMAIL` | Newsletter sender address, e.g. `You <newsletter@yourdomain.com>` |
+
+Connect Bluesky and Mastodon accounts from `/admin/accounts` after setup — no env vars needed.
 
 ### 3. Install and run
 
@@ -108,6 +106,6 @@ If you enabled GitHub Actions during scaffolding, a workflow is generated at `.g
 | `INDIEPUB_TOKEN` | Same admin token as `.dev.vars` |
 | `NPM_TOKEN` | Your IndiePub license token |
 
-Add any optional secrets (`BSKY_APP_PASSWORD`, `MASTODON_ACCESS_TOKEN`, etc.) that your site uses. Set these as [Cloudflare Pages environment variables](https://developers.cloudflare.com/pages/configuration/environment-variables/) so they're available at runtime.
+Add any optional secrets your site uses (e.g. `RESEND_API_KEY` for email subscriptions). Set these as [Cloudflare Pages environment variables](https://developers.cloudflare.com/pages/configuration/environment-variables/) so they're available at runtime.
 
 Pushes to `main` will automatically build and deploy.
