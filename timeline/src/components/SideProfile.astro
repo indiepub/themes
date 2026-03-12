@@ -3,6 +3,7 @@ import { Icon } from 'astro-icon/components';
 import type { Author, IndiePubConfig } from '@indiepub/types';
 import SocialIcon from './SocialIcon.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import SubscribeForm from './SubscribeForm.astro';
 
 interface Props {
   author: Author;
@@ -13,7 +14,7 @@ interface Props {
   mobile?: boolean | undefined;
 }
 
-const { author, activePath, topTags = [], mobile = false } = Astro.props;
+const { author, config, activePath, topTags = [], mobile = false } = Astro.props;
 
 const navLinks = [
   { href: '/',           label: 'All posts' },
@@ -91,6 +92,9 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
         <span>JSON</span>
       </a>
     </div>
+    {config.subscriptions?.enabled && (
+      <SubscribeForm compact />
+    )}
   </div>
 
   <!-- Tag cloud -->

@@ -1,0 +1,190 @@
+---
+/**
+ * Embeddable email subscription form.
+ * POSTs to /api/subscribe; handles success/error via ?subscribed= query param on redirect.
+ *
+ * Usage:
+ *   <SubscribeForm />
+ *   <SubscribeForm compact />
+ */
+
+interface Props {
+  /** Compact variant — single row, no heading */
+  compact?: boolean | undefined;
+}
+
+const { compact = false } = Astro.props;
+
+const url = new URL(Astro.request.url);
+const subscribed = url.searchParams.get('subscribed');
+const success = subscribed === '1';
+const duplicate = subscribed === 'dup';
+---
+
+{success ? (
+  <div class="subscribe-success" role="status">
+    <span class="subscribe-success__icon" aria-hidden="true">&#10003;</span>
+    <p>You're subscribed. Thanks!</p>
+  </div>
+) : (
+  <form
+    class:list={['subscribe-form', { 'subscribe-form--compact': compact }]}
+    method="post"
+    action={`/api/subscribe?next=${encodeURIComponent(url.pathname + '?subscribed=1')}`}
+  >
+    {!compact && (
+      <p class="subscribe-form__heading">Get updates</p>
+    )}
+
+    {duplicate && (
+      <p class="subscribe-form__note" role="status">You're already subscribed.</p>
+    )}
+
+    <div class="subscribe-form__fields">
+      {!compact && (
+        <div class="subscribe-form__field">
+          <label for="subscribe-name">Name <span class="subscribe-form__optional">(optional)</span></label>
+          <input
+            type="text"
+            id="subscribe-name"
+            name="name"
+            placeholder="Your name"
+            autocomplete="name"
+          />
+        </div>
+      )}
+
+      <div class="subscribe-form__field">
+        <label for="subscribe-email">{compact ? 'Email' : 'Email address'}</label>
+        <input
+          type="email"
+          id="subscribe-email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <button type="submit" class="subscribe-form__btn">
+        Subscribe
+      </button>
+    </div>
+  </form>
+)}
+
+<style>
+  .subscribe-success {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: color-mix(in oklch, var(--color-success) 12%, transparent);
+    border: 1px solid color-mix(in oklch, var(--color-success) 30%, transparent);
+    border-radius: var(--radius-lg);
+    color: var(--color-success);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .subscribe-success__icon {
+    font-size: var(--text-base);
+  }
+
+  .subscribe-form__heading {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-4);
+  }
+
+  .subscribe-form__note {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .subscribe-form__optional {
+    color: var(--color-text-tertiary);
+    font-weight: var(--weight-normal);
+  }
+
+  /* Default (stacked) layout */
+  .subscribe-form__fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .subscribe-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+  }
+
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    transition: border-color var(--transition);
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--color-brand);
+  }
+
+  .subscribe-form__btn {
+    align-self: flex-start;
+    padding: var(--space-2) var(--space-5);
+    background: var(--color-brand);
+    color: var(--color-text-on-brand);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+
+  .subscribe-form__btn:hover {
+    background: var(--color-text-link-hover);
+  }
+
+  /* Compact: single-row layout */
+  .subscribe-form--compact .subscribe-form__fields {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .subscribe-form--compact .subscribe-form__field {
+    flex: 1;
+  }
+
+  .subscribe-form--compact .subscribe-form__btn {
+    align-self: auto;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    .subscribe-form--compact .subscribe-form__fields {
+      flex-direction: column;
+    }
+
+    .subscribe-form--compact .subscribe-form__btn {
+      align-self: flex-start;
+    }
+  }
+</style>
