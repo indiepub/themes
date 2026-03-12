@@ -297,6 +297,78 @@ const badgeLabel = typeBadgeLabel[entry.type];
     </div>
   )}
 
+  {/* ── Verb entries (watch/read/listen/play) ──────────────── */}
+  {['watch', 'read', 'listen', 'play'].includes(entry.type) && (
+    <div class="card-body">
+      <div class="card-header">
+        {showBadge && badgeLabel && <span class="type-badge">{badgeLabel}</span>}
+        {(entry.visibility === 'members' || entry.visibility === 'paid') && (
+          <span class="visibility-badge">
+            <Icon name="lucide:lock" aria-hidden="true" />
+            {entry.visibility === 'paid' ? 'Paid' : 'Members'}
+          </span>
+        )}
+      </div>
+      <div class="verb-callout">
+        <span class="verb-callout__emoji">
+          {entry.type === 'watch' ? '📺' : entry.type === 'read' ? '📚' : entry.type === 'listen' ? '🎧' : '🎮'}
+        </span>
+        <span class="verb-callout__text">
+          {entry.type === 'watch' ? 'Watched' : entry.type === 'read' ? 'Read' : entry.type === 'listen' ? 'Listened to' : 'Played'}
+          {' '}
+          {entry.objectUrl ? (
+            <a href={entry.objectUrl} class="verb-callout__link" rel="noopener" target="_blank">
+              {entry.objectName ?? entry.objectUrl}
+              <Icon name="lucide:external-link" aria-hidden="true" />
+            </a>
+          ) : (
+            <strong>{entry.objectName}</strong>
+          )}
+        </span>
+      </div>
+      {entry.rating != null && entry.rating > 0 && (
+        <div class="verb-rating" aria-label={`Rating: ${entry.rating} out of 5`}>
+          {[1,2,3,4,5].map(n => (
+            <span class={n <= entry.rating! ? 'star-filled' : 'star-empty'}>{n <= entry.rating! ? '★' : '☆'}</span>
+          ))}
+        </div>
+      )}
+      {entry.content && (
+        <Markdown content={linkifyHashtags(entry.content)} class="e-content card-content" />
+      )}
+      <footer class="card-footer">
+        <a href={detailUrl} class="card-footer__time u-url">
+          <time class="dt-published" datetime={isoDate(pubDate)}>
+            {formatDateCompact(pubDate)}
+          </time>
+        </a>
+        {hasInteractions && (
+          <div class="card-footer__counts">
+            {counts!.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{counts!.likes}</span>}
+            {counts!.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
+            {counts!.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{counts!.comments}</span>}
+          </div>
+        )}
+        <div class="card-footer__actions">
+          {entry.syndicationUrls && entry.syndicationUrls.map((url: string) => {
+            const { icon, label } = syndicationMeta(url);
+            return (
+              <a
+                href={url}
+                class="card-syndication u-syndication"
+                rel="syndication noopener"
+                target="_blank"
+                aria-label={`${label} (syndicated copy)`}
+              >
+                <Icon name={icon} aria-hidden="true" />
+              </a>
+            );
+          })}
+        </div>
+      </footer>
+    </div>
+  )}
+
   {/* ── Like / Repost / Reply (compact) ───────────────────── */}
   {(entry.type === 'like' || entry.type === 'repost' || entry.type === 'reply') && (
     <div class="card-body interaction-card">
@@ -625,6 +697,56 @@ const badgeLabel = typeBadgeLabel[entry.type];
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     line-height: var(--leading-relaxed);
+  }
+
+  /* ── Verb callout ───────────────────────────────────────── */
+  .verb-callout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    line-height: var(--leading-snug);
+  }
+
+  .verb-callout__emoji {
+    font-size: var(--text-xl);
+    flex-shrink: 0;
+  }
+
+  .verb-callout__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .verb-callout__link:hover {
+    color: var(--color-text-link);
+  }
+
+  .verb-callout__link :global(svg) {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .verb-rating {
+    display: flex;
+    gap: 0.125rem;
+    font-size: var(--text-lg);
+  }
+
+  .star-filled {
+    color: var(--color-text-link);
+  }
+
+  .star-empty {
+    color: var(--color-border);
   }
 
   /* ── Interaction card ────────────────────────────────────── */

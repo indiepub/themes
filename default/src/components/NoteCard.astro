@@ -40,6 +40,32 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
       </time>
     </a>
   </header>
+  {entry.verb && entry.objectName && (
+    <div class="note-card__verb-callout">
+      <span class="note-card__verb-emoji">
+        {entry.verb === 'watch' ? '📺' : entry.verb === 'read' ? '📚' : entry.verb === 'listen' ? '🎧' : entry.verb === 'play' ? '🎮' : ''}
+      </span>
+      <span class="note-card__verb-text">
+        {entry.verb === 'watch' ? 'Watched' : entry.verb === 'read' ? 'Read' : entry.verb === 'listen' ? 'Listened to' : entry.verb === 'play' ? 'Played' : entry.verb}
+        {' '}
+        {entry.objectUrl ? (
+          <a href={entry.objectUrl} rel="noopener" target="_blank">
+            {entry.objectName}
+            <Icon name="lucide:external-link" aria-hidden="true" />
+          </a>
+        ) : (
+          <strong>{entry.objectName}</strong>
+        )}
+      </span>
+    </div>
+  )}
+  {entry.rating != null && entry.rating > 0 && (
+    <div class="note-card__rating" aria-label={`Rating: ${entry.rating} out of 5`}>
+      {[1,2,3,4,5].map(n => (
+        <span class={n <= entry.rating! ? 'star-filled' : 'star-empty'}>{n <= entry.rating! ? '★' : '☆'}</span>
+      ))}
+    </div>
+  )}
   {entry.inReplyTo && (
     <p class="note-card__reply-to">
       <Icon name="lucide:corner-down-right" aria-hidden="true" />
@@ -134,6 +160,55 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
   .note-card__time:hover {
     color: var(--color-text-secondary);
     text-decoration: none;
+  }
+
+  .note-card__verb-callout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background-color: var(--color-surface-2, var(--color-surface));
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  .note-card__verb-emoji {
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+  }
+
+  .note-card__verb-text a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .note-card__verb-text a:hover {
+    color: var(--color-text-link);
+  }
+
+  .note-card__verb-text :global(svg) {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .note-card__rating {
+    display: flex;
+    gap: 0.125rem;
+    font-size: var(--text-base);
+  }
+
+  .note-card__rating .star-filled {
+    color: var(--color-text-link, var(--color-accent));
+  }
+
+  .note-card__rating .star-empty {
+    color: var(--color-border);
   }
 
   .note-card__reply-to {

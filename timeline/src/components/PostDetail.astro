@@ -121,6 +121,34 @@ const backLabel =
   {/* ── Non-article: enlarged card layout ───────────────── */}
   {!isArticle && (
     <div class="post-detail__card">
+      {/* Verb activity callout */}
+      {entry.verb && entry.objectName && (
+        <div class="verb-callout">
+          <span class="verb-callout__emoji">
+            {entry.verb === 'watch' ? '📺' : entry.verb === 'read' ? '📚' : entry.verb === 'listen' ? '🎧' : entry.verb === 'play' ? '🎮' : ''}
+          </span>
+          <span class="verb-callout__text">
+            {entry.verb === 'watch' ? 'Watched' : entry.verb === 'read' ? 'Read' : entry.verb === 'listen' ? 'Listened to' : entry.verb === 'play' ? 'Played' : entry.verb}
+            {' '}
+            {entry.objectUrl ? (
+              <a href={entry.objectUrl} rel="noopener" target="_blank">
+                {entry.objectName}
+                <Icon name="lucide:external-link" aria-hidden="true" />
+              </a>
+            ) : (
+              <strong>{entry.objectName}</strong>
+            )}
+          </span>
+        </div>
+      )}
+      {entry.rating != null && entry.rating > 0 && (
+        <div class="verb-rating" aria-label={`Rating: ${entry.rating} out of 5`}>
+          {[1,2,3,4,5].map(n => (
+            <span class={n <= entry.rating! ? 'star-filled' : 'star-empty'}>{n <= entry.rating! ? '★' : '☆'}</span>
+          ))}
+        </div>
+      )}
+
       {entry.inReplyTo && (
         <p class="reply-to">
           <Icon name="lucide:corner-down-right" aria-hidden="true" />
@@ -447,6 +475,56 @@ const backLabel =
     border-radius: 0;
     max-height: 480px;
     object-fit: cover;
+  }
+
+  /* Verb callout */
+  .verb-callout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+  }
+
+  .verb-callout__emoji {
+    font-size: var(--text-2xl);
+    flex-shrink: 0;
+  }
+
+  .verb-callout__text a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .verb-callout__text a:hover {
+    color: var(--color-text-link);
+  }
+
+  .verb-callout__text :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .verb-rating {
+    display: flex;
+    gap: 0.125rem;
+    font-size: var(--text-xl);
+  }
+
+  .star-filled {
+    color: var(--color-text-link);
+  }
+
+  .star-empty {
+    color: var(--color-border);
   }
 
   /* Reply to / interaction targets */
