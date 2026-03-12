@@ -10,9 +10,10 @@ interface Props {
   webmentions: WebMention[];
   interactions: Interaction[];
   counts: InteractionCounts;
+  isPaidLocked?: boolean;
 }
 
-const { entry, webmentions, interactions, counts } = Astro.props;
+const { entry, webmentions, interactions, counts, isPaidLocked = false } = Astro.props;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 const detailUrl = `/posts/${entry.slug}`;
 
@@ -104,7 +105,14 @@ const backLabel =
       {entry.summary && (
         <p class="p-summary post-detail__lead">{entry.summary}</p>
       )}
-      {entry.content && (
+      {isPaidLocked ? (
+        <div class="paywall-cta">
+          <Icon name="lucide:lock" aria-hidden="true" />
+          <p class="paywall-cta__heading">This post is for paid subscribers</p>
+          <p class="paywall-cta__desc text-sm text-secondary">Upgrade your subscription to read the full article.</p>
+          <a href="/subscribe" class="paywall-cta__btn">Subscribe</a>
+        </div>
+      ) : entry.content && (
         <Markdown content={entry.content} class="e-content post-detail__prose prose" />
       )}
     </div>
@@ -143,7 +151,14 @@ const backLabel =
         <h1 class="p-name post-detail__name">{entry.name}</h1>
       )}
 
-      {entry.content && (
+      {isPaidLocked ? (
+        <div class="paywall-cta">
+          <Icon name="lucide:lock" aria-hidden="true" />
+          <p class="paywall-cta__heading">This post is for paid subscribers</p>
+          <p class="paywall-cta__desc text-sm text-secondary">Upgrade your subscription to read the full article.</p>
+          <a href="/subscribe" class="paywall-cta__btn">Subscribe</a>
+        </div>
+      ) : entry.content && (
         <Markdown content={entry.content} class="e-content post-detail__content" />
       )}
 
@@ -475,6 +490,47 @@ const backLabel =
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
+  }
+
+  /* ── Paywall CTA ──────────────────────────────────────────── */
+  .paywall-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-8) var(--space-6);
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  .paywall-cta > :global(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .paywall-cta__heading {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+  }
+
+  .paywall-cta__btn {
+    display: inline-block;
+    padding: var(--space-2) var(--space-5);
+    background: var(--color-brand);
+    color: var(--color-text-on-brand);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+    transition: background var(--transition);
+  }
+
+  .paywall-cta__btn:hover {
+    background: var(--color-text-link-hover);
+    text-decoration: none;
   }
 
   /* ── Footer ──────────────────────────────────────────────── */
