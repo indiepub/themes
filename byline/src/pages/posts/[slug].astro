@@ -56,6 +56,33 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-re
           </header>
         )}
 
+        {entry.verb && entry.objectName && (
+          <div class="verb-callout">
+            <span class="verb-emoji">
+              {entry.verb === 'watch' ? '📺' : entry.verb === 'read' ? '📚' : entry.verb === 'listen' ? '🎧' : entry.verb === 'play' ? '🎮' : ''}
+            </span>
+            <span>
+              {entry.verb === 'watch' ? 'Watched' : entry.verb === 'read' ? 'Read' : entry.verb === 'listen' ? 'Listened to' : entry.verb === 'play' ? 'Played' : entry.verb}
+              {' '}
+              {entry.objectUrl ? (
+                <a href={entry.objectUrl} rel="noopener" target="_blank">
+                  {entry.objectName}
+                  <Icon name="lucide:external-link" aria-hidden="true" width="13" height="13" />
+                </a>
+              ) : (
+                <strong>{entry.objectName}</strong>
+              )}
+            </span>
+          </div>
+        )}
+        {entry.rating != null && entry.rating > 0 && (
+          <div class="verb-rating" aria-label={`Rating: ${entry.rating} out of 5`}>
+            {[1,2,3,4,5].map(n => (
+              <span>{n <= entry.rating! ? '★' : '☆'}</span>
+            ))}
+          </div>
+        )}
+
         {entry.content && (
           <Markdown content={entry.content} class="note-body e-content" />
         )}
@@ -178,6 +205,44 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-re
   .note-wrap footer a:hover {
     color: var(--color-text-secondary);
     text-decoration: none;
+  }
+
+  /* ── Verb callout ── */
+  .verb-callout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-surface-2, var(--color-surface));
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .verb-emoji {
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+  }
+
+  .verb-callout a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .verb-callout a:hover {
+    color: var(--color-accent);
+  }
+
+  .verb-rating {
+    display: flex;
+    gap: 0.125rem;
+    font-size: var(--text-base);
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
   }
 
   /* ── Article ── */
