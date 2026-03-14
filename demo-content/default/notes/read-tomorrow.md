@@ -1,0 +1,13 @@
+---
+slug: read-tomorrow-x3
+type: read
+published: 2026-02-20T21:00:00Z
+visibility: public
+tags: [books]
+verb: finished
+object_name: "Tomorrow, and Tomorrow, and Tomorrow"
+object_url: "https://www.gabriellezevin.com/tomorrow"
+rating: 5
+---
+
+This wrecked me in the best way. A book about making things with people you love, and how that changes over a lifetime. Can't recommend it enough.
