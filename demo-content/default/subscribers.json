@@ -1,0 +1,23 @@
+[
+  {
+    "email": "demo-reader-1@example.com",
+    "name": "Jordan",
+    "tier": "free",
+    "status": "active",
+    "subscribedAt": "2026-02-10T09:00:00Z"
+  },
+  {
+    "email": "demo-reader-2@example.com",
+    "name": "Priya",
+    "tier": "free",
+    "status": "active",
+    "subscribedAt": "2026-02-18T14:30:00Z"
+  },
+  {
+    "email": "demo-reader-3@example.com",
+    "name": "Sam K.",
+    "tier": "paid",
+    "status": "active",
+    "subscribedAt": "2026-01-22T11:00:00Z"
+  }
+]

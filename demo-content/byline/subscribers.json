@@ -1,0 +1,37 @@
+[
+  {
+    "email": "demo-sub-1@example.com",
+    "name": "Taylor R.",
+    "tier": "free",
+    "status": "active",
+    "subscribedAt": "2026-01-05T10:00:00Z"
+  },
+  {
+    "email": "demo-sub-2@example.com",
+    "name": "Kai Nakamura",
+    "tier": "paid",
+    "status": "active",
+    "subscribedAt": "2026-01-12T14:00:00Z"
+  },
+  {
+    "email": "demo-sub-3@example.com",
+    "name": "Ellis Brewer",
+    "tier": "free",
+    "status": "active",
+    "subscribedAt": "2026-02-01T09:30:00Z"
+  },
+  {
+    "email": "demo-sub-4@example.com",
+    "name": "Reese P.",
+    "tier": "free",
+    "status": "active",
+    "subscribedAt": "2026-02-20T16:00:00Z"
+  },
+  {
+    "email": "demo-sub-5@example.com",
+    "name": "Dana Ortiz",
+    "tier": "paid",
+    "status": "active",
+    "subscribedAt": "2026-03-01T11:00:00Z"
+  }
+]
