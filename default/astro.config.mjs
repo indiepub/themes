@@ -19,6 +19,9 @@ export default defineConfig({
       },
     },
   },
+  markdown: {
+    syntaxHighlight: false,
+  },
   integrations: [
     icon(),
     indiepub({
