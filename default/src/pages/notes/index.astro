@@ -2,6 +2,7 @@
 import Page from '../../layouts/Page.astro';
 import EntryCard from '../../components/EntryCard.astro';
 import NoteComposer from '../../components/NoteComposer.astro';
+import { setCollectionCacheHeaders } from '../../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -12,10 +13,7 @@ const memberTier = Astro.locals.member?.tier ?? null;
 const notes = await content.getEntries('note', { memberTier, limit: 30 });
 const countsMap = await content.getBatchInteractionCounts(notes.map(e => e.id));
 
-Astro.response.headers.set(
-  'Cache-Control',
-  Astro.locals.isAdmin ? 'no-store' : 'public, s-maxage=60, stale-while-revalidate=3600',
-);
+setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
 ---
 
 <Page title="Notes">

@@ -1,6 +1,7 @@
 ---
 import Feed from '../../layouts/Feed.astro';
 import FeedCard from '../../components/FeedCard.astro';
+import { setCollectionCacheHeaders } from '../../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -11,10 +12,7 @@ const memberTier = Astro.locals.member?.tier ?? null;
 const entries = await content.getEntries('bookmark', { memberTier, limit: 50 });
 const countsMap = await content.getBatchInteractionCounts(entries.map(e => e.id));
 
-Astro.response.headers.set(
-  'Cache-Control',
-  Astro.locals.isAdmin ? 'no-store' : 'public, s-maxage=60, stale-while-revalidate=3600',
-);
+setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, entries);
 ---
 
 <Feed title="Bookmarks">

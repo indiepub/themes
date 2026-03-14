@@ -1,6 +1,7 @@
 ---
 import Feed from '../../layouts/Feed.astro';
 import PostDetail from '../../components/PostDetail.astro';
+import { setEntryCacheHeaders } from '../../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -48,7 +49,7 @@ const pageTitle = entry.name ?? (entry.content ? entry.content.replace(/<[^>]*>/
 const pageDescription = entry.summary ?? undefined;
 const ogImage = `/og/${entry.slug}`;
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=300');
+setEntryCacheHeaders(Astro.response, entry);
 ---
 
 <Feed title={pageTitle} description={pageDescription} ogImage={ogImage}>

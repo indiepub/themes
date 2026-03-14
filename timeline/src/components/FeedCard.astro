@@ -7,7 +7,7 @@ import { formatDateCompact, isoDate, hostname, linkifyHashtags } from '../lib/fo
 
 interface Props {
   entry: Entry;
-  counts?: InteractionCounts;
+  counts?: InteractionCounts | undefined;
 }
 
 const { entry, counts } = Astro.props;

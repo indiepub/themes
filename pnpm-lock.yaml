@@ -18,14 +18,14 @@ importers:
         specifier: ^1.0.0
         version: 1.2.72
       '@indiepub/admin':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 1.0.0-beta.14
+        version: 1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@indiepub/astro':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 1.0.0-beta.14
+        version: 1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@indiepub/db':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
+        specifier: 1.0.0-beta.2
+        version: 1.0.0-beta.2(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
       '@tiptap/core':
         specifier: ^3.20.0
         version: 3.20.1(@tiptap/pm@3.20.1)
@@ -61,8 +61,8 @@ importers:
         specifier: ^4.0.0
         version: 4.20260305.1
       '@indiepub/types':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1
+        specifier: 1.0.0-beta.2
+        version: 1.0.0-beta.2
       astro:
         specifier: ^5.0.0
         version: 5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -85,11 +85,11 @@ importers:
         specifier: ^1.0.0
         version: 1.2.72
       '@indiepub/admin':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 1.0.0-beta.14
+        version: 1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@indiepub/astro':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 1.0.0-beta.14
+        version: 1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       astro-icon:
         specifier: ^1.1.5
         version: 1.1.5
@@ -98,11 +98,11 @@ importers:
         specifier: ^0.9.6
         version: 0.9.6(prettier@3.8.1)(typescript@5.9.3)
       '@indiepub/db':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
+        specifier: 1.0.0-beta.2
+        version: 1.0.0-beta.2(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
       '@indiepub/types':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1
+        specifier: 1.0.0-beta.2
+        version: 1.0.0-beta.2
       astro:
         specifier: ^5.0.0
         version: 5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -125,11 +125,11 @@ importers:
         specifier: ^1.0.0
         version: 1.2.72
       '@indiepub/admin':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 1.0.0-beta.14
+        version: 1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@indiepub/astro':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 1.0.0-beta.14
+        version: 1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       astro-icon:
         specifier: ^1.1.5
         version: 1.1.5
@@ -138,11 +138,11 @@ importers:
         specifier: ^0.9.6
         version: 0.9.6(prettier@3.8.1)(typescript@5.9.3)
       '@indiepub/db':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
+        specifier: 1.0.0-beta.2
+        version: 1.0.0-beta.2(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
       '@indiepub/types':
-        specifier: ^1.0.0-beta.1
-        version: 1.0.0-beta.1
+        specifier: 1.0.0-beta.2
+        version: 1.0.0-beta.2
       astro:
         specifier: ^5.0.0
         version: 5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -1119,37 +1119,37 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@indiepub/activitypub@1.0.0-beta.1':
-    resolution: {integrity: sha512-vbfBd1/2lgQ1KzEacQ7fnANUslE8ExDmwUUR5H6e5E1FhYpRMjqP4EJJEIt5QpMUpzfjHgle0wHwcealEOKe3Q==}
+  '@indiepub/activitypub@1.0.0-beta.12':
+    resolution: {integrity: sha512-N67emwAbpBrQixGTK2H3oS/fF7bUfIEA1MbO/3Yj1JUtYzzP0pVxQIFzaOX45PWdtUmmEMr0xn5ZNAr4ayYeZg==}
 
-  '@indiepub/admin@1.0.0-beta.1':
-    resolution: {integrity: sha512-+zk0MOSt1lUzFOqp42aL9R2j2BEouE07XfwkUIaG7tPhxVlKC5IUbw9cAtEm1GgnhyK8ZqoK9Jqay4elgr+AEw==}
+  '@indiepub/admin@1.0.0-beta.14':
+    resolution: {integrity: sha512-N+sBWcPPiK9BMKsxK+nQQtRCurpNwQI4R5PTVjaNCPHj5+L+3jVoFK4ENWM4z1lOxW0YgFisedm6AJ5jItObnQ==}
     peerDependencies:
-      '@indiepub/astro': 1.0.0-beta.1
+      '@indiepub/astro': 1.0.0-beta.14
       astro: ^5.0.0
 
-  '@indiepub/astro@1.0.0-beta.1':
-    resolution: {integrity: sha512-D0T5ZB7ZKLB+rvNiEK5WuMCmLe2SMKcSkVHZhGMb+qQ2/vPSlkFWmy7yUM4kaWkLK4bQNgFCaWB0jl3KhJy9Rg==}
+  '@indiepub/astro@1.0.0-beta.14':
+    resolution: {integrity: sha512-eOCG6mk22OUCBvS/YvSf3Gvny0AUtxLpLsCSsctNTESmudPY4GdhMROZUbpDUWfoECk55tBa6JbySSReueFPeQ==}
     peerDependencies:
       astro: ^5.0.0
 
-  '@indiepub/atproto@1.0.0-beta.1':
-    resolution: {integrity: sha512-MKRrCd7GY2k0yUPMtiqjy1tM1tyOZuhgUDj1GGvYGo0w7cxbLMa5PxHoCWQtkLLKlzm2SLKu2oP/nyExA5ntog==}
+  '@indiepub/atproto@1.0.0-beta.12':
+    resolution: {integrity: sha512-ajhQ5zAnWWi926DkfOKXzp+v2BT1oCmEZzAt5OatfBcrMzbLQm5O8ABge0sBfUkkmBP2SzMK/mw4+jxJ3//ELQ==}
 
-  '@indiepub/core@1.0.0-beta.1':
-    resolution: {integrity: sha512-tYl6J3vsF8M5+nPyjMLOdJ3yaKuDgHaJa+kc1Xz822e6vn1jpFtC5Jy39t+fCPVARP2FN2N6CXuYZ04joa8M+g==}
+  '@indiepub/core@1.0.0-beta.12':
+    resolution: {integrity: sha512-vZUNAQVAvmeen6Z/2lieHiWn9IJHJnhszk4Ei6QoMt2xJUjn0+peJVoxnnpwLSkT9ETPI8KFUslfqZTW/u4wgw==}
 
-  '@indiepub/db@1.0.0-beta.1':
-    resolution: {integrity: sha512-iMdKTxI6lEvKAr3xldVkDN9l4OA46jSMQROkBF4pFmbnO7Fazb+6penwOwSh2EJeqb379CafC5SpqmFXfflgxQ==}
+  '@indiepub/db@1.0.0-beta.2':
+    resolution: {integrity: sha512-3eev7iHAs+9KAsbqw6p6UwlH1ZNfcBmcf0zCOFd/aoeXfflxwxGNNMPulz913t8F3Ai5bGGGsM6ZBbHg8cTOrQ==}
 
-  '@indiepub/email@1.0.0-beta.1':
-    resolution: {integrity: sha512-OGknPxP1K5o77vx6ethkPxT6o9S+sd32NgEfnq62UM6QPRCgWtD18GduffYqwsWaIiA+8P9iUA10kNu/5CHWaQ==}
+  '@indiepub/email@1.0.0-beta.2':
+    resolution: {integrity: sha512-wjMy4sF3VJ0h7tAerV9kALH/uF8X+VIdoPYTAi7QUbHXKIUzc4FoPvedVyQBjTNie1t8jQJtW9mSoqmlbKYfvA==}
 
-  '@indiepub/types@1.0.0-beta.1':
-    resolution: {integrity: sha512-q8O2U1QRXHJ3DnwvqR5RcBwj85vqCiHGrdvxCglHN9fIbRTLe8xR+ixA4P6J9eDJLD91/eF1lg5NzscPve20+g==}
+  '@indiepub/types@1.0.0-beta.2':
+    resolution: {integrity: sha512-54nz1pInLWxP4oGrQdq6Hgg8sPcY3gF09AUBn67HPyi2Z+YkSCt9sU8T5ueR2u/sduLN/Sjx/JrpQZGwCKPMkw==}
 
-  '@indiepub/webmentions@1.0.0-beta.1':
-    resolution: {integrity: sha512-cSgwpV/Vn5zkycrqT0JmtbDiGrBxACKaafYN5ttqklLtHAMR7opolf2xwfEjYaRgIic6nvnGw4VyVITI1tBDgQ==}
+  '@indiepub/webmentions@1.0.0-beta.2':
+    resolution: {integrity: sha512-N85ZP9N2nThuPxbnxKWgoLO1KHnf9OiSnhFPQ7DKmHVD+UCpINrfI+OXAIli1ZUg8QSeRJXJjLwOD9hKSETSbA==}
 
   '@isaacs/fs-minipass@4.0.1':
     resolution: {integrity: sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==}
@@ -2233,6 +2233,9 @@ packages:
 
   fflate@0.7.4:
     resolution: {integrity: sha512-5u2V/CDW15QM1XbbgS+0DfPxVB+jUKhWEKuuFuHncbk3tEEqzmoXL+2KyOFuKGqOnmdIy0/davWF1CkuwtibCw==}
+
+  fflate@0.8.2:
+    resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
 
   flattie@1.1.1:
     resolution: {integrity: sha512-9UbaD6XdAL97+k/n+N7JwX46K/M6Zc6KcFYskrYL8wbBV/Uyk0CTAMY0VT+qiK5PM7AIc9aTWYtq65U7T+aCNQ==}
@@ -4227,17 +4230,19 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@indiepub/activitypub@1.0.0-beta.1':
+  '@indiepub/activitypub@1.0.0-beta.12':
     dependencies:
-      '@indiepub/types': 1.0.0-beta.1
+      '@indiepub/core': 1.0.0-beta.12
+      '@indiepub/types': 1.0.0-beta.2
       marked: 17.0.4
 
-  '@indiepub/admin@1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@indiepub/admin@1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(@indiepub/astro@1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
-      '@indiepub/astro': 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@indiepub/db': 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
-      '@indiepub/email': 1.0.0-beta.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@indiepub/types': 1.0.0-beta.1
+      '@indiepub/astro': 1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@indiepub/atproto': 1.0.0-beta.12
+      '@indiepub/db': 1.0.0-beta.2(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
+      '@indiepub/email': 1.0.0-beta.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@indiepub/types': 1.0.0-beta.2
       '@tiptap/core': 2.27.2(@tiptap/pm@2.27.2)
       '@tiptap/extension-image': 2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))
       '@tiptap/extension-link': 2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))(@tiptap/pm@2.27.2)
@@ -4248,6 +4253,7 @@ snapshots:
       '@tiptap/suggestion': 2.27.2(@tiptap/core@3.20.1(@tiptap/pm@3.20.1))(@tiptap/pm@3.20.1)
       astro: 5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2)
       drizzle-orm: 0.38.4(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
+      fflate: 0.8.2
       marked: 17.0.4
       nanoid: 5.1.6
       tiptap-markdown: 0.8.10(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))
@@ -4283,22 +4289,25 @@ snapshots:
       - sql.js
       - sqlite3
 
-  '@indiepub/astro@1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@indiepub/astro@1.0.0-beta.14(@cloudflare/workers-types@4.20260305.1)(astro@5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
-      '@indiepub/activitypub': 1.0.0-beta.1
-      '@indiepub/atproto': 1.0.0-beta.1
-      '@indiepub/core': 1.0.0-beta.1
-      '@indiepub/db': 1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
-      '@indiepub/email': 1.0.0-beta.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@indiepub/types': 1.0.0-beta.1
-      '@indiepub/webmentions': 1.0.0-beta.1
+      '@indiepub/activitypub': 1.0.0-beta.12
+      '@indiepub/atproto': 1.0.0-beta.12
+      '@indiepub/core': 1.0.0-beta.12
+      '@indiepub/db': 1.0.0-beta.2(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
+      '@indiepub/email': 1.0.0-beta.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@indiepub/types': 1.0.0-beta.2
+      '@indiepub/webmentions': 1.0.0-beta.2
       '@resvg/resvg-wasm': 2.6.2
+      '@shikijs/core': 3.23.0
+      '@shikijs/engine-javascript': 3.23.0
+      '@shikijs/langs': 3.23.0
+      '@shikijs/themes': 3.23.0
       astro: 5.18.0(@types/node@25.3.5)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2)
       drizzle-orm: 0.38.4(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
       marked: 17.0.4
       nanoid: 5.1.6
       satori: 0.10.14
-      shiki: 3.23.0
       zod: 4.3.6
     transitivePeerDependencies:
       - '@aws-sdk/client-rds-data'
@@ -4332,17 +4341,18 @@ snapshots:
       - sql.js
       - sqlite3
 
-  '@indiepub/atproto@1.0.0-beta.1':
+  '@indiepub/atproto@1.0.0-beta.12':
     dependencies:
       '@atproto/api': 0.13.35
-      '@indiepub/types': 1.0.0-beta.1
+      '@indiepub/core': 1.0.0-beta.12
+      '@indiepub/types': 1.0.0-beta.2
       marked: 17.0.4
 
-  '@indiepub/core@1.0.0-beta.1':
+  '@indiepub/core@1.0.0-beta.12':
     dependencies:
-      '@indiepub/types': 1.0.0-beta.1
+      '@indiepub/types': 1.0.0-beta.2
 
-  '@indiepub/db@1.0.0-beta.1(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)':
+  '@indiepub/db@1.0.0-beta.2(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)':
     dependencies:
       drizzle-orm: 0.38.4(@cloudflare/workers-types@4.20260305.1)(react@19.2.4)
     transitivePeerDependencies:
@@ -4376,19 +4386,19 @@ snapshots:
       - sql.js
       - sqlite3
 
-  '@indiepub/email@1.0.0-beta.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@indiepub/email@1.0.0-beta.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
-      '@indiepub/types': 1.0.0-beta.1
+      '@indiepub/types': 1.0.0-beta.2
       resend: 4.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     transitivePeerDependencies:
       - react
       - react-dom
 
-  '@indiepub/types@1.0.0-beta.1': {}
+  '@indiepub/types@1.0.0-beta.2': {}
 
-  '@indiepub/webmentions@1.0.0-beta.1':
+  '@indiepub/webmentions@1.0.0-beta.2':
     dependencies:
-      '@indiepub/types': 1.0.0-beta.1
+      '@indiepub/types': 1.0.0-beta.2
       microformats-parser: 2.0.4
 
   '@isaacs/fs-minipass@4.0.1':
@@ -5509,6 +5519,8 @@ snapshots:
       picomatch: 4.0.3
 
   fflate@0.7.4: {}
+
+  fflate@0.8.2: {}
 
   flattie@1.1.1: {}
 

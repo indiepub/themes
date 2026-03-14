@@ -1,6 +1,7 @@
 ---
 import Feed from '../../layouts/Feed.astro';
 import FeedCard from '../../components/FeedCard.astro';
+import { setCollectionCacheHeaders } from '../../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -19,7 +20,7 @@ const entries = await Astro.locals.indiepub.content.getEntries(undefined, {
 
 if (entries.length === 0) return new Response('Not found', { status: 404 });
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+setCollectionCacheHeaders(Astro.response, false, entries);
 ---
 
 <Feed title={`#${decodedTag}`}>

@@ -2,9 +2,11 @@
 import Page from '../layouts/Page.astro';
 import EntryDetail from '../components/EntryDetail.astro';
 import { formatDate } from '../lib/format.ts';
+import { setCollectionCacheHeaders } from '../lib/cache';
 
 let nowEntry = null;
-let interactions = { likes: 0, comments: 0, reposts: 0 };
+let interactions: import('@indiepub/types').Interaction[] = [];
+let counts: import('@indiepub/types').InteractionCounts = { likes: 0, comments: 0, reposts: 0 };
 let webmentions: import('@indiepub/types').WebMention[] = [];
 
 if (Astro.locals.indiepub) {
@@ -13,14 +15,15 @@ if (Astro.locals.indiepub) {
   nowEntry = entries[0] ?? null;
 
   if (nowEntry) {
-    [interactions, webmentions] = await Promise.all([
+    [interactions, counts, webmentions] = await Promise.all([
+      content.getInteractions(nowEntry.id),
       content.getInteractionCounts(nowEntry.id),
       content.getWebmentions(nowEntry.id),
     ]);
   }
 }
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+setCollectionCacheHeaders(Astro.response, false, nowEntry ? [nowEntry] : []);
 ---
 
 <Page title="Now">
@@ -34,7 +37,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-re
   </div>
 
   {nowEntry ? (
-    <EntryDetail entry={nowEntry} webmentions={webmentions} interactions={interactions} />
+    <EntryDetail entry={nowEntry} webmentions={webmentions} interactions={interactions} counts={counts} />
   ) : (
     <div class="now-placeholder">
       <p>

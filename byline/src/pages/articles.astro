@@ -1,5 +1,6 @@
 ---
 import Page from '../layouts/Page.astro';
+import { setCollectionCacheHeaders } from '../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -45,7 +46,7 @@ const yearGroups: YearGroup[] = Object.keys(byYear)
   .sort((a, b) => b - a)
   .map(year => ({ year, rows: byYear[year]! }));
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, articles);
 ---
 
 <Page title="Articles">

@@ -19,10 +19,10 @@ const { entry, webmentions, interactions, counts } = Astro.props;
 // Merge interactions and webmentions into unified response items
 type ResponseItem = {
   type: 'like' | 'repost' | 'comment';
-  authorName?: string;
-  authorUrl?: string;
-  authorPhoto?: string;
-  content?: string;
+  authorName?: string | undefined;
+  authorUrl?: string | undefined;
+  authorPhoto?: string | undefined;
+  content?: string | undefined;
   sourceUrl: string;
   sourceLabel: string;
 };
