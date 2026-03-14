@@ -1,6 +1,7 @@
 ---
 import Page from '../../layouts/Page.astro';
 import EntryCard from '../../components/EntryCard.astro';
+import { setCollectionCacheHeaders } from '../../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -11,7 +12,7 @@ const memberTier = Astro.locals.member?.tier ?? null;
 const bookmarks = await content.getEntries('bookmark', { memberTier, limit: 30 });
 const countsMap = await content.getBatchInteractionCounts(bookmarks.map(e => e.id));
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, bookmarks);
 ---
 
 <Page title="Bookmarks">

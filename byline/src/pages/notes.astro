@@ -3,6 +3,7 @@ import Page from '../layouts/Page.astro';
 import NoteComposer from '../components/NoteComposer.astro';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import { Icon } from 'astro-icon/components';
+import { setCollectionCacheHeaders } from '../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -40,7 +41,7 @@ const noteItems: NoteItem[] = notes.map(entry => ({
     : '',
 }));
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
 ---
 
 <Page title="Notes">

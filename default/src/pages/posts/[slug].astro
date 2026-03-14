@@ -1,6 +1,7 @@
 ---
 import Page from '../../layouts/Page.astro';
 import EntryDetail from '../../components/EntryDetail.astro';
+import { setEntryCacheHeaders } from '../../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -43,8 +44,7 @@ const pageTitle = entry.name ?? (entry.content ? entry.content.replace(/<[^>]*>/
 const pageDescription = entry.summary ?? undefined;
 const ogImage = `/og/${entry.slug}`;
 
-// Light cache — entries are SSR but public content can be cached briefly
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=300');
+setEntryCacheHeaders(Astro.response, entry);
 
 const typeLabels: Record<string, string> = {
   note: 'Notes',

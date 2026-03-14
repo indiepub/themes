@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import Feed from '../layouts/Feed.astro';
 import SocialIcon from '../components/SocialIcon.astro';
+import { setStaticCacheHeaders } from '../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -10,7 +11,7 @@ if (!Astro.locals.indiepub) {
 const { content, config } = Astro.locals.indiepub;
 const author = await content.getAuthor();
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+setStaticCacheHeaders(Astro.response);
 ---
 
 <Feed title="About">

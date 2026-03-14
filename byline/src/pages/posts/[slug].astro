@@ -2,6 +2,7 @@
 import Page from '../../layouts/Page.astro';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import { Icon } from 'astro-icon/components';
+import { setEntryCacheHeaders } from '../../lib/cache';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -39,7 +40,7 @@ const publishedDate = entry.publishedAt
 const showSubscribeCta =
   (config.subscriptions?.enabled ?? false) && !Astro.locals.member;
 
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=300');
+setEntryCacheHeaders(Astro.response, entry);
 ---
 
 <Page title={pageTitle} description={pageDescription} ogImage={ogImage} narrow>

@@ -1,0 +1,10 @@
+{
+  "name": "indiepub-themes",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev"
+  }
+}

@@ -10,7 +10,7 @@ import { syndicationMeta } from './card-utils.ts';
 
 interface Props {
   entry: Entry;
-  counts?: InteractionCounts;
+  counts?: InteractionCounts | undefined;
 }
 
 const { entry, counts } = Astro.props;

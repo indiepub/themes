@@ -20,10 +20,10 @@ const detailUrl = `/posts/${entry.slug}`;
 // Merge interactions + webmentions into a common shape for display
 type ResponseItem = {
   type: 'like' | 'repost' | 'comment';
-  authorName?: string;
-  authorUrl?: string;
-  authorPhoto?: string;
-  content?: string;
+  authorName?: string | undefined;
+  authorUrl?: string | undefined;
+  authorPhoto?: string | undefined;
+  content?: string | undefined;
   sourceUrl: string;
   sourceLabel: string;
 };

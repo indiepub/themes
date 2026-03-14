@@ -7,7 +7,7 @@ import BookmarkCard from './BookmarkCard.astro';
 
 interface Props {
   entry: Entry;
-  counts?: InteractionCounts;
+  counts?: InteractionCounts | undefined;
 }
 
 const { entry, counts } = Astro.props;
