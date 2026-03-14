@@ -16,8 +16,8 @@
     "@astrojs/cloudflare": "^12.0.0",
     "@iconify-json/lucide": "^1.2.0",
     "@iconify-json/simple-icons": "^1.0.0",
-    "@indiepub/admin": "1.0.0-beta.13",
-    "@indiepub/astro": "1.0.0-beta.13",
+    "@indiepub/admin": "1.0.0-beta.14",
+    "@indiepub/astro": "1.0.0-beta.14",
     "astro-icon": "^1.1.5"
   },
   "devDependencies": {
