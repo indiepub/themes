@@ -28,3 +28,6 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
+
+      - name: Build
+        run: pnpm --filter @indiepub/theme-default build
