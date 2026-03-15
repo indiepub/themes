@@ -1,7 +1,10 @@
 name = "byline-site"
+main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "dist"
+
+[assets]
+directory = "dist"
 
 # Set secrets via the CLI, never commit them:
 #   wrangler secret put INDIEPUB_TOKEN

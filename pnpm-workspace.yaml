@@ -2,3 +2,9 @@ packages:
   - default
   - byline
   - timeline
+  - minimal
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - workerd

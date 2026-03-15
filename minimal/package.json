@@ -13,15 +13,15 @@
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.0.0",
+    "@astrojs/cloudflare": "^13.0.0",
     "@indiepub/admin": "1.0.0-beta.14",
     "@indiepub/astro": "1.0.0-beta.14",
-    "astro": "^5.0.0"
+    "astro": "^6.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@indiepub/types": "1.0.0-beta.2",
     "typescript": "^5.9.3",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.73.0"
   }
 }
