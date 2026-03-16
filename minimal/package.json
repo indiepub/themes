@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.0.0",
-    "@indiepub/admin": "1.0.0-beta.15",
-    "@indiepub/astro": "1.0.0-beta.15",
+    "@indiepub/admin": "1.0.0-beta.16",
+    "@indiepub/astro": "1.0.0-beta.16",
     "astro": "^6.0.0"
   },
   "devDependencies": {
