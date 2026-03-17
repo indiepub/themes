@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["@tiptap/*", "tiptap-*"],
+      "groupName": "tiptap"
+    },
+    {
+      "matchPackagePatterns": ["@astrojs/*"],
+      "groupName": "astro ecosystem"
+    }
+  ]
+}
