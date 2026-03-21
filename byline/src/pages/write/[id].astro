@@ -6,6 +6,7 @@ import { entries, tags, entryTags } from '@indiepub/db/schema';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import type { D1Database } from '@cloudflare/workers-types';
+import { getEnv } from '@indiepub/astro/lib/env';
 
 if (!Astro.locals.isAdmin) return Astro.redirect('/');
 
@@ -16,10 +17,7 @@ const indiepub = Astro.locals.indiepub;
 if (!indiepub) return new Response('Service unavailable', { status: 503 });
 
 const d1BindingName = indiepub.config.d1BindingName ?? 'DB';
-const runtime = (Astro.locals as unknown as Record<string, unknown>)['runtime'] as
-  | { env: Record<string, unknown> }
-  | undefined;
-const d1 = runtime?.env?.[d1BindingName] as D1Database;
+const d1 = getEnv()[d1BindingName] as D1Database;
 const db = createDb(d1);
 
 function slugify(text: string): string {

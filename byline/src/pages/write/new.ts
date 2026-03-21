@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import type { D1Database } from '@cloudflare/workers-types';
 import { createMutationsApi } from '@indiepub/astro/lib/mutations';
+import { getEnv } from '@indiepub/astro/lib/env';
 
 export const POST: APIRoute = async ({ locals, request, redirect }) => {
   if (!locals.isAdmin) return redirect('/', 302);
@@ -10,10 +11,7 @@ export const POST: APIRoute = async ({ locals, request, redirect }) => {
 
   const cfg = indiepub.config;
   const d1BindingName = cfg.d1BindingName ?? 'DB';
-  const runtime = (locals as unknown as Record<string, unknown>)['runtime'] as
-    | { env: Record<string, unknown> }
-    | undefined;
-  const d1 = runtime?.env?.[d1BindingName] as D1Database;
+  const d1 = getEnv()[d1BindingName] as D1Database;
   const siteUrl = cfg.siteUrl ?? new URL(request.url).origin;
 
   const form = await request.formData();

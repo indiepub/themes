@@ -4,6 +4,7 @@ import { createDb } from '@indiepub/astro/lib/db';
 import { entries } from '@indiepub/db/schema';
 import { and, desc, inArray, count } from 'drizzle-orm';
 import type { D1Database } from '@cloudflare/workers-types';
+import { getEnv } from '@indiepub/astro/lib/env';
 
 if (!Astro.locals.isAdmin) return Astro.redirect('/');
 
@@ -12,10 +13,7 @@ if (!indiepub) return new Response('Service unavailable', { status: 503 });
 
 const cfg = indiepub.config;
 const d1BindingName = cfg.d1BindingName ?? 'DB';
-const runtime = (Astro.locals as unknown as Record<string, unknown>)['runtime'] as
-  | { env: Record<string, unknown> }
-  | undefined;
-const d1 = runtime?.env?.[d1BindingName] as D1Database;
+const d1 = getEnv()[d1BindingName] as D1Database;
 
 const db = createDb(d1);
 
