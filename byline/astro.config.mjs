@@ -7,8 +7,10 @@ import { indiepubAdmin } from '@indiepub/admin';
 export default defineConfig({
   output: 'server',
   adapter: cloudflare({
+    platformProxy: { enabled: true },
     imageService: 'cloudflare',
   }),
+  session: { driver: 'unstorage/drivers/null' },
   vite: {
     environments: {
       ssr: {
