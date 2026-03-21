@@ -19,5 +19,5 @@ export const POST: APIRoute = async ({ locals, request, redirect }) => {
 
   const mutations = createMutationsApi(d1, siteUrl);
   const entry = await mutations.createEntry({ type: entryType, status: 'draft' });
-  return redirect(`/write/${entry.id}`, 302);
+  return redirect(`/write/${entryType}/${entry.id}`, 302);
 };

@@ -120,7 +120,7 @@ function truncate(s: string | null | undefined, len = 80) {
           {recentRows.map(row => (
             <tr>
               <td>
-                <a href={`/write/${row.id}`}>
+                <a href={`/write/${row.type === 'article' ? 'article' : 'note'}/${row.id}`}>
                   {row.name
                     ? row.name
                     : <span class="preview">{truncate(row.content) || '(empty)'}</span>

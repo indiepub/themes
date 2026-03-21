@@ -1,5 +1,5 @@
 ---
-import Page from '../../layouts/Page.astro';
+import Page from '../../../layouts/Page.astro';
 import { Icon } from 'astro-icon/components';
 import { createDb } from '@indiepub/astro/lib/db';
 import { entries, tags, entryTags } from '@indiepub/db/schema';
@@ -33,7 +33,6 @@ if (Astro.request.method === 'POST') {
   const visibility = (form.get('visibility') as string) || 'public';
   const action = (form.get('action') as string) || 'save';
   const status = action === 'publish' ? 'published' : 'draft';
-  const type = name ? 'article' : 'note';
   const tagsRaw = (form.get('tags') as string) || '';
   const tagNames = tagsRaw.split(',').map((t) => t.trim()).filter(Boolean);
   const now = new Date();
@@ -45,7 +44,7 @@ if (Astro.request.method === 'POST') {
       content,
       summary,
       visibility,
-      type,
+      type: 'article',
       status,
       updatedAt: now,
       ...(status === 'published' ? { publishedAt: now } : {}),
@@ -63,7 +62,7 @@ if (Astro.request.method === 'POST') {
   }
 
   return Astro.redirect(
-    action === 'publish' ? `/posts/${form.get('slug') ?? id}` : `/write/${id}`,
+    action === 'publish' ? `/posts/${form.get('slug') ?? id}` : `/write/article/${id}`,
   );
 }
 
@@ -79,7 +78,7 @@ const entryTagRows = await db
 
 const currentTags = entryTagRows.map((r) => r.name).join(', ');
 
-const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit post');
+const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New article' : 'Edit article');
 ---
 
 <Page title={pageTitle} fullBleed>
@@ -100,35 +99,11 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
             id="title-input"
             name="name"
             value={entry.name ?? ''}
-            placeholder="Title (leave blank for a note)"
+            placeholder="Article title"
             class="title-input"
             autocomplete="off"
           />
 
-          <!-- Toolbar -->
-          <div id="toolbar" role="toolbar" aria-label="Formatting">
-            <button type="button" data-action="h2" title="Heading 2">H2</button>
-            <button type="button" data-action="h3" title="Heading 3">H3</button>
-            <span class="sep" aria-hidden="true"></span>
-            <button type="button" data-action="bold" title="Bold"><strong>B</strong></button>
-            <button type="button" data-action="italic" title="Italic"><em>I</em></button>
-            <button type="button" data-action="blockquote" title="Blockquote">
-              <Icon name="lucide:quote" aria-hidden="true" width="13" height="13" />
-            </button>
-            <button type="button" data-action="code" title="Code block">
-              <Icon name="lucide:code" aria-hidden="true" width="13" height="13" />
-            </button>
-            <span class="sep" aria-hidden="true"></span>
-            <button type="button" data-action="link" title="Link">
-              <Icon name="lucide:link" aria-hidden="true" width="13" height="13" />
-            </button>
-            <button type="button" data-action="image" title="Upload image">
-              <Icon name="lucide:image" aria-hidden="true" width="13" height="13" />
-            </button>
-            <button type="button" data-action="hr" title="Horizontal rule">—</button>
-          </div>
-
-          <!-- TipTap mount point -->
           <div
             id="editor"
             data-content={JSON.stringify(entry.content ?? '')}
@@ -199,12 +174,8 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
 </Page>
 
 <script>
-  import { Editor } from '@tiptap/core';
-  import StarterKit from '@tiptap/starter-kit';
-  import Image from '@tiptap/extension-image';
-  import Link from '@tiptap/extension-link';
-  import Placeholder from '@tiptap/extension-placeholder';
-  import { Markdown } from 'tiptap-markdown';
+  import { createArticleEditor } from '@indiepub/admin/composer';
+  import '@indiepub/admin/composer/styles.css';
 
   const editorEl = document.getElementById('editor') as HTMLElement | null;
   const contentInput = document.getElementById('content-input') as HTMLInputElement | null;
@@ -218,117 +189,14 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
       initialContent = '';
     }
 
-    const editor = new Editor({
+    const editor = createArticleEditor({
       element: editorEl,
-      extensions: [
-        StarterKit,
-        Image,
-        Link.configure({ openOnClick: false }),
-        Placeholder.configure({ placeholder: 'Start writing…' }),
-        Markdown.configure({ html: false, tightLists: true }),
-      ],
       content: initialContent,
-      editorProps: {
-        attributes: { class: 'prose-content' },
-      },
+      placeholder: 'Start writing…',
     });
 
-    // Serialize markdown to hidden input on submit
     form.addEventListener('submit', () => {
-      const mdStorage = editor.storage as unknown as { markdown: { getMarkdown(): string } };
-      contentInput.value = mdStorage.markdown.getMarkdown();
-    });
-
-    // ── Toolbar ──────────────────────────────────────────────
-    const toolbar = document.getElementById('toolbar');
-
-    async function uploadImage(file: File): Promise<string | null> {
-      const fd = new FormData();
-      fd.append('file', file);
-      try {
-        const res = await fetch('/admin/upload', { method: 'POST', body: fd });
-        if (!res.ok) return null;
-        const { url } = (await res.json()) as { url: string };
-        return url;
-      } catch {
-        return null;
-      }
-    }
-
-    toolbar?.addEventListener('click', async (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-action]');
-      if (!btn) return;
-      const action = btn.dataset.action;
-
-      switch (action) {
-        case 'h2':
-          editor.chain().focus().toggleHeading({ level: 2 }).run();
-          break;
-        case 'h3':
-          editor.chain().focus().toggleHeading({ level: 3 }).run();
-          break;
-        case 'bold':
-          editor.chain().focus().toggleBold().run();
-          break;
-        case 'italic':
-          editor.chain().focus().toggleItalic().run();
-          break;
-        case 'blockquote':
-          editor.chain().focus().toggleBlockquote().run();
-          break;
-        case 'code':
-          editor.chain().focus().toggleCodeBlock().run();
-          break;
-        case 'hr':
-          editor.chain().focus().setHorizontalRule().run();
-          break;
-        case 'link': {
-          const href = prompt('Enter URL:');
-          if (href) editor.chain().focus().setLink({ href }).run();
-          break;
-        }
-        case 'image': {
-          const picker = document.createElement('input');
-          picker.type = 'file';
-          picker.accept = 'image/*';
-          picker.addEventListener('change', async () => {
-            const file = picker.files?.[0];
-            if (!file) return;
-            const url = await uploadImage(file);
-            if (url) editor.chain().focus().setImage({ src: url }).run();
-          });
-          picker.click();
-          break;
-        }
-      }
-    });
-
-    // Toolbar active-state sync
-    editor.on('selectionUpdate', () => {
-      toolbar?.querySelectorAll<HTMLButtonElement>('button[data-action]').forEach((btn) => {
-        const a = btn.dataset.action;
-        let active = false;
-        if (a === 'h2') active = editor.isActive('heading', { level: 2 });
-        else if (a === 'h3') active = editor.isActive('heading', { level: 3 });
-        else if (a === 'bold') active = editor.isActive('bold');
-        else if (a === 'italic') active = editor.isActive('italic');
-        else if (a === 'blockquote') active = editor.isActive('blockquote');
-        else if (a === 'code') active = editor.isActive('codeBlock');
-        else if (a === 'link') active = editor.isActive('link');
-        btn.classList.toggle('is-active', active);
-      });
-    });
-
-    // Image drag-and-drop
-    editorEl.addEventListener('dragover', (e) => {
-      if (e.dataTransfer?.types.includes('Files')) e.preventDefault();
-    });
-    editorEl.addEventListener('drop', async (e) => {
-      const file = e.dataTransfer?.files?.[0];
-      if (!file?.type.startsWith('image/')) return;
-      e.preventDefault();
-      const url = await uploadImage(file);
-      if (url) editor.chain().focus().setImage({ src: url }).run();
+      contentInput.value = editor.getMarkdown();
     });
   }
 </script>
@@ -355,7 +223,6 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
     color: var(--color-text-secondary);
   }
 
-  /* ── Two-column layout ── */
   .layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -369,7 +236,6 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
     }
   }
 
-  /* ── Title ── */
   .title-input {
     display: block;
     width: 100%;
@@ -391,57 +257,6 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
     color: var(--color-text-tertiary);
   }
 
-  /* ── Toolbar ── */
-  #toolbar {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: var(--space-4);
-    flex-wrap: wrap;
-  }
-
-  #toolbar button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2rem;
-    height: 2rem;
-    padding: 0 var(--space-2);
-    font-size: var(--text-sm);
-    font-family: var(--font-sans);
-    background: none;
-    border: 1px solid transparent;
-    border-radius: var(--radius-sm);
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    transition: background-color var(--transition), color var(--transition);
-    line-height: 1;
-  }
-
-  #toolbar button:hover {
-    background-color: var(--color-surface-2);
-    color: var(--color-text-primary);
-    border-color: var(--color-border);
-  }
-
-  #toolbar button.is-active {
-    background-color: var(--color-surface-3);
-    color: var(--color-text-primary);
-    border-color: var(--color-border);
-  }
-
-  .sep {
-    display: block;
-    width: 1px;
-    height: 1.25rem;
-    background-color: var(--color-border);
-    margin: 0 var(--space-1);
-    flex-shrink: 0;
-  }
-
-  /* ── ProseMirror editor ── */
   #editor {
     min-height: 480px;
     cursor: text;
@@ -461,40 +276,39 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
     height: 0;
   }
 
-  /* Prose content styles for editor */
-  #editor :global(.prose-content) {
+  #editor :global(.article-editor-content) {
     font-family: var(--font-serif);
     font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
     color: var(--color-text-primary);
   }
 
-  #editor :global(.prose-content h2) {
+  #editor :global(.article-editor-content h2) {
     font-size: var(--text-2xl);
     font-weight: var(--weight-bold);
     margin: var(--space-8) 0 var(--space-3);
     letter-spacing: -0.01em;
   }
 
-  #editor :global(.prose-content h3) {
+  #editor :global(.article-editor-content h3) {
     font-size: var(--text-xl);
     font-weight: var(--weight-bold);
     margin: var(--space-6) 0 var(--space-3);
   }
 
-  #editor :global(.prose-content p) {
+  #editor :global(.article-editor-content p) {
     margin-bottom: var(--space-4);
   }
 
-  #editor :global(.prose-content strong) {
+  #editor :global(.article-editor-content strong) {
     font-weight: var(--weight-bold);
   }
 
-  #editor :global(.prose-content em) {
+  #editor :global(.article-editor-content em) {
     font-style: italic;
   }
 
-  #editor :global(.prose-content blockquote) {
+  #editor :global(.article-editor-content blockquote) {
     border-left: 3px solid var(--color-accent);
     padding-left: var(--space-5);
     margin: var(--space-6) 0;
@@ -502,7 +316,7 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
     font-style: italic;
   }
 
-  #editor :global(.prose-content pre) {
+  #editor :global(.article-editor-content pre) {
     background-color: var(--color-surface-2);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -514,7 +328,7 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
     line-height: var(--leading-relaxed);
   }
 
-  #editor :global(.prose-content code) {
+  #editor :global(.article-editor-content code) {
     font-family: var(--font-mono);
     font-size: 0.875em;
     background-color: var(--color-surface-2);
@@ -522,41 +336,45 @@ const pageTitle = entry.name ?? (entry.status === 'draft' ? 'New post' : 'Edit p
     border-radius: var(--radius-sm);
   }
 
-  #editor :global(.prose-content pre code) {
+  #editor :global(.article-editor-content pre code) {
     background: none;
     padding: 0;
     font-size: inherit;
   }
 
-  #editor :global(.prose-content ul),
-  #editor :global(.prose-content ol) {
+  #editor :global(.article-editor-content ul),
+  #editor :global(.article-editor-content ol) {
     padding-left: var(--space-6);
     margin-bottom: var(--space-4);
   }
 
-  #editor :global(.prose-content li) {
+  #editor :global(.article-editor-content li) {
     margin-bottom: var(--space-2);
   }
 
-  #editor :global(.prose-content hr) {
+  #editor :global(.article-editor-content hr) {
     border: none;
     border-top: 1px solid var(--color-border);
     margin: var(--space-8) 0;
   }
 
-  #editor :global(.prose-content a) {
+  #editor :global(.article-editor-content a) {
     color: var(--color-text-link);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
 
-  #editor :global(.prose-content img) {
+  #editor :global(.article-editor-content img) {
     max-width: 100%;
     border-radius: var(--radius-md);
     margin: var(--space-6) 0;
   }
 
-  /* ── Sidebar ── */
+  #editor :global(.mention) {
+    color: var(--color-accent);
+    font-weight: var(--weight-medium);
+  }
+
   aside {
     position: static;
   }
