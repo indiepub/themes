@@ -25,10 +25,10 @@ export default defineConfig({
     icon({
       include: {
         lucide: [
-          'bookmark', 'chevron-down', 'corner-down-right', 'external-link',
+          'bookmark', 'chevron-down', 'clapperboard', 'corner-down-right', 'external-link',
           'globe', 'heart', 'link', 'lock', 'mail', 'message-square',
-          'monitor', 'moon', 'paperclip', 'repeat-2', 'rss', 'sun',
-          'trash-2', 'user',
+          'monitor', 'moon', 'paperclip', 'pen-line', 'repeat-2', 'reply', 'rss',
+          'sun', 'trash-2', 'user',
         ],
         'simple-icons': [
           'bluesky', 'codepen', 'dribbble', 'github', 'gitlab',
