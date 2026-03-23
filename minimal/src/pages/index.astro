@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import Markdown from '@indiepub/astro/components/Markdown.astro';
+
+if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
+
+const { content } = Astro.locals.indiepub;
+const memberTier = Astro.locals.member?.tier ?? null;
+
+const PER_PAGE = 20;
+const page = Math.max(1, parseInt(Astro.url.searchParams.get('page') ?? '1', 10) || 1);
+const offset = (page - 1) * PER_PAGE;
+
+const fetched = await content.getEntries(undefined, { memberTier, limit: PER_PAGE + 1, offset });
+const hasNext = fetched.length > PER_PAGE;
+const entries = hasNext ? fetched.slice(0, PER_PAGE) : fetched;
+const hasPrev = page > 1;
+---
+
+<Base>
+  <section class="h-feed">
+    <h1 class="visually-hidden">Recent posts</h1>
+
+    {entries.map(entry => (
+      <article class="h-entry">
+        <header>
+          {entry.name
+            ? <a href={`/posts/${entry.slug}`} class="p-name">{entry.name}</a>
+            : <a href={`/posts/${entry.slug}`}><time class="dt-published" datetime={entry.publishedAt?.toISOString()}>
+                {entry.publishedAt?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </time></a>
+          }
+          {entry.name && entry.publishedAt && (
+            <time class="dt-published" datetime={entry.publishedAt.toISOString()}>
+              {entry.publishedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </time>
+          )}
+        </header>
+        {entry.summary
+          ? <p class="p-summary">{entry.summary}</p>
+          : entry.type === 'note' && <Markdown content={entry.content ?? ''} class="e-content" />
+        }
+      </article>
+    ))}
+
+    {entries.length === 0 && <p>No posts yet.</p>}
+  </section>
+
+  {(hasPrev || hasNext) && (
+    <nav aria-label="Pagination">
+      <span>{hasPrev ? <a href={page === 2 ? '/' : `/?page=${page - 1}`}>&larr; Newer</a> : ''}</span>
+      <span>{hasNext ? <a href={`/?page=${page + 1}`}>Older &rarr;</a> : ''}</span>
+    </nav>
+  )}
+</Base>

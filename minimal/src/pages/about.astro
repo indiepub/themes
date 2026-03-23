@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+
+if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
+
+const author = await Astro.locals.indiepub.content.getAuthor();
+const socialLinks = author?.socialLinks ?? [];
+---
+
+<Base title="About">
+  <div class="h-card">
+    {author?.avatarUrl && (
+      <img src={author.avatarUrl} alt={author.displayName} class="u-photo" width="96" height="96" style="border-radius: 50%; margin-bottom: 1rem;" />
+    )}
+
+    <h1 class="p-name">{author?.displayName ?? 'About'}</h1>
+
+    {author?.bio && <p class="p-note">{author.bio}</p>}
+
+    {socialLinks.length > 0 && (
+      <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.75rem;">
+        {socialLinks.map(link => (
+          <li>
+            <a href={link.url} class="u-url" rel="me noopener" target="_blank">{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</Base>

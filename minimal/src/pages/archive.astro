@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+
+if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
+
+const { content } = Astro.locals.indiepub;
+const memberTier = Astro.locals.member?.tier ?? null;
+
+const entries = await content.getEntries(undefined, { memberTier, limit: 500 });
+
+const byYear = new Map<number, typeof entries>();
+for (const entry of entries) {
+  const year = entry.publishedAt?.getFullYear() ?? 0;
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(entry);
+}
+
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<Base title="Archive">
+  <h1>Archive</h1>
+
+  <dl>
+    {years.map(year => (
+      <>
+        <dt>{year || 'Undated'}</dt>
+        {byYear.get(year)!.map(entry => (
+          <dd>
+            <a href={`/posts/${entry.slug}`}>{entry.name ?? entry.content?.slice(0, 80) ?? '(untitled)'}</a>
+            {entry.publishedAt && (
+              <time datetime={entry.publishedAt.toISOString()}>
+                {entry.publishedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </time>
+            )}
+          </dd>
+        ))}
+      </>
+    ))}
+  </dl>
+</Base>

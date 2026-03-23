@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+
+const config = Astro.locals.indiepub?.config;
+const subscriberCount = Astro.locals.indiepub
+  ? await Astro.locals.indiepub.content.getSubscriberCount()
+  : 0;
+---
+
+<Base title="Subscribe">
+  <h1>Subscribe</h1>
+
+  <p>
+    Get new posts delivered to your inbox.
+    {subscriberCount > 0 && <> Join {subscriberCount} {subscriberCount === 1 ? 'subscriber' : 'subscribers'}.</>}
+  </p>
+
+  <form action="/api/subscribe" method="post">
+    <div>
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email" required placeholder="you@example.com" />
+    </div>
+    <button type="submit">Subscribe</button>
+  </form>
+
+  <p style="margin-top: 1.5rem; font-size: 0.8125rem; color: var(--text-muted);">
+    You can also follow via <a href="/feed.xml">RSS</a>,
+    <a href="/feed.atom">Atom</a>, or
+    <a href="/feed.json">JSON Feed</a>.
+  </p>
+</Base>

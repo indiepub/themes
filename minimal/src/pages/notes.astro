@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import Markdown from '@indiepub/astro/components/Markdown.astro';
+
+if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
+
+const { content } = Astro.locals.indiepub;
+const memberTier = Astro.locals.member?.tier ?? null;
+
+const PER_PAGE = 20;
+const page = Math.max(1, parseInt(Astro.url.searchParams.get('page') ?? '1', 10) || 1);
+const offset = (page - 1) * PER_PAGE;
+
+const fetched = await content.getEntries('note', { memberTier, limit: PER_PAGE + 1, offset });
+const hasNext = fetched.length > PER_PAGE;
+const notes = hasNext ? fetched.slice(0, PER_PAGE) : fetched;
+const hasPrev = page > 1;
+---
+
+<Base title="Notes">
+  <section class="h-feed">
+    <h1>Notes</h1>
+
+    {notes.map(note => (
+      <article class="h-entry">
+        <header>
+          <a href={`/posts/${note.slug}`}>
+            <time class="dt-published" datetime={note.publishedAt?.toISOString()}>
+              {note.publishedAt?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </time>
+          </a>
+        </header>
+        <Markdown content={note.content ?? ''} class="e-content" />
+      </article>
+    ))}
+
+    {notes.length === 0 && <p>No notes yet.</p>}
+  </section>
+
+  {(hasPrev || hasNext) && (
+    <nav aria-label="Pagination">
+      <span>{hasPrev ? <a href={page === 2 ? '/notes' : `/notes?page=${page - 1}`}>&larr; Newer</a> : ''}</span>
+      <span>{hasNext ? <a href={`/notes?page=${page + 1}`}>Older &rarr;</a> : ''}</span>
+    </nav>
+  )}
+</Base>
