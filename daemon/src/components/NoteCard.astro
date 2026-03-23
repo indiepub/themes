@@ -51,7 +51,7 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
         {entry.objectUrl ? (
           <a href={entry.objectUrl} rel="noopener" target="_blank">
             {entry.objectName}
-            <Icon name="lucide:external-link" aria-hidden="true" />
+            <Icon name="external-link" aria-hidden="true" />
           </a>
         ) : (
           <strong>{entry.objectName}</strong>
@@ -68,7 +68,7 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
   )}
   {entry.inReplyTo && (
     <p class="note-card__reply-to">
-      <Icon name="lucide:corner-down-right" aria-hidden="true" />
+      <Icon name="corner-down-right" aria-hidden="true" />
       <span class="text-secondary text-sm">in reply to </span>
       <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">
         {hostname(entry.inReplyTo)}

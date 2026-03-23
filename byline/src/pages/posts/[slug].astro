@@ -68,7 +68,7 @@ setEntryCacheHeaders(Astro.response, entry);
               {entry.objectUrl ? (
                 <a href={entry.objectUrl} rel="noopener" target="_blank">
                   {entry.objectName}
-                  <Icon name="lucide:external-link" aria-hidden="true" width="13" height="13" />
+                  <Icon name="external-link" aria-hidden="true" width="13" height="13" />
                 </a>
               ) : (
                 <strong>{entry.objectName}</strong>
@@ -90,7 +90,7 @@ setEntryCacheHeaders(Astro.response, entry);
 
         <footer>
           <a href={Astro.url.href} aria-label="Permalink to this note">
-            <Icon name="lucide:link" aria-hidden="true" width="13" height="13" />
+            <Icon name="link" aria-hidden="true" width="13" height="13" />
             Share
           </a>
         </footer>

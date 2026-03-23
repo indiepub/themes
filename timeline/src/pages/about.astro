@@ -71,7 +71,7 @@ setStaticCacheHeaders(Astro.response);
                 rel="me noopener"
                 target="_blank"
               >
-                <Icon name="simple-icons:bluesky" aria-hidden="true" />
+                <Icon name="social/bluesky" aria-hidden="true" />
                 @{config.syndication.bluesky.handle}
               </a>
             </li>
@@ -84,7 +84,7 @@ setStaticCacheHeaders(Astro.response);
                 rel="me noopener"
                 target="_blank"
               >
-                <Icon name="simple-icons:mastodon" aria-hidden="true" />
+                <Icon name="social/mastodon" aria-hidden="true" />
                 @{config.syndication.mastodon.handle}@{config.syndication.mastodon.instance}
               </a>
             </li>
@@ -99,19 +99,19 @@ setStaticCacheHeaders(Astro.response);
       <ul class="about__link-list">
         <li>
           <a href="/feed.xml">
-            <Icon name="lucide:rss" aria-hidden="true" />
+            <Icon name="rss" aria-hidden="true" />
             RSS feed
           </a>
         </li>
         <li>
           <a href="/feed.atom">
-            <Icon name="lucide:rss" aria-hidden="true" />
+            <Icon name="rss" aria-hidden="true" />
             Atom feed
           </a>
         </li>
         <li>
           <a href="/feed.json">
-            <Icon name="lucide:rss" aria-hidden="true" />
+            <Icon name="rss" aria-hidden="true" />
             JSON Feed
           </a>
         </li>

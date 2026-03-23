@@ -107,7 +107,7 @@ const backLabel =
       )}
       {isPaidLocked ? (
         <div class="paywall-cta">
-          <Icon name="lucide:lock" aria-hidden="true" />
+          <Icon name="lock" aria-hidden="true" />
           <p class="paywall-cta__heading">This post is for paid subscribers</p>
           <p class="paywall-cta__desc text-sm text-secondary">Upgrade your subscription to read the full article.</p>
           <a href="/subscribe" class="paywall-cta__btn">Subscribe</a>
@@ -133,7 +133,7 @@ const backLabel =
             {entry.objectUrl ? (
               <a href={entry.objectUrl} rel="noopener" target="_blank">
                 {entry.objectName}
-                <Icon name="lucide:external-link" aria-hidden="true" />
+                <Icon name="external-link" aria-hidden="true" />
               </a>
             ) : (
               <strong>{entry.objectName}</strong>
@@ -151,7 +151,7 @@ const backLabel =
 
       {entry.inReplyTo && (
         <p class="reply-to">
-          <Icon name="lucide:corner-down-right" aria-hidden="true" />
+          <Icon name="corner-down-right" aria-hidden="true" />
           <span class="text-secondary text-sm">in reply to </span>
           <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">
             {hostname(entry.inReplyTo)}
@@ -181,7 +181,7 @@ const backLabel =
 
       {isPaidLocked ? (
         <div class="paywall-cta">
-          <Icon name="lucide:lock" aria-hidden="true" />
+          <Icon name="lock" aria-hidden="true" />
           <p class="paywall-cta__heading">This post is for paid subscribers</p>
           <p class="paywall-cta__desc text-sm text-secondary">Upgrade your subscription to read the full article.</p>
           <a href="/subscribe" class="paywall-cta__btn">Subscribe</a>
@@ -213,10 +213,10 @@ const backLabel =
       {/* Bookmark target */}
       {entry.bookmarkOf && (
         <p class="bookmark-of">
-          <Icon name="lucide:bookmark" aria-hidden="true" />
+          <Icon name="bookmark" aria-hidden="true" />
           <a href={entry.bookmarkOf} class="u-bookmark-of" rel="noopener" target="_blank">
             {entry.name ?? hostname(entry.bookmarkOf)}
-            <Icon name="lucide:external-link" aria-hidden="true" />
+            <Icon name="external-link" aria-hidden="true" />
           </a>
         </p>
       )}
@@ -250,7 +250,7 @@ const backLabel =
           {entry.syndicationUrls.map((url: string) => (
             <li>
               <a href={url} class="syndication-link u-syndication" rel="syndication noopener" target="_blank">
-                <Icon name="lucide:external-link" aria-hidden="true" />
+                <Icon name="external-link" aria-hidden="true" />
                 {hostname(url)}
               </a>
             </li>
@@ -263,19 +263,19 @@ const backLabel =
       <div class="interaction-bar">
         {counts.likes > 0 && (
           <span class="interaction-count">
-            <Icon name="lucide:heart" aria-hidden="true" />
+            <Icon name="heart" aria-hidden="true" />
             {counts.likes} {counts.likes === 1 ? 'like' : 'likes'}
           </span>
         )}
         {counts.reposts > 0 && (
           <span class="interaction-count">
-            <Icon name="lucide:repeat-2" aria-hidden="true" />
+            <Icon name="repeat-2" aria-hidden="true" />
             {counts.reposts} {counts.reposts === 1 ? 'repost' : 'reposts'}
           </span>
         )}
         {counts.comments > 0 && (
           <span class="interaction-count">
-            <Icon name="lucide:message-square" aria-hidden="true" />
+            <Icon name="message-square" aria-hidden="true" />
             {counts.comments} {counts.comments === 1 ? 'comment' : 'comments'}
           </span>
         )}
@@ -295,7 +295,7 @@ const backLabel =
     {likes.length > 0 && (
       <div class="wm-pile" aria-label={`${likes.length} ${likes.length === 1 ? 'like' : 'likes'}`}>
         <p class="wm-pile__label text-sm text-secondary">
-          <Icon name="lucide:heart" aria-hidden="true" />
+          <Icon name="heart" aria-hidden="true" />
           {likes.length} {likes.length === 1 ? 'like' : 'likes'}
         </p>
         <div class="wm-pile__avatars">
@@ -315,7 +315,7 @@ const backLabel =
                  class="wm-pile__avatar wm-pile__avatar--placeholder"
                  aria-label={r.authorName ?? r.sourceLabel}
               >
-                <Icon name="lucide:user" aria-hidden="true" />
+                <Icon name="user" aria-hidden="true" />
               </a>
             )
           ))}
@@ -330,7 +330,7 @@ const backLabel =
     {reposts.length > 0 && (
       <div class="wm-pile" aria-label={`${reposts.length} ${reposts.length === 1 ? 'repost' : 'reposts'}`}>
         <p class="wm-pile__label text-sm text-secondary">
-          <Icon name="lucide:repeat-2" aria-hidden="true" />
+          <Icon name="repeat-2" aria-hidden="true" />
           {reposts.length} {reposts.length === 1 ? 'repost' : 'reposts'}
         </p>
         <div class="wm-pile__avatars">
@@ -350,7 +350,7 @@ const backLabel =
                  class="wm-pile__avatar wm-pile__avatar--placeholder"
                  aria-label={r.authorName ?? r.sourceLabel}
               >
-                <Icon name="lucide:user" aria-hidden="true" />
+                <Icon name="user" aria-hidden="true" />
               </a>
             )
           ))}
@@ -365,7 +365,7 @@ const backLabel =
     {replies.length > 0 && (
       <div class="wm-replies" aria-label="Replies">
         <p class="wm-replies__label text-sm text-secondary">
-          <Icon name="lucide:message-square" aria-hidden="true" />
+          <Icon name="message-square" aria-hidden="true" />
           {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
         </p>
         <ul class="wm-replies__list">

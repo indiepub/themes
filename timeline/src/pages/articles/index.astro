@@ -52,9 +52,9 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, articles);
               const c = countsMap.get(entry.id);
               return c && (c.likes > 0 || c.reposts > 0 || c.comments > 0) ? (
                 <div class="ix-bar">
-                  {c.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{c.likes}</span>}
-                  {c.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{c.reposts}</span>}
-                  {c.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{c.comments}</span>}
+                  {c.likes > 0 && <span class="ix-count"><Icon name="heart" aria-hidden="true" />{c.likes}</span>}
+                  {c.reposts > 0 && <span class="ix-count"><Icon name="repeat-2" aria-hidden="true" />{c.reposts}</span>}
+                  {c.comments > 0 && <span class="ix-count"><Icon name="message-square" aria-hidden="true" />{c.comments}</span>}
                 </div>
               ) : null;
             })()}

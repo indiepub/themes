@@ -31,13 +31,13 @@ const isActive = (path: string) => currentPath === path || currentPath.startsWit
       </a>
       {isAdmin && (
         <a href="/write" class="admin" aria-label="Write" aria-current={isActive('/write') ? 'page' : undefined}>
-          <Icon name="lucide:pencil" aria-hidden="true" width="16" height="16" />
+          <Icon name="pencil" aria-hidden="true" width="16" height="16" />
           <span class="sr-only">Write</span>
         </a>
       )}
       {isAdmin && (
         <a href="/admin" class="admin" aria-label="Admin settings" aria-current={isActive('/admin') ? 'page' : undefined}>
-          <Icon name="lucide:settings" aria-hidden="true" width="16" height="16" />
+          <Icon name="settings" aria-hidden="true" width="16" height="16" />
           <span class="sr-only">Admin</span>
         </a>
       )}
@@ -50,7 +50,7 @@ const isActive = (path: string) => currentPath === path || currentPath.startsWit
 
     <!-- Mobile menu toggle -->
     <button aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
-      <Icon name="lucide:menu" aria-hidden="true" width="20" height="20" />
+      <Icon name="menu" aria-hidden="true" width="20" height="20" />
     </button>
   </div>
 

@@ -6,10 +6,10 @@ const currentPath = Astro.url.pathname;
 const subscriptionsEnabled = Astro.locals.indiepub?.config.subscriptions?.enabled ?? false;
 
 const sections = [
-  { href: '/notes',     label: 'Notes',     icon: 'lucide:message-circle' },
-  { href: '/articles',  label: 'Articles',  icon: 'lucide:file-text' },
-  { href: '/photos',    label: 'Photos',    icon: 'lucide:image' },
-  { href: '/bookmarks', label: 'Bookmarks', icon: 'lucide:bookmark' },
+  { href: '/notes',     label: 'Notes',     icon: 'message-circle' },
+  { href: '/articles',  label: 'Articles',  icon: 'file-text' },
+  { href: '/photos',    label: 'Photos',    icon: 'image' },
+  { href: '/bookmarks', label: 'Bookmarks', icon: 'bookmark' },
 ];
 ---
 
@@ -35,7 +35,7 @@ const sections = [
   {subscriptionsEnabled && (
     <div class="sidebar-section">
       <a href="/subscribe" class="subscribe-cta">
-        <Icon name="lucide:mail" aria-hidden="true" />
+        <Icon name="mail" aria-hidden="true" />
         Subscribe via email
       </a>
     </div>

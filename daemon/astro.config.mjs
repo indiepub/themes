@@ -22,22 +22,7 @@ export default defineConfig({
     syntaxHighlight: false,
   },
   integrations: [
-    icon({
-      include: {
-        lucide: [
-          'arrow-right', 'bookmark', 'corner-down-right', 'external-link',
-          'file-text', 'globe', 'heart', 'link', 'lock', 'log-out',
-          'mail', 'menu', 'message-circle', 'message-square', 'monitor',
-          'moon', 'paperclip', 'repeat-2', 'rss', 'sun', 'trash-2',
-          'user', 'x',
-        ],
-        'simple-icons': [
-          'bluesky', 'codepen', 'dribbble', 'github', 'gitlab',
-          'instagram', 'linkedin', 'mastodon', 'threads', 'twitch',
-          'x', 'youtube',
-        ],
-      },
-    }),
+    icon(),
     indiepub({
       title: 'My IndieWeb Site',
       description: 'An IndieWeb site built with IndiePub.',

@@ -10,10 +10,10 @@ const member = Astro.locals.member ?? null;
 const isAdmin = Astro.locals.isAdmin ?? false;
 
 const nav = [
-  { href: '/notes',     label: 'Notes',     icon: 'lucide:message-circle' },
-  { href: '/articles',  label: 'Articles',  icon: 'lucide:file-text' },
-  { href: '/photos',    label: 'Photos',    icon: 'lucide:image' },
-  { href: '/bookmarks', label: 'Bookmarks', icon: 'lucide:bookmark' },
+  { href: '/notes',     label: 'Notes',     icon: 'message-circle' },
+  { href: '/articles',  label: 'Articles',  icon: 'file-text' },
+  { href: '/photos',    label: 'Photos',    icon: 'image' },
+  { href: '/bookmarks', label: 'Bookmarks', icon: 'bookmark' },
 ];
 
 const authAction = isAdmin
@@ -53,7 +53,7 @@ const authAction = isAdmin
 
       {authAction === 'admin' && (
         <a href="/admin" class="admin-link">
-          <Icon name="lucide:lock" aria-hidden="true" />
+          <Icon name="lock" aria-hidden="true" />
           <span>Admin</span>
         </a>
       )}
@@ -61,13 +61,13 @@ const authAction = isAdmin
         <form method="post" action="/auth/logout" class="member-logout">
           <span class="member-email" title={member.email}>{member.email}</span>
           <button type="submit" class="member-logout-btn" aria-label="Log out">
-            <Icon name="lucide:log-out" aria-hidden="true" />
+            <Icon name="log-out" aria-hidden="true" />
           </button>
         </form>
       )}
       {authAction === 'login' && (
         <a href="/login" class="member-login-link">
-          <Icon name="lucide:user" aria-hidden="true" />
+          <Icon name="user" aria-hidden="true" />
           <span>Login</span>
         </a>
       )}
@@ -78,8 +78,8 @@ const authAction = isAdmin
         aria-controls="mobile-nav"
         aria-label="Toggle menu"
       >
-        <Icon name="lucide:menu" aria-hidden="true" class="icon-menu" />
-        <Icon name="lucide:x"    aria-hidden="true" class="icon-close" />
+        <Icon name="menu" aria-hidden="true" class="icon-menu" />
+        <Icon name="x"    aria-hidden="true" class="icon-close" />
       </button>
     </div>
   </div>

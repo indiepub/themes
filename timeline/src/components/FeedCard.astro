@@ -21,19 +21,19 @@ function syndicationMeta(url: string): { icon: string; label: string } {
     const host = parsed.hostname;
     const path = parsed.pathname;
     if (host === 'bsky.app' || host.endsWith('.bsky.app')) {
-      return { icon: 'simple-icons:bluesky', label: 'Bluesky' };
+      return { icon: 'social/bluesky', label: 'Bluesky' };
     }
     if (host === 'twitter.com' || host === 'x.com') {
-      return { icon: 'simple-icons:x', label: 'X' };
+      return { icon: 'social/x', label: 'X' };
     }
     // Mastodon: path pattern /@username/<numeric-id>
     if (/\/@[^/]+\/\d+/.test(path)) {
-      return { icon: 'simple-icons:mastodon', label: 'Mastodon' };
+      return { icon: 'social/mastodon', label: 'Mastodon' };
     }
   } catch {
     // ignore malformed URLs
   }
-  return { icon: 'lucide:external-link', label: hostname(url) };
+  return { icon: 'external-link', label: hostname(url) };
 }
 
 const typeBadgeLabel: Partial<Record<string, string>> = {
@@ -66,14 +66,14 @@ const badgeLabel = typeBadgeLabel[entry.type];
       {(entry.visibility === 'members' || entry.visibility === 'paid') && (
         <div class="card-header">
           <span class="visibility-badge">
-            <Icon name="lucide:lock" aria-hidden="true" />
+            <Icon name="lock" aria-hidden="true" />
             {entry.visibility === 'paid' ? 'Paid' : 'Members'}
           </span>
         </div>
       )}
       {entry.inReplyTo && (
         <p class="reply-pill">
-          <Icon name="lucide:corner-down-right" aria-hidden="true" />
+          <Icon name="corner-down-right" aria-hidden="true" />
           <span class="text-secondary text-sm">in reply to </span>
           <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">
             {hostname(entry.inReplyTo)}
@@ -99,9 +99,9 @@ const badgeLabel = typeBadgeLabel[entry.type];
         </a>
         {hasInteractions && (
           <div class="card-footer__counts">
-            {counts!.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{counts!.likes}</span>}
-            {counts!.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
-            {counts!.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{counts!.comments}</span>}
+            {counts!.likes > 0 && <span class="ix-count"><Icon name="heart" aria-hidden="true" />{counts!.likes}</span>}
+            {counts!.reposts > 0 && <span class="ix-count"><Icon name="repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
+            {counts!.comments > 0 && <span class="ix-count"><Icon name="message-square" aria-hidden="true" />{counts!.comments}</span>}
           </div>
         )}
         <div class="card-footer__actions">
@@ -131,7 +131,7 @@ const badgeLabel = typeBadgeLabel[entry.type];
         {showBadge && badgeLabel && <span class="type-badge">{badgeLabel}</span>}
         {(entry.visibility === 'members' || entry.visibility === 'paid') && (
           <span class="visibility-badge">
-            <Icon name="lucide:lock" aria-hidden="true" />
+            <Icon name="lock" aria-hidden="true" />
             {entry.visibility === 'paid' ? 'Paid' : 'Members'}
           </span>
         )}
@@ -159,9 +159,9 @@ const badgeLabel = typeBadgeLabel[entry.type];
         </a>
         {hasInteractions && (
           <div class="card-footer__counts">
-            {counts!.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{counts!.likes}</span>}
-            {counts!.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
-            {counts!.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{counts!.comments}</span>}
+            {counts!.likes > 0 && <span class="ix-count"><Icon name="heart" aria-hidden="true" />{counts!.likes}</span>}
+            {counts!.reposts > 0 && <span class="ix-count"><Icon name="repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
+            {counts!.comments > 0 && <span class="ix-count"><Icon name="message-square" aria-hidden="true" />{counts!.comments}</span>}
           </div>
         )}
         <div class="card-footer__actions">
@@ -213,9 +213,9 @@ const badgeLabel = typeBadgeLabel[entry.type];
           )}
           {hasInteractions && (
             <div class="card-footer__counts">
-              {counts!.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{counts!.likes}</span>}
-              {counts!.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
-              {counts!.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{counts!.comments}</span>}
+              {counts!.likes > 0 && <span class="ix-count"><Icon name="heart" aria-hidden="true" />{counts!.likes}</span>}
+              {counts!.reposts > 0 && <span class="ix-count"><Icon name="repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
+              {counts!.comments > 0 && <span class="ix-count"><Icon name="message-square" aria-hidden="true" />{counts!.comments}</span>}
             </div>
           )}
           <div class="card-footer__actions">
@@ -246,19 +246,19 @@ const badgeLabel = typeBadgeLabel[entry.type];
         {showBadge && badgeLabel && <span class="type-badge">{badgeLabel}</span>}
         {(entry.visibility === 'members' || entry.visibility === 'paid') && (
           <span class="visibility-badge">
-            <Icon name="lucide:lock" aria-hidden="true" />
+            <Icon name="lock" aria-hidden="true" />
             {entry.visibility === 'paid' ? 'Paid' : 'Members'}
           </span>
         )}
         <span class="bookmark-domain text-sm text-secondary">
-          <Icon name="lucide:bookmark" aria-hidden="true" />
+          <Icon name="bookmark" aria-hidden="true" />
           {hostname(entry.bookmarkOf)}
         </span>
       </div>
       <h2 class="p-name bookmark-title">
         <a href={entry.bookmarkOf} class="u-bookmark-of" rel="noopener" target="_blank">
           {entry.name ?? entry.bookmarkOf}
-          <Icon name="lucide:external-link" aria-hidden="true" />
+          <Icon name="external-link" aria-hidden="true" />
         </a>
       </h2>
       {entry.summary && (
@@ -272,9 +272,9 @@ const badgeLabel = typeBadgeLabel[entry.type];
         </a>
         {hasInteractions && (
           <div class="card-footer__counts">
-            {counts!.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{counts!.likes}</span>}
-            {counts!.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
-            {counts!.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{counts!.comments}</span>}
+            {counts!.likes > 0 && <span class="ix-count"><Icon name="heart" aria-hidden="true" />{counts!.likes}</span>}
+            {counts!.reposts > 0 && <span class="ix-count"><Icon name="repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
+            {counts!.comments > 0 && <span class="ix-count"><Icon name="message-square" aria-hidden="true" />{counts!.comments}</span>}
           </div>
         )}
         <div class="card-footer__actions">
@@ -304,7 +304,7 @@ const badgeLabel = typeBadgeLabel[entry.type];
         {showBadge && badgeLabel && <span class="type-badge">{badgeLabel}</span>}
         {(entry.visibility === 'members' || entry.visibility === 'paid') && (
           <span class="visibility-badge">
-            <Icon name="lucide:lock" aria-hidden="true" />
+            <Icon name="lock" aria-hidden="true" />
             {entry.visibility === 'paid' ? 'Paid' : 'Members'}
           </span>
         )}
@@ -319,7 +319,7 @@ const badgeLabel = typeBadgeLabel[entry.type];
           {entry.objectUrl ? (
             <a href={entry.objectUrl} class="verb-callout__link" rel="noopener" target="_blank">
               {entry.objectName ?? entry.objectUrl}
-              <Icon name="lucide:external-link" aria-hidden="true" />
+              <Icon name="external-link" aria-hidden="true" />
             </a>
           ) : (
             <strong>{entry.objectName}</strong>
@@ -344,9 +344,9 @@ const badgeLabel = typeBadgeLabel[entry.type];
         </a>
         {hasInteractions && (
           <div class="card-footer__counts">
-            {counts!.likes > 0 && <span class="ix-count"><Icon name="lucide:heart" aria-hidden="true" />{counts!.likes}</span>}
-            {counts!.reposts > 0 && <span class="ix-count"><Icon name="lucide:repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
-            {counts!.comments > 0 && <span class="ix-count"><Icon name="lucide:message-square" aria-hidden="true" />{counts!.comments}</span>}
+            {counts!.likes > 0 && <span class="ix-count"><Icon name="heart" aria-hidden="true" />{counts!.likes}</span>}
+            {counts!.reposts > 0 && <span class="ix-count"><Icon name="repeat-2" aria-hidden="true" />{counts!.reposts}</span>}
+            {counts!.comments > 0 && <span class="ix-count"><Icon name="message-square" aria-hidden="true" />{counts!.comments}</span>}
           </div>
         )}
         <div class="card-footer__actions">
@@ -376,7 +376,7 @@ const badgeLabel = typeBadgeLabel[entry.type];
         {showBadge && badgeLabel && <span class="type-badge">{badgeLabel}</span>}
         {(entry.visibility === 'members' || entry.visibility === 'paid') && (
           <span class="visibility-badge">
-            <Icon name="lucide:lock" aria-hidden="true" />
+            <Icon name="lock" aria-hidden="true" />
             {entry.visibility === 'paid' ? 'Paid' : 'Members'}
           </span>
         )}

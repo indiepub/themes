@@ -17,7 +17,7 @@ const pubDate = entry.publishedAt ?? entry.createdAt;
   <h2 class="p-name bookmark-card__title">
     <a href={entry.bookmarkOf!} class="u-bookmark-of" rel="noopener" target="_blank">
       {entry.name ?? entry.bookmarkOf}
-      <Icon name="lucide:external-link" aria-hidden="true" />
+      <Icon name="external-link" aria-hidden="true" />
     </a>
   </h2>
   <p class="bookmark-card__source text-sm text-secondary">{hostname(entry.bookmarkOf!)}</p>
