@@ -14,19 +14,19 @@ const hasAny = counts.likes > 0 || counts.reposts > 0 || counts.comments > 0;
   <div class="interaction-bar">
     {counts.likes > 0 && (
       <span class="interaction-count">
-        <Icon name="lucide:heart" aria-hidden="true" />
+        <Icon name="heart" aria-hidden="true" />
         {counts.likes}
       </span>
     )}
     {counts.reposts > 0 && (
       <span class="interaction-count">
-        <Icon name="lucide:repeat-2" aria-hidden="true" />
+        <Icon name="repeat-2" aria-hidden="true" />
         {counts.reposts}
       </span>
     )}
     {counts.comments > 0 && (
       <span class="interaction-count">
-        <Icon name="lucide:message-square" aria-hidden="true" />
+        <Icon name="message-square" aria-hidden="true" />
         {counts.comments}
       </span>
     )}

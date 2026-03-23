@@ -99,7 +99,7 @@ const attachments = entry.attachments?.length
           {entry.objectUrl ? (
             <a href={entry.objectUrl} rel="noopener" target="_blank">
               {entry.objectName}
-              <Icon name="lucide:external-link" aria-hidden="true" />
+              <Icon name="external-link" aria-hidden="true" />
             </a>
           ) : (
             <strong>{entry.objectName}</strong>
@@ -117,7 +117,7 @@ const attachments = entry.attachments?.length
 
     {entry.inReplyTo && (
       <p class="entry-detail__reply-to">
-        <Icon name="lucide:corner-down-right" aria-hidden="true" />
+        <Icon name="corner-down-right" aria-hidden="true" />
         <span>in reply to </span>
         <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">{hostname(entry.inReplyTo)}</a>
       </p>
@@ -148,7 +148,7 @@ const attachments = entry.attachments?.length
             <li>
               <a href={url} class="u-syndication" rel="syndication noopener" target="_blank">
                 {hostname(url)}
-                <Icon name="lucide:external-link" aria-hidden="true" />
+                <Icon name="external-link" aria-hidden="true" />
               </a>
             </li>
           ))}
@@ -160,19 +160,19 @@ const attachments = entry.attachments?.length
       <div class="entry-detail__counts">
         {counts.likes > 0 && (
           <span class="interaction-count">
-            <Icon name="lucide:heart" aria-hidden="true" />
+            <Icon name="heart" aria-hidden="true" />
             {counts.likes} {counts.likes === 1 ? 'like' : 'likes'}
           </span>
         )}
         {counts.reposts > 0 && (
           <span class="interaction-count">
-            <Icon name="lucide:repeat-2" aria-hidden="true" />
+            <Icon name="repeat-2" aria-hidden="true" />
             {counts.reposts} {counts.reposts === 1 ? 'repost' : 'reposts'}
           </span>
         )}
         {counts.comments > 0 && (
           <span class="interaction-count">
-            <Icon name="lucide:message-square" aria-hidden="true" />
+            <Icon name="message-square" aria-hidden="true" />
             {counts.comments} {counts.comments === 1 ? 'comment' : 'comments'}
           </span>
         )}
@@ -196,7 +196,7 @@ const attachments = entry.attachments?.length
     {responseLikes.length > 0 && (
       <div class="responses__pile" aria-label={`${responseLikes.length} ${responseLikes.length === 1 ? 'like' : 'likes'}`}>
         <p class="responses__pile-label text-sm text-secondary">
-          <Icon name="lucide:heart" aria-hidden="true" />
+          <Icon name="heart" aria-hidden="true" />
           {responseLikes.length} {responseLikes.length === 1 ? 'like' : 'likes'}
         </p>
         <div class="responses__avatars">
@@ -208,7 +208,7 @@ const attachments = entry.attachments?.length
             ) : (
               <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
                  class="responses__avatar responses__avatar--placeholder">
-                <Icon name="lucide:user" aria-hidden="true" />
+                <Icon name="user" aria-hidden="true" />
               </a>
             )
           ))}
@@ -222,7 +222,7 @@ const attachments = entry.attachments?.length
     {responseReposts.length > 0 && (
       <div class="responses__pile" aria-label={`${responseReposts.length} ${responseReposts.length === 1 ? 'repost' : 'reposts'}`}>
         <p class="responses__pile-label text-sm text-secondary">
-          <Icon name="lucide:repeat-2" aria-hidden="true" />
+          <Icon name="repeat-2" aria-hidden="true" />
           {responseReposts.length} {responseReposts.length === 1 ? 'repost' : 'reposts'}
         </p>
         <div class="responses__avatars">
@@ -234,7 +234,7 @@ const attachments = entry.attachments?.length
             ) : (
               <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
                  class="responses__avatar responses__avatar--placeholder">
-                <Icon name="lucide:user" aria-hidden="true" />
+                <Icon name="user" aria-hidden="true" />
               </a>
             )
           ))}
@@ -248,7 +248,7 @@ const attachments = entry.attachments?.length
     {responseComments.length > 0 && (
       <div class="responses__comments">
         <p class="responses__comments-label text-sm text-secondary">
-          <Icon name="lucide:message-square" aria-hidden="true" />
+          <Icon name="message-square" aria-hidden="true" />
           {responseComments.length} {responseComments.length === 1 ? 'reply' : 'replies'}
         </p>
         <ul class="responses__comment-list">
