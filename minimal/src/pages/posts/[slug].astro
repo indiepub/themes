@@ -1,0 +1,114 @@
+---
+import Base from '../../layouts/Base.astro';
+import Markdown from '@indiepub/astro/components/Markdown.astro';
+
+if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
+
+const { slug } = Astro.params;
+if (!slug) return new Response('Not found', { status: 404 });
+
+const { content } = Astro.locals.indiepub;
+const entry = await content.getEntry(slug);
+if (!entry) return new Response('Not found', { status: 404 });
+
+const interactions = await content.getInteractions(entry.id);
+const likes = interactions.filter(i => i.type === 'like');
+const reposts = interactions.filter(i => i.type === 'repost');
+const comments = interactions.filter(i => i.type === 'comment');
+
+const tags = entry.tags ?? [];
+const siteUrl = Astro.locals.indiepub.config.siteUrl ?? Astro.url.origin;
+const permalink = `${siteUrl}/posts/${entry.slug}`;
+---
+
+<Base title={entry.name ?? 'Post'}>
+  <article class="h-entry" itemscope itemtype="https://schema.org/Article">
+    <header>
+      {entry.name && <h1 class="p-name" itemprop="headline">{entry.name}</h1>}
+      {entry.publishedAt && (
+        <time
+          class="dt-published"
+          itemprop="datePublished"
+          datetime={entry.publishedAt.toISOString()}
+        >
+          {entry.publishedAt.toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+          })}
+        </time>
+      )}
+    </header>
+
+    <Markdown content={entry.content ?? ''} class="e-content" itemprop="articleBody" />
+
+    {tags.length > 0 && (
+      <footer>
+        {tags.map(tag => (
+          <a href={`/tags/${tag.slug}`} rel="tag" class="p-category">{tag.name}</a>
+          <>{' '}</>
+        ))}
+      </footer>
+    )}
+
+    <a href={permalink} class="u-url visually-hidden">Permalink</a>
+  </article>
+
+  {(likes.length > 0 || reposts.length > 0 || comments.length > 0) && (
+    <section class="interactions">
+      {likes.length > 0 && (
+        <>
+          <h2>{likes.length} {likes.length === 1 ? 'Like' : 'Likes'}</h2>
+          <ol>
+            {likes.map(like => (
+              <li>
+                {like.authorUrl
+                  ? <a href={like.authorUrl} class="p-author h-card" rel="nofollow">{like.authorName ?? 'Someone'}</a>
+                  : <span class="p-author h-card">{like.authorName ?? 'Someone'}</span>
+                }
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+
+      {reposts.length > 0 && (
+        <>
+          <h2>{reposts.length} {reposts.length === 1 ? 'Repost' : 'Reposts'}</h2>
+          <ol>
+            {reposts.map(repost => (
+              <li>
+                {repost.authorUrl
+                  ? <a href={repost.authorUrl} rel="nofollow">{repost.authorName ?? 'Someone'}</a>
+                  : <span>{repost.authorName ?? 'Someone'}</span>
+                }
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+
+      {comments.length > 0 && (
+        <>
+          <h2>{comments.length} {comments.length === 1 ? 'Reply' : 'Replies'}</h2>
+          <ol>
+            {comments.map(comment => (
+              <li class="p-comment h-cite">
+                <strong>
+                  {comment.authorUrl
+                    ? <a href={comment.authorUrl} class="p-author h-card" rel="nofollow">{comment.authorName ?? 'Someone'}</a>
+                    : <span class="p-author h-card">{comment.authorName ?? 'Someone'}</span>
+                  }
+                </strong>
+                {comment.content && <p class="p-content">{comment.content}</p>}
+                {comment.createdAt && (
+                  <time class="dt-published" datetime={comment.createdAt.toISOString()}>
+                    {comment.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </time>
+                )}
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+    </section>
+  )}
+</Base>

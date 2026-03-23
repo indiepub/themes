@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+
+if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
+
+const { tag } = Astro.params;
+if (!tag) return new Response('Not found', { status: 404 });
+
+const { content } = Astro.locals.indiepub;
+const memberTier = Astro.locals.member?.tier ?? null;
+
+const entries = await content.getEntries(undefined, { memberTier, tag, limit: 100 });
+---
+
+<Base title={`#${tag}`}>
+  <h1>#{tag}</h1>
+
+  <section class="h-feed">
+    {entries.map(entry => (
+      <article class="h-entry">
+        <header>
+          <a href={`/posts/${entry.slug}`} class={entry.name ? 'p-name' : undefined}>
+            {entry.name ?? entry.content?.slice(0, 80) ?? '(untitled)'}
+          </a>
+          {entry.publishedAt && (
+            <time class="dt-published" datetime={entry.publishedAt.toISOString()}>
+              {entry.publishedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </time>
+          )}
+        </header>
+      </article>
+    ))}
+
+    {entries.length === 0 && <p>No posts tagged #{tag}.</p>}
+  </section>
+</Base>

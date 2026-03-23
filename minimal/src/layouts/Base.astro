@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+const config = Astro.locals.indiepub?.config;
+const siteTitle = config?.title ?? 'My Site';
+const author = Astro.locals.indiepub
+  ? await Astro.locals.indiepub.content.getAuthor()
+  : null;
+const pageTitle = title ? `${title} · ${siteTitle}` : siteTitle;
+const siteUrl = config?.siteUrl ?? Astro.url.origin;
+const isAdmin = !!Astro.locals.isAdmin;
+---
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={config?.description ?? ''} />
+  <link rel="alternate" type="application/rss+xml" title={siteTitle} href="/feed.xml" />
+  <link rel="alternate" type="application/atom+xml" title={siteTitle} href="/feed.atom" />
+  <link rel="alternate" type="application/feed+json" title={siteTitle} href="/feed.json" />
+  <link rel="webmention" href="/.well-known/webmention" />
+  <link rel="micropub" href="/micropub" />
+</head>
+<body>
+  <header>
+    <a href="/" class="p-name">{siteTitle}</a>
+    <nav>
+      <a href="/notes" aria-current={Astro.url.pathname === '/notes' ? 'page' : undefined}>Notes</a>
+      <a href="/articles" aria-current={Astro.url.pathname === '/articles' ? 'page' : undefined}>Articles</a>
+      <a href="/archive" aria-current={Astro.url.pathname === '/archive' ? 'page' : undefined}>Archive</a>
+      <a href="/about" aria-current={Astro.url.pathname === '/about' ? 'page' : undefined}>About</a>
+      {isAdmin && <a href="/admin">Admin</a>}
+    </nav>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  <footer>
+    <span>&copy; {new Date().getFullYear()} {author?.displayName ?? siteTitle}</span>
+    <nav>
+      <a href="/subscribe">Subscribe</a>
+      <a href="/feed.xml">RSS</a>
+    </nav>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+
+if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
+
+const { content } = Astro.locals.indiepub;
+const memberTier = Astro.locals.member?.tier ?? null;
+
+const PER_PAGE = 20;
+const page = Math.max(1, parseInt(Astro.url.searchParams.get('page') ?? '1', 10) || 1);
+const offset = (page - 1) * PER_PAGE;
+
+const fetched = await content.getEntries('article', { memberTier, limit: PER_PAGE + 1, offset });
+const hasNext = fetched.length > PER_PAGE;
+const articles = hasNext ? fetched.slice(0, PER_PAGE) : fetched;
+const hasPrev = page > 1;
+---
+
+<Base title="Articles">
+  <section class="h-feed">
+    <h1>Articles</h1>
+
+    {articles.map(article => (
+      <article class="h-entry">
+        <header>
+          <a href={`/posts/${article.slug}`} class="p-name">{article.name ?? '(untitled)'}</a>
+          {article.publishedAt && (
+            <time class="dt-published" datetime={article.publishedAt.toISOString()}>
+              {article.publishedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </time>
+          )}
+        </header>
+        {article.summary && <p class="p-summary">{article.summary}</p>}
+      </article>
+    ))}
+
+    {articles.length === 0 && <p>No articles yet.</p>}
+  </section>
+
+  {(hasPrev || hasNext) && (
+    <nav aria-label="Pagination">
+      <span>{hasPrev ? <a href={page === 2 ? '/articles' : `/articles?page=${page - 1}`}>&larr; Newer</a> : ''}</span>
+      <span>{hasNext ? <a href={`/articles?page=${page + 1}`}>Older &rarr;</a> : ''}</span>
+    </nav>
+  )}
+</Base>

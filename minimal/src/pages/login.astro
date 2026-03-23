@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+
+if (Astro.locals.member) return Astro.redirect('/');
+---
+
+<Base title="Log in">
+  <h1>Log in</h1>
+  <p>Enter your email to receive a login link.</p>
+
+  <form action="/auth/login" method="post">
+    <div>
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email" required placeholder="you@example.com" />
+    </div>
+    <button type="submit">Send login link</button>
+  </form>
+</Base>
