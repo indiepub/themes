@@ -3,6 +3,9 @@ import { Icon } from 'astro-icon/components';
 import type { Entry, Interaction, InteractionCounts, WebMention } from '@indiepub/types';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel.astro';
+import TagList from './TagList.astro';
+import StarRating from './StarRating.astro';
+import VerbCallout from './VerbCallout.astro';
 import { formatDate, isoDate, hostname } from '../lib/format.ts';
 
 interface Props {
@@ -123,30 +126,10 @@ const backLabel =
     <div class="post-detail__card">
       {/* Verb activity callout */}
       {entry.verb && entry.objectName && (
-        <div class="verb-callout">
-          <span class="verb-callout__emoji">
-            {entry.verb === 'watch' ? '📺' : entry.verb === 'read' ? '📚' : entry.verb === 'listen' ? '🎧' : entry.verb === 'play' ? '🎮' : ''}
-          </span>
-          <span class="verb-callout__text">
-            {entry.verb === 'watch' ? 'Watched' : entry.verb === 'read' ? 'Read' : entry.verb === 'listen' ? 'Listened to' : entry.verb === 'play' ? 'Played' : entry.verb}
-            {' '}
-            {entry.objectUrl ? (
-              <a href={entry.objectUrl} rel="noopener" target="_blank">
-                {entry.objectName}
-                <Icon name="external-link" aria-hidden="true" />
-              </a>
-            ) : (
-              <strong>{entry.objectName}</strong>
-            )}
-          </span>
-        </div>
+        <VerbCallout verb={entry.verb} objectName={entry.objectName} objectUrl={entry.objectUrl} size="large" />
       )}
       {entry.rating != null && entry.rating > 0 && (
-        <div class="verb-rating" aria-label={`Rating: ${entry.rating} out of 5`}>
-          {[1,2,3,4,5].map(n => (
-            <span class={n <= entry.rating! ? 'star-filled' : 'star-empty'}>{n <= entry.rating! ? '★' : '☆'}</span>
-          ))}
-        </div>
+        <StarRating rating={entry.rating} size="xl" />
       )}
 
       {entry.inReplyTo && (
@@ -234,13 +217,7 @@ const backLabel =
   <!-- Tags + syndication + counts footer -->
   <footer class="post-detail__footer">
     {entry.tags && entry.tags.length > 0 && (
-      <ul class="tag-list" aria-label="Tags">
-        {entry.tags.map((tag: string) => (
-          <li>
-            <a href={`/tags/${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
-          </li>
-        ))}
-      </ul>
+      <TagList tags={entry.tags} />
     )}
 
     {entry.syndicationUrls && entry.syndicationUrls.length > 0 && (
@@ -477,56 +454,6 @@ const backLabel =
     object-fit: cover;
   }
 
-  /* Verb callout */
-  .verb-callout {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4);
-    background-color: var(--color-surface-2);
-    border-radius: var(--radius-md);
-    font-size: var(--text-lg);
-    line-height: var(--leading-snug);
-  }
-
-  .verb-callout__emoji {
-    font-size: var(--text-2xl);
-    flex-shrink: 0;
-  }
-
-  .verb-callout__text a {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-decoration: none;
-  }
-
-  .verb-callout__text a:hover {
-    color: var(--color-text-link);
-  }
-
-  .verb-callout__text :global(svg) {
-    width: 0.875rem;
-    height: 0.875rem;
-    color: var(--color-text-tertiary);
-  }
-
-  .verb-rating {
-    display: flex;
-    gap: 0.125rem;
-    font-size: var(--text-xl);
-  }
-
-  .star-filled {
-    color: var(--color-text-link);
-  }
-
-  .star-empty {
-    color: var(--color-border);
-  }
-
   /* Reply to / interaction targets */
   .reply-to {
     display: flex;
@@ -619,31 +546,6 @@ const backLabel =
     padding-top: var(--space-6);
     border-top: 1px solid var(--color-border);
     margin-top: var(--space-2);
-  }
-
-  .tag-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    list-style: none;
-    padding: 0;
-  }
-
-  .tag {
-    display: inline-block;
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    color: var(--color-text-link);
-    background-color: var(--color-brand-muted);
-    padding: 0.2em 0.6em;
-    border-radius: var(--radius-full);
-    text-decoration: none;
-    transition: background-color var(--transition);
-  }
-
-  .tag:hover {
-    background-color: var(--color-surface-3);
-    text-decoration: none;
   }
 
   .syndication-list {

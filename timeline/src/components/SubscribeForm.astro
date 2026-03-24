@@ -22,8 +22,8 @@ const duplicate = subscribed === 'dup';
 ---
 
 {success ? (
-  <div class="subscribe-success" role="status">
-    <span class="subscribe-success__icon" aria-hidden="true">&#10003;</span>
+  <div role="status">
+    <span aria-hidden="true">&#10003;</span>
     <p>You're subscribed. Thanks!</p>
   </div>
 ) : (
@@ -40,10 +40,10 @@ const duplicate = subscribed === 'dup';
       <p class="subscribe-form__note" role="status">You're already subscribed.</p>
     )}
 
-    <div class="subscribe-form__fields">
+    <div>
       {!compact && (
-        <div class="subscribe-form__field">
-          <label for="subscribe-name">Name <span class="subscribe-form__optional">(optional)</span></label>
+        <div>
+          <label for="subscribe-name">Name <span>(optional)</span></label>
           <input
             type="text"
             id="subscribe-name"
@@ -54,7 +54,7 @@ const duplicate = subscribed === 'dup';
         </div>
       )}
 
-      <div class="subscribe-form__field">
+      <div>
         <label for="subscribe-email">{compact ? 'Email' : 'Email address'}</label>
         <input
           type="email"
@@ -66,7 +66,7 @@ const duplicate = subscribed === 'dup';
         />
       </div>
 
-      <button type="submit" class="subscribe-form__btn">
+      <button type="submit">
         Subscribe
       </button>
     </div>
@@ -74,7 +74,7 @@ const duplicate = subscribed === 'dup';
 )}
 
 <style>
-  .subscribe-success {
+  div[role="status"] {
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -87,7 +87,7 @@ const duplicate = subscribed === 'dup';
     font-weight: var(--weight-medium);
   }
 
-  .subscribe-success__icon {
+  div[role="status"] > span {
     font-size: var(--text-base);
   }
 
@@ -103,19 +103,19 @@ const duplicate = subscribed === 'dup';
     margin-bottom: var(--space-3);
   }
 
-  .subscribe-form__optional {
+  label span {
     color: var(--color-text-tertiary);
     font-weight: var(--weight-normal);
   }
 
   /* Default (stacked) layout */
-  .subscribe-form__fields {
+  form > div {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
   }
 
-  .subscribe-form__field {
+  form > div > div {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
@@ -146,7 +146,7 @@ const duplicate = subscribed === 'dup';
     border-color: var(--color-brand);
   }
 
-  .subscribe-form__btn {
+  button {
     align-self: flex-start;
     padding: var(--space-2) var(--space-5);
     background: var(--color-brand);
@@ -160,31 +160,31 @@ const duplicate = subscribed === 'dup';
     transition: background var(--transition);
   }
 
-  .subscribe-form__btn:hover {
+  button:hover {
     background: var(--color-text-link-hover);
   }
 
   /* Compact: single-row layout */
-  .subscribe-form--compact .subscribe-form__fields {
+  .subscribe-form--compact > div {
     flex-direction: row;
     align-items: flex-end;
   }
 
-  .subscribe-form--compact .subscribe-form__field {
+  .subscribe-form--compact > div > div {
     flex: 1;
   }
 
-  .subscribe-form--compact .subscribe-form__btn {
+  .subscribe-form--compact button {
     align-self: auto;
     white-space: nowrap;
   }
 
   @media (max-width: 480px) {
-    .subscribe-form--compact .subscribe-form__fields {
+    .subscribe-form--compact > div {
       flex-direction: column;
     }
 
-    .subscribe-form--compact .subscribe-form__btn {
+    .subscribe-form--compact button {
       align-self: flex-start;
     }
   }
