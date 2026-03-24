@@ -10,4 +10,4 @@ object_url: "https://www.imdb.com/title/tt11280740/"
 rating: 4
 ---
 
-Stuck the landing. The finale was tense in a way that very few shows manage anymore. Still thinking about the corridor scene.
+The finale was genuinely tense. They stuck the landing in a way I didn't expect. Still thinking about that corridor scene two days later.

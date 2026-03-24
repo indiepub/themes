@@ -7,4 +7,4 @@ tags: [workspace, photos]
 photo: [assets/workspace.avif]
 ---
 
-New desk setup for spring. Finally mounted the monitor and got the cables under control. The plant is fake but don't tell anyone.
+New desk setup. Finally wall-mounted the monitor and routed the cables through the desk. The succulent is real, the productivity boost is debatable.

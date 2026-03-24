@@ -1,12 +1,12 @@
 ---
-slug: checkin-strange-brew
+slug: checkin-roasting-co
 type: checkin
 published: 2026-03-09T10:30:00Z
 visibility: public
-tags: [portland, coffee]
+tags: [seattle, coffee]
 verb: at
-object_name: "Strange Brew Coffee"
+object_name: "Elm Coffee Roasters"
 object_url: "https://maps.app.goo.gl/example"
 ---
 
-Best cortado in the Alberta Arts district. The barista remembered my order from last week, which either means I come here too often or I'm memorable. Probably the first one.
+Saturday morning ritual. The oat milk flat white here is dangerously consistent. Brought my laptop but honestly just people-watching.

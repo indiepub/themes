@@ -7,4 +7,4 @@ tags: [indieweb, web]
 url: "https://neustadt.fr/essays/the-small-web/"
 ---
 
-Excellent essay on why the "small web" matters. Not nostalgia — a practical argument for personal sites as a counterweight to algorithmic feeds.
+Not nostalgia — a practical argument for why personal sites matter as a counterweight to algorithmic feeds. Required reading if you're building for the open web.

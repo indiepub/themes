@@ -6,4 +6,4 @@ visibility: public
 tags: [web, indieweb]
 ---
 
-Hot take: RSS never died, people just stopped looking for the icon. Every site I build ships with a feed. If you're reading this and don't have one yet, it takes five minutes.
+I follow 90+ feeds in NetNewsWire. No algorithm, no engagement metrics, no "you might also like." Just people writing things and me choosing to read them. This is peak internet.
