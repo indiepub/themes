@@ -421,3 +421,8 @@ th {
   font-style: italic;
 }
 .card-content blockquote p { margin-bottom: 0; }
+
+/* Lock body scroll when mobile menu is open */
+body.menu-open {
+  overflow: hidden;
+}
