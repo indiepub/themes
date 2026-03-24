@@ -7,19 +7,25 @@ interface Props {
 const { tags, class: className } = Astro.props;
 ---
 
-{tags && tags.length > 0 && (
-  <ul class:list={['tag-list', className]}>
-    {tags.map(tag => (
-      <li>
-        <a href={`/tags/${encodeURIComponent(tag)}`} class="tag">
-          #{tag}
-        </a>
-      </li>
-    ))}
-  </ul>
-)}
+{
+  tags && tags.length > 0 && (
+    <ul class:list={["tag-list", className]}>
+      {tags.map((tag) => (
+        <li>
+          <a href={`/tags/${encodeURIComponent(tag)}`} class="tag">
+            #{tag}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 <style>
+  li + li {
+    margin-top: 0;
+  }
+
   .tag-list {
     display: flex;
     flex-wrap: wrap;

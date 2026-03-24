@@ -1,40 +1,42 @@
 ---
 slug: building-my-own-website
 type: article
-title: "Building My Own Website with IndieWeb"
+title: "Why I Built My Own Website"
 published: 2026-02-15T10:00:00Z
 visibility: public
 tags: [indieweb, web, personal-sites]
 summary: >-
-  After years of posting on other people's platforms, I finally built a site I fully own. Here's why it matters and how I did it.
+  I spent a decade posting on other people's platforms. Then I stopped and built this instead.
 ---
 
-I've had accounts on every platform you can name. Twitter, Mastodon, Bluebird, whatever came next. And every time, the same thing happened — the platform changed, my archive got harder to export, and I lost control of my own words.
+I've had accounts everywhere. Twitter before it was X, Tumblr before Yahoo killed it, Medium before the paywalls. Every time, the same story — the platform changes, your archive gets locked behind an export button that may or may not work, and you realize you were always a guest.
 
-## Why IndieWeb?
+## The idea that clicked
 
-The [IndieWeb](https://indieweb.org) is built on a simple idea: **your content should live on a domain you control**. You can still syndicate to other networks, reply to people on Bluesky or Mastodon, and show up in feeds. But the canonical version lives on your site.
+The [IndieWeb](https://indieweb.org) community talks about **POSSE** — Publish on your Own Site, Syndicate Elsewhere. Your site is the source of truth. Everything else is a copy.
 
-That resonated with me. So I built this.
+That clicked for me. I don't need to quit Bluesky or Mastodon. I just need a place where my words live that isn't subject to someone else's product decisions.
 
-## The stack
+## What this site does
 
-This site runs on [IndiePub](https://indiepub.dev), which gives me:
+This is an [IndiePub](https://indiepub.dev) site. Out of the box I get:
 
-- **Micropub** for posting from any client
-- **Webmentions** for cross-site replies
-- **RSS and Atom feeds** out of the box
-- **Cloudflare Pages** for hosting — fast, cheap, global
+- **Micropub** — I can post from any Micropub client
+- **Webmentions** — cross-site replies, likes, and reposts
+- **Feeds** — RSS, Atom, and JSON Feed for subscribers
+- **Syndication** — my posts go to Bluesky and Mastodon automatically
 
-The setup took about 20 minutes. Most of that was deciding on a color scheme.
+The whole thing runs on Cloudflare Workers. No servers to manage, no Docker containers, no `apt-get upgrade` at 2am.
 
-## What I post here
+## All the post types
 
-Everything. Notes, articles, bookmarks, photos, what I'm watching and reading. It all lives here first, then gets syndicated out.
+I don't just write articles here. I post notes, bookmark links, share photos, log what I'm reading and watching, reply to people on other sites. It all lives here in one timeline.
 
-```bash
-# This is literally how I deploy
-git push origin main
+```html
+<!-- My site has an h-feed. Remember those? -->
+<section class="h-feed">
+  <article class="h-entry">...</article>
+</section>
 ```
 
-If you're thinking about building your own site, stop thinking and start building. The IndieWeb community is welcoming and the tooling has never been better.
+If you're a developer and you've been meaning to build a personal site — this is the nudge. It took me an afternoon to set up and I haven't looked back.

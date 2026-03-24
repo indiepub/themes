@@ -10,4 +10,4 @@ object_url: "https://www.gabriellezevin.com/tomorrow"
 rating: 5
 ---
 
-This wrecked me in the best way. A book about making things with people you love, and how that changes over a lifetime. Can't recommend it enough.
+A book about making things with people you love and how that changes over a lifetime. It's about games but it's really about collaboration and loss. Wrecked me.

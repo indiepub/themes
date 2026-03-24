@@ -1,10 +1,10 @@
 ---
-slug: forest-park-trail
+slug: discovery-park-trail
 type: photo
 published: 2026-02-22T16:30:00Z
 visibility: public
-tags: [photos, portland]
+tags: [photos, seattle]
 photo: [assets/trail.avif]
 ---
 
-Forest Park after the rain. The moss is electric green this time of year.
+Discovery Park after the rain. The ferns are electric green this time of year.
