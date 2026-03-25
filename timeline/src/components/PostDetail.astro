@@ -6,6 +6,8 @@ import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel.astro';
 import TagList from './TagList.astro';
 import StarRating from './StarRating.astro';
 import VerbCallout from './VerbCallout.astro';
+import PaywallCTA from './PaywallCTA.astro';
+import Responses from './Responses.astro';
 import { formatDate, isoDate, hostname } from '../lib/format.ts';
 
 interface Props {
@@ -60,14 +62,8 @@ for (const wm of webmentions) {
   });
 }
 
-const likes = allResponses.filter(r => r.type === 'like');
-const reposts = allResponses.filter(r => r.type === 'repost');
-const replies = allResponses.filter(r => r.type === 'comment');
-const hasResponses = allResponses.length > 0;
-
 const isArticle = entry.type === 'article';
 
-// Back link destination
 const backHref =
   entry.type === 'note'     ? '/notes'     :
   entry.type === 'article'  ? '/articles'  :
@@ -80,25 +76,25 @@ const backLabel =
   entry.type === 'bookmark' ? 'Bookmarks' : 'Feed';
 ---
 
-<article class="post-detail h-entry">
-  <nav class="post-detail__back">
-    <a href={backHref} class="back-link">← {backLabel}</a>
+<article class="h-entry">
+  <nav>
+    <a href={backHref}>← {backLabel}</a>
   </nav>
 
   {/* ── Article prose layout ────────────────────────────── */}
   {isArticle && (
-    <div class="post-detail__article">
+    <div class="article-layout">
       {entry.name && (
-        <h1 class="p-name post-detail__title">{entry.name}</h1>
+        <h1 class="p-name">{entry.name}</h1>
       )}
-      <div class="post-detail__byline">
-        <a href={detailUrl} class="u-url post-detail__permalink">
+      <div class="byline">
+        <a href={detailUrl} class="u-url permalink">
           <time class="dt-published" datetime={isoDate(pubDate)}>
             {formatDate(pubDate)}
           </time>
         </a>
         {entry.updatedAt && entry.updatedAt > pubDate && (
-          <span class="post-detail__updated text-sm text-secondary">
+          <span class="text-sm text-secondary">
             Updated <time class="dt-updated" datetime={isoDate(entry.updatedAt)}>
               {formatDate(entry.updatedAt)}
             </time>
@@ -106,15 +102,10 @@ const backLabel =
         )}
       </div>
       {entry.summary && (
-        <p class="p-summary post-detail__lead">{entry.summary}</p>
+        <p class="p-summary lead">{entry.summary}</p>
       )}
       {isPaidLocked ? (
-        <div class="paywall-cta">
-          <Icon name="lock" aria-hidden="true" />
-          <p class="paywall-cta__heading">This post is for paid subscribers</p>
-          <p class="paywall-cta__desc text-sm text-secondary">Upgrade your subscription to read the full article.</p>
-          <a href="/subscribe" class="paywall-cta__btn">Subscribe</a>
-        </div>
+        <PaywallCTA />
       ) : entry.content && (
         <Markdown content={entry.content} class="e-content post-detail__prose prose" />
       )}
@@ -123,8 +114,7 @@ const backLabel =
 
   {/* ── Non-article: enlarged card layout ───────────────── */}
   {!isArticle && (
-    <div class="post-detail__card">
-      {/* Verb activity callout */}
+    <div class="card-layout">
       {entry.verb && entry.objectName && (
         <VerbCallout verb={entry.verb} objectName={entry.objectName} objectUrl={entry.objectUrl} size="large" />
       )}
@@ -147,33 +137,27 @@ const backLabel =
           attachments={entry.attachments}
           fallbackAlt={entry.summary ?? entry.name ?? ''}
           sizes="(min-width: 768px) 600px, 100vw"
-          class="post-detail__media"
+          class="card-media"
         />
       ) : entry.photo ? (
         <PhotoCarousel
           attachments={[{ id: '', url: entry.photo, contentType: 'image/*', displayOrder: 0 }]}
           fallbackAlt={entry.summary ?? entry.name ?? ''}
           sizes="(min-width: 768px) 600px, 100vw"
-          class="post-detail__media"
+          class="card-media"
         />
       ) : null}
 
       {entry.name && (
-        <h1 class="p-name post-detail__name">{entry.name}</h1>
+        <h1 class="p-name card-name">{entry.name}</h1>
       )}
 
       {isPaidLocked ? (
-        <div class="paywall-cta">
-          <Icon name="lock" aria-hidden="true" />
-          <p class="paywall-cta__heading">This post is for paid subscribers</p>
-          <p class="paywall-cta__desc text-sm text-secondary">Upgrade your subscription to read the full article.</p>
-          <a href="/subscribe" class="paywall-cta__btn">Subscribe</a>
-        </div>
+        <PaywallCTA />
       ) : entry.content && (
         <Markdown content={entry.content} class="e-content post-detail__content" />
       )}
 
-      {/* Like target */}
       {entry.likeOf && (
         <blockquote class="interaction-target">
           <span class="text-secondary text-sm">liked </span>
@@ -183,7 +167,6 @@ const backLabel =
         </blockquote>
       )}
 
-      {/* Repost target */}
       {entry.repostOf && (
         <blockquote class="interaction-target">
           <span class="text-secondary text-sm">reposted </span>
@@ -193,7 +176,6 @@ const backLabel =
         </blockquote>
       )}
 
-      {/* Bookmark target */}
       {entry.bookmarkOf && (
         <p class="bookmark-of">
           <Icon name="bookmark" aria-hidden="true" />
@@ -204,8 +186,8 @@ const backLabel =
         </p>
       )}
 
-      <div class="post-detail__byline">
-        <a href={detailUrl} class="u-url post-detail__permalink">
+      <div class="byline">
+        <a href={detailUrl} class="u-url permalink">
           <time class="dt-published" datetime={isoDate(pubDate)}>
             {formatDate(pubDate)}
           </time>
@@ -215,18 +197,18 @@ const backLabel =
   )}
 
   <!-- Tags + syndication + counts footer -->
-  <footer class="post-detail__footer">
+  <footer>
     {entry.tags && entry.tags.length > 0 && (
       <TagList tags={entry.tags} />
     )}
 
     {entry.syndicationUrls && entry.syndicationUrls.length > 0 && (
       <div class="syndication-list">
-        <p class="syndication-list__label text-xs text-secondary">Syndicated to</p>
+        <p class="syndication-label text-xs text-secondary">Syndicated to</p>
         <ul>
           {entry.syndicationUrls.map((url: string) => (
             <li>
-              <a href={url} class="syndication-link u-syndication" rel="syndication noopener" target="_blank">
+              <a href={url} class="u-syndication" rel="syndication noopener" target="_blank">
                 <Icon name="external-link" aria-hidden="true" />
                 {hostname(url)}
               </a>
@@ -239,19 +221,19 @@ const backLabel =
     {(counts.likes > 0 || counts.reposts > 0 || counts.comments > 0) && (
       <div class="interaction-bar">
         {counts.likes > 0 && (
-          <span class="interaction-count">
+          <span>
             <Icon name="heart" aria-hidden="true" />
             {counts.likes} {counts.likes === 1 ? 'like' : 'likes'}
           </span>
         )}
         {counts.reposts > 0 && (
-          <span class="interaction-count">
+          <span>
             <Icon name="repeat-2" aria-hidden="true" />
             {counts.reposts} {counts.reposts === 1 ? 'repost' : 'reposts'}
           </span>
         )}
         {counts.comments > 0 && (
-          <span class="interaction-count">
+          <span>
             <Icon name="message-square" aria-hidden="true" />
             {counts.comments} {counts.comments === 1 ? 'comment' : 'comments'}
           </span>
@@ -261,122 +243,17 @@ const backLabel =
   </footer>
 </article>
 
-{/* ── Responses (interactions + webmentions) ──────────────── */}
-{hasResponses && (
-  <section class="webmentions" aria-labelledby="responses-heading">
-    <h2 id="responses-heading" class="webmentions__heading">
-      Responses <span class="webmentions__count">({allResponses.length})</span>
-    </h2>
-
-    {/* Like pile */}
-    {likes.length > 0 && (
-      <div class="wm-pile" aria-label={`${likes.length} ${likes.length === 1 ? 'like' : 'likes'}`}>
-        <p class="wm-pile__label text-sm text-secondary">
-          <Icon name="heart" aria-hidden="true" />
-          {likes.length} {likes.length === 1 ? 'like' : 'likes'}
-        </p>
-        <div class="wm-pile__avatars">
-          {likes.slice(0, 12).map(r => (
-            r.authorPhoto ? (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
-                <img
-                  class="wm-pile__avatar"
-                  src={r.authorPhoto}
-                  alt={r.authorName ?? ''}
-                  width="32"
-                  height="32"
-                />
-              </a>
-            ) : (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
-                 class="wm-pile__avatar wm-pile__avatar--placeholder"
-                 aria-label={r.authorName ?? r.sourceLabel}
-              >
-                <Icon name="user" aria-hidden="true" />
-              </a>
-            )
-          ))}
-          {likes.length > 12 && (
-            <span class="wm-pile__overflow">+{likes.length - 12}</span>
-          )}
-        </div>
-      </div>
-    )}
-
-    {/* Repost pile */}
-    {reposts.length > 0 && (
-      <div class="wm-pile" aria-label={`${reposts.length} ${reposts.length === 1 ? 'repost' : 'reposts'}`}>
-        <p class="wm-pile__label text-sm text-secondary">
-          <Icon name="repeat-2" aria-hidden="true" />
-          {reposts.length} {reposts.length === 1 ? 'repost' : 'reposts'}
-        </p>
-        <div class="wm-pile__avatars">
-          {reposts.slice(0, 12).map(r => (
-            r.authorPhoto ? (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
-                <img
-                  class="wm-pile__avatar"
-                  src={r.authorPhoto}
-                  alt={r.authorName ?? ''}
-                  width="32"
-                  height="32"
-                />
-              </a>
-            ) : (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
-                 class="wm-pile__avatar wm-pile__avatar--placeholder"
-                 aria-label={r.authorName ?? r.sourceLabel}
-              >
-                <Icon name="user" aria-hidden="true" />
-              </a>
-            )
-          ))}
-          {reposts.length > 12 && (
-            <span class="wm-pile__overflow">+{reposts.length - 12}</span>
-          )}
-        </div>
-      </div>
-    )}
-
-    {/* Replies */}
-    {replies.length > 0 && (
-      <div class="wm-replies" aria-label="Replies">
-        <p class="wm-replies__label text-sm text-secondary">
-          <Icon name="message-square" aria-hidden="true" />
-          {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
-        </p>
-        <ul class="wm-replies__list">
-          {replies.map(r => (
-            <li class="wm-reply">
-              {r.authorPhoto && (
-                <img class="wm-reply__photo" src={r.authorPhoto} alt={r.authorName ?? ''} width="36" height="36" />
-              )}
-              <div class="wm-reply__body">
-                <a href={r.authorUrl ?? r.sourceUrl} class="wm-reply__author" rel="noopener" target="_blank">
-                  {r.authorName ?? r.sourceLabel}
-                </a>
-                {r.content && (
-                  <p class="wm-reply__content text-sm">{r.content}</p>
-                )}
-                <a href={r.sourceUrl} class="wm-reply__source text-xs text-secondary" rel="noopener" target="_blank">
-                  {r.sourceLabel}
-                </a>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </section>
+{allResponses.length > 0 && (
+  <Responses responses={allResponses} />
 )}
 
 <style>
   /* ── Back nav ───────────────────────────────────────────── */
-  .post-detail__back {
+  nav {
     margin-bottom: var(--space-6);
   }
 
-  .back-link {
+  nav a {
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
     color: var(--color-text-secondary);
@@ -384,43 +261,43 @@ const backLabel =
     transition: color var(--transition);
   }
 
-  .back-link:hover {
+  nav a:hover {
     color: var(--color-text-link);
     text-decoration: none;
   }
 
   /* ── Article layout ─────────────────────────────────────── */
-  .post-detail__article {
+  .article-layout {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
     margin-bottom: var(--space-8);
   }
 
-  .post-detail__title {
+  .article-layout h1 {
     font-size: var(--text-3xl);
     font-weight: var(--weight-bold);
     line-height: var(--leading-tight);
   }
 
-  .post-detail__byline {
+  .byline {
     display: flex;
     align-items: center;
     gap: var(--space-4);
   }
 
-  .post-detail__permalink {
+  .permalink {
     font-size: var(--text-sm);
     color: var(--color-text-tertiary);
     text-decoration: none;
   }
 
-  .post-detail__permalink:hover {
+  .permalink:hover {
     color: var(--color-text-secondary);
     text-decoration: none;
   }
 
-  .post-detail__lead {
+  .lead {
     font-size: var(--text-lg);
     font-style: italic;
     color: var(--color-text-secondary);
@@ -428,7 +305,7 @@ const backLabel =
   }
 
   /* ── Non-article card layout ────────────────────────────── */
-  .post-detail__card {
+  .card-layout {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
@@ -440,13 +317,13 @@ const backLabel =
     padding: var(--space-5);
   }
 
-  .post-detail__name {
+  .card-name {
     font-size: var(--text-xl);
     font-weight: var(--weight-semibold);
     line-height: var(--leading-snug);
   }
 
-  .post-detail__media {
+  .card-media {
     margin: calc(var(--space-5) * -1);
     margin-bottom: 0;
     border-radius: 0;
@@ -462,7 +339,7 @@ const backLabel =
     font-size: var(--text-sm);
   }
 
-  .reply-to svg {
+  .reply-to :global(svg) {
     width: 0.875rem;
     height: 0.875rem;
     color: var(--color-text-tertiary);
@@ -484,7 +361,7 @@ const backLabel =
     font-size: var(--text-sm);
   }
 
-  .bookmark-of svg {
+  .bookmark-of :global(svg) {
     width: 1rem;
     height: 1rem;
     color: var(--color-text-tertiary);
@@ -497,49 +374,8 @@ const backLabel =
     gap: var(--space-1);
   }
 
-  /* ── Paywall CTA ──────────────────────────────────────────── */
-  .paywall-cta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-8) var(--space-6);
-    background-color: var(--color-surface-2);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    text-align: center;
-  }
-
-  .paywall-cta > :global(svg) {
-    width: 1.5rem;
-    height: 1.5rem;
-    color: var(--color-text-tertiary);
-  }
-
-  .paywall-cta__heading {
-    font-size: var(--text-base);
-    font-weight: var(--weight-semibold);
-  }
-
-  .paywall-cta__btn {
-    display: inline-block;
-    padding: var(--space-2) var(--space-5);
-    background: var(--color-brand);
-    color: var(--color-text-on-brand);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
-    text-decoration: none;
-    transition: background var(--transition);
-  }
-
-  .paywall-cta__btn:hover {
-    background: var(--color-text-link-hover);
-    text-decoration: none;
-  }
-
   /* ── Footer ──────────────────────────────────────────────── */
-  .post-detail__footer {
+  footer {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
@@ -554,7 +390,7 @@ const backLabel =
     gap: var(--space-2);
   }
 
-  .syndication-list__label {
+  .syndication-label {
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: var(--weight-semibold);
@@ -568,14 +404,14 @@ const backLabel =
     gap: var(--space-3);
   }
 
-  .syndication-link {
+  .syndication-list a {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
     font-size: var(--text-sm);
   }
 
-  .syndication-link svg {
+  .syndication-list :global(svg) {
     width: 0.875rem;
     height: 0.875rem;
   }
@@ -586,7 +422,7 @@ const backLabel =
     flex-wrap: wrap;
   }
 
-  .interaction-count {
+  .interaction-bar > span {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -594,163 +430,8 @@ const backLabel =
     color: var(--color-text-secondary);
   }
 
-  .interaction-count svg {
+  .interaction-bar :global(svg) {
     width: 1rem;
     height: 1rem;
   }
-
-  /* ── Webmentions ─────────────────────────────────────────── */
-  .webmentions {
-    margin-top: var(--space-12);
-    padding-top: var(--space-8);
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-  }
-
-  .webmentions__heading {
-    font-size: var(--text-lg);
-  }
-
-  .webmentions__count {
-    font-weight: var(--weight-normal);
-    color: var(--color-text-secondary);
-  }
-
-  /* Like / repost piles */
-  .wm-pile {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .wm-pile__label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .wm-pile__label svg {
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-  }
-
-  .wm-pile__avatars {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-    align-items: center;
-  }
-
-  .wm-pile__avatar {
-    display: block;
-    width: 2rem;
-    height: 2rem;
-    border-radius: var(--radius-full);
-    object-fit: cover;
-    border: 2px solid var(--color-bg);
-    margin-left: -0.375rem;
-    transition: transform var(--transition);
-    text-decoration: none;
-  }
-
-  .wm-pile__avatars a:first-child .wm-pile__avatar,
-  .wm-pile__avatars a:first-child {
-    margin-left: 0;
-  }
-
-  .wm-pile__avatar:hover {
-    transform: translateY(-2px);
-    z-index: 1;
-    position: relative;
-  }
-
-  .wm-pile__avatar--placeholder {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--color-surface-2);
-    color: var(--color-text-tertiary);
-  }
-
-  .wm-pile__avatar--placeholder :global(svg) {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .wm-pile__overflow {
-    font-size: var(--text-xs);
-    color: var(--color-text-secondary);
-    margin-left: var(--space-2);
-  }
-
-  /* Reply list */
-  .wm-replies {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .wm-replies__label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .wm-replies__label svg {
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-  }
-
-  .wm-replies__list {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .wm-reply {
-    display: flex;
-    gap: var(--space-3);
-    align-items: flex-start;
-  }
-
-  .wm-reply__photo {
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: var(--radius-full);
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  .wm-reply__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    min-width: 0;
-  }
-
-  .wm-reply__author {
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-decoration: none;
-  }
-
-  .wm-reply__author:hover { color: var(--color-text-link); }
-
-  .wm-reply__content {
-    color: var(--color-text-secondary);
-    line-height: var(--leading-relaxed);
-  }
-
-  .wm-reply__source {
-    text-decoration: none;
-  }
-
-  .wm-reply__source:hover { color: var(--color-text-link) !important; }
 </style>
