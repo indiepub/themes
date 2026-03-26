@@ -1,9 +1,9 @@
 ---
-import { Icon } from 'astro-icon/components';
 import type { Author, IndiePubConfig } from '@indiepub/types';
-import SocialIcon from './SocialIcon.astro';
 import ThemeToggle from './ThemeToggle.astro';
-import SubscribeForm from './SubscribeForm.astro';
+import SideProfileSubscribe from './SideProfileSubscribe.astro';
+import SideProfileTagCloud from './SideProfileTagCloud.astro';
+import SideProfileSocial from './SideProfileSocial.astro';
 
 interface Props {
   author: Author;
@@ -36,9 +36,9 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
 <div class:list={['side-profile', 'h-card', { 'side-profile--mobile': mobile }]}>
   <!-- Avatar -->
   {author.photo && (
-    <a href="/about" class="side-profile__avatar-link">
+    <a href="/about" class="avatar-link">
       <img
-        class="u-photo side-profile__avatar"
+        class="u-photo"
         src={author.photo}
         alt={author.name}
         width="72"
@@ -48,13 +48,13 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
   )}
 
   <!-- Identity -->
-  <div class="side-profile__identity">
-    <a href="/about" class="p-name side-profile__name" rel="me">{author.name}</a>
+  <div class="identity">
+    <a href="/about" class="p-name identity__name" rel="me">{author.name}</a>
     {authorDomain && (
-      <span class="side-profile__domain text-sm text-secondary">{authorDomain}</span>
+      <span class="text-sm text-secondary">{authorDomain}</span>
     )}
     {author.bio && (
-      <p class="p-note side-profile__bio text-sm">{author.bio}</p>
+      <p class="p-note identity__bio text-sm">{author.bio}</p>
     )}
   </div>
 
@@ -74,64 +74,12 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
 
   <hr />
 
-  <!-- Subscribe -->
-  <div class="side-profile__subscribe">
-    <p class="side-profile__subscribe-label text-xs text-secondary">Subscribe</p>
-    <div class="side-profile__feed-links">
-      <a href="/feed.xml" class="side-profile__feed-link" title="RSS feed">
-        <Icon name="rss" aria-hidden="true" />
-        <span>RSS</span>
-      </a>
-      <a href="/feed.atom" class="side-profile__feed-link" title="Atom feed">
-        <Icon name="rss" aria-hidden="true" />
-        <span>Atom</span>
-      </a>
-      <a href="/feed.json" class="side-profile__feed-link" title="JSON Feed">
-        <Icon name="rss" aria-hidden="true" />
-        <span>JSON</span>
-      </a>
-    </div>
-    {config.subscriptions?.enabled && (
-      <SubscribeForm compact />
-    )}
-  </div>
-
-  <!-- Tag cloud -->
-  {topTags.length > 0 && (
-    <div class="side-profile__tags">
-      <p class="side-profile__section-label text-xs text-secondary">Topics</p>
-      <div class="side-profile__tag-cloud">
-        {topTags.map(tag => (
-          <a
-            href={`/tags/${encodeURIComponent(tag.slug)}`}
-            class:list={['side-profile__tag', { 'side-profile__tag--active': activePath === `/tags/${tag.slug}` }]}
-          >
-            #{tag.name}
-          </a>
-        ))}
-      </div>
-    </div>
-  )}
-
-  <!-- Social links -->
-  {socialLinks.length > 0 && (
-    <div class="side-profile__social" aria-label="Social profiles">
-      {socialLinks.map(link => (
-        <a
-          href={link.url}
-          class="side-profile__social-link u-url"
-          rel="me noopener"
-          target="_blank"
-          aria-label={link.label}
-        >
-          <SocialIcon icon={link.icon} aria-hidden="true" />
-        </a>
-      ))}
-    </div>
-  )}
+  <SideProfileSubscribe config={config} />
+  <SideProfileTagCloud tags={topTags} activePath={activePath} />
+  <SideProfileSocial links={socialLinks} />
 
   <!-- Theme toggle -->
-  <div class="side-profile__theme">
+  <div class="theme-wrap">
     <ThemeToggle />
   </div>
 </div>
@@ -143,18 +91,14 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
     gap: var(--space-4);
   }
 
-  .side-profile--mobile {
-    /* no overrides needed */
-  }
-
   /* Avatar */
-  .side-profile__avatar-link {
+  .avatar-link {
     display: block;
     width: 4.5rem;
     text-decoration: none;
   }
 
-  .side-profile__avatar {
+  .avatar-link img {
     width: 4.5rem;
     height: 4.5rem;
     border-radius: var(--radius-full);
@@ -162,13 +106,13 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
   }
 
   /* Identity */
-  .side-profile__identity {
+  .identity {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
   }
 
-  .side-profile__name {
+  .identity__name {
     font-weight: var(--weight-bold);
     font-size: var(--text-base);
     color: var(--color-text-primary);
@@ -176,16 +120,12 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
     line-height: var(--leading-snug);
   }
 
-  .side-profile__name:hover {
+  .identity__name:hover {
     color: var(--color-text-link);
     text-decoration: none;
   }
 
-  .side-profile__domain {
-    display: block;
-  }
-
-  .side-profile__bio {
+  .identity__bio {
     color: var(--color-text-secondary);
     line-height: var(--leading-normal);
     display: -webkit-box;
@@ -235,125 +175,8 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
     background-color: var(--color-brand-muted);
   }
 
-  /* Subscribe */
-  .side-profile__subscribe {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .side-profile__subscribe-label {
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: var(--weight-semibold);
-  }
-
-  .side-profile__feed-links {
-    display: flex;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-  }
-
-  .side-profile__feed-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    color: var(--color-text-secondary);
-    text-decoration: none;
-    padding: 0.2rem var(--space-2);
-    border-radius: var(--radius-md);
-    background-color: var(--color-surface-2);
-    transition: color var(--transition), background-color var(--transition);
-  }
-
-  .side-profile__feed-link:hover {
-    color: var(--color-text-link);
-    background-color: var(--color-brand-muted);
-    text-decoration: none;
-  }
-
-  .side-profile__feed-link svg {
-    width: 0.75rem;
-    height: 0.75rem;
-    flex-shrink: 0;
-  }
-
-  /* Tag cloud */
-  .side-profile__tags {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .side-profile__section-label {
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: var(--weight-semibold);
-  }
-
-  .side-profile__tag-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-  }
-
-  .side-profile__tag {
-    display: inline-block;
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    color: var(--color-text-secondary);
-    text-decoration: none;
-    padding: 0.2em 0.5em;
-    border-radius: var(--radius-full);
-    transition: color var(--transition), background-color var(--transition);
-  }
-
-  .side-profile__tag:hover {
-    color: var(--color-text-link);
-    background-color: var(--color-brand-muted);
-    text-decoration: none;
-  }
-
-  .side-profile__tag--active {
-    color: var(--color-text-link);
-    background-color: var(--color-brand-muted);
-  }
-
-  /* Social icons */
-  .side-profile__social {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-  }
-
-  .side-profile__social-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: var(--radius-md);
-    color: var(--color-text-secondary);
-    text-decoration: none;
-    transition: color var(--transition), background-color var(--transition);
-  }
-
-  .side-profile__social-link:hover {
-    color: var(--color-text-primary);
-    background-color: var(--color-surface-2);
-    text-decoration: none;
-  }
-
-  .side-profile__social-link :global(svg) {
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-  }
-
   /* Theme toggle */
-  .side-profile__theme {
+  .theme-wrap {
     margin-top: auto;
     padding-top: var(--space-2);
     align-self: flex-start;
