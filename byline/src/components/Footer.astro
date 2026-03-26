@@ -13,27 +13,24 @@ const socialLinks = author?.socialLinks ?? [];
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
-  <div class="site-footer__inner">
-    <div class="site-footer__brand">
-      <span class="site-footer__title font-serif">{siteTitle}</span>
-    </div>
+<footer>
+  <div>
+    <span class="font-serif">{siteTitle}</span>
 
-    <nav class="site-footer__nav" aria-label="Footer navigation">
-      <a href="/archive" class="footer-link">Archive</a>
-      <a href="/about"   class="footer-link">About</a>
-      <a href="/subscribe" class="footer-link">Subscribe</a>
+    <nav aria-label="Footer navigation">
+      <a href="/archive">Archive</a>
+      <a href="/about">About</a>
+      <a href="/subscribe">Subscribe</a>
     </nav>
 
     {socialLinks.length > 0 && (
-      <nav class="site-footer__social" aria-label="Social links">
+      <nav aria-label="Social links">
         {socialLinks.map(link => (
           <a
             href={link.url}
             rel="me noopener"
             target="_blank"
             aria-label={link.label}
-            class="social-link"
           >
             <Icon name={`social/${link.icon}`} aria-hidden="true" width="16" height="16" />
           </a>
@@ -41,22 +38,22 @@ const year = new Date().getFullYear();
       </nav>
     )}
 
-    <p class="site-footer__credit text-xs text-secondary">
+    <p class="text-xs text-secondary">
       &copy; {year} {author?.name ?? siteTitle} &middot;
-      Powered by <a href="https://indiepub.dev" class="footer-link" target="_blank" rel="noopener">IndiePub</a>
+      Powered by <a href="https://indiepub.dev" target="_blank" rel="noopener">IndiePub</a>
     </p>
   </div>
 </footer>
 
 <style>
-  .site-footer {
+  footer {
     border-top: 1px solid var(--color-border);
     background-color: var(--color-bg-alt);
     padding: var(--space-12) var(--space-6);
     margin-top: var(--space-16);
   }
 
-  .site-footer__inner {
+  footer > div {
     max-width: var(--max-width-site);
     margin-inline: auto;
     display: flex;
@@ -66,60 +63,60 @@ const year = new Date().getFullYear();
     text-align: center;
   }
 
-  .site-footer__title {
+  footer > div > span {
     font-size: var(--text-xl);
     font-weight: var(--weight-bold);
     color: var(--color-text-primary);
   }
 
-  .site-footer__nav {
+  nav[aria-label="Footer navigation"] {
     display: flex;
     gap: var(--space-6);
     flex-wrap: wrap;
     justify-content: center;
   }
 
-  .footer-link {
+  nav[aria-label="Footer navigation"] a {
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     text-decoration: none;
     transition: color var(--transition);
   }
 
-  .footer-link:hover {
+  nav[aria-label="Footer navigation"] a:hover {
     color: var(--color-text-primary);
     text-decoration: none;
   }
 
-  .site-footer__social {
+  nav[aria-label="Social links"] {
     display: flex;
     gap: var(--space-4);
     flex-wrap: wrap;
     justify-content: center;
   }
 
-  .social-link {
+  nav[aria-label="Social links"] a {
     display: inline-flex;
     align-items: center;
     color: var(--color-text-tertiary);
     transition: color var(--transition);
   }
 
-  .social-link:hover {
+  nav[aria-label="Social links"] a:hover {
     color: var(--color-text-secondary);
   }
 
-  .site-footer__credit {
+  p {
     color: var(--color-text-tertiary);
   }
 
-  .site-footer__credit a {
+  p a {
     color: inherit;
     text-decoration: underline;
     text-underline-offset: 2px;
   }
 
-  .site-footer__credit a:hover {
+  p a:hover {
     color: var(--color-text-secondary);
   }
 </style>

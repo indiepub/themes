@@ -18,9 +18,9 @@ const { title, description, canonicalUrl, ogImage, fullBleed = false, narrow = f
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl} ogImage={ogImage}>
-  <div class="site-wrapper">
+  <div>
     <Header />
-    <main class:list={['site-main', { 'site-main--full-bleed': fullBleed, 'site-main--narrow': narrow }]}>
+    <main class:list={[{ 'main--full-bleed': fullBleed, 'main--narrow': narrow }]}>
       <slot />
     </main>
     <Footer />
@@ -28,13 +28,13 @@ const { title, description, canonicalUrl, ogImage, fullBleed = false, narrow = f
 </Base>
 
 <style>
-  .site-wrapper {
+  div {
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
   }
 
-  .site-main {
+  main {
     flex: 1;
     width: 100%;
     max-width: var(--max-width-content);
@@ -42,27 +42,27 @@ const { title, description, canonicalUrl, ogImage, fullBleed = false, narrow = f
     padding: var(--space-8) var(--space-4);
   }
 
-  .site-main--full-bleed {
+  .main--full-bleed {
     max-width: none;
     padding-inline: 0;
   }
 
-  .site-main--narrow {
+  .main--narrow {
     max-width: var(--max-width-prose);
   }
 
   @media (min-width: 640px) {
-    .site-main {
+    main {
       padding-inline: var(--space-6);
     }
   }
 
   @media (min-width: 768px) {
-    .site-main {
+    main {
       padding: var(--space-16) var(--space-8);
     }
 
-    .site-main--full-bleed {
+    .main--full-bleed {
       padding-inline: 0;
     }
   }
