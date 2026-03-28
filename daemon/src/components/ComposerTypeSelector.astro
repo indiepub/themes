@@ -14,17 +14,16 @@ interface Props {
 const { types, currentType } = Astro.props;
 ---
 
-<div class="composer__type-selector" id="type-selector">
-  <button type="button" class="composer__type-btn" id="type-toggle" aria-haspopup="listbox" aria-expanded="false">
+<div>
+  <button type="button" id="type-toggle" aria-haspopup="listbox" aria-expanded="false">
     <span id="type-icon">{currentType.icon}</span>
     <span id="type-label">{currentType.label}</span>
-    <span class="composer__chevron">▾</span>
+    <span class="chevron">▾</span>
   </button>
-  <div class="composer__type-dropdown" id="type-dropdown" role="listbox" hidden>
+  <div id="type-dropdown" role="listbox" hidden>
     {types.map(t => (
       <button
         type="button"
-        class="composer__type-option"
         role="option"
         data-value={t.value}
         data-icon={t.icon}
@@ -36,3 +35,74 @@ const { types, currentType } = Astro.props;
     ))}
   </div>
 </div>
+
+<style>
+  div {
+    position: relative;
+  }
+
+  [aria-haspopup] {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 0.375rem);
+    background: transparent;
+    font-size: var(--text-sm);
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--color-text);
+  }
+
+  [aria-haspopup]:hover {
+    background: var(--color-surface-2, var(--color-surface-alt, #f5f5f5));
+  }
+
+  .chevron {
+    font-size: 0.7em;
+    opacity: 0.6;
+  }
+
+  [role="listbox"] {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 50;
+    background: var(--color-surface-1, var(--color-surface, #fff));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 0.375rem);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-width: 140px;
+    overflow: hidden;
+  }
+
+  [role="listbox"][hidden] {
+    display: none;
+  }
+
+  [role="option"] {
+    display: block;
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    appearance: none;
+    font-family: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    color: var(--color-text);
+    transition: background var(--transition);
+  }
+
+  [role="option"]:hover {
+    background: var(--color-surface-2, var(--color-surface-alt, #f5f5f5));
+  }
+
+  [role="option"] + [role="option"] {
+    border-top: 1px solid var(--color-border);
+  }
+</style>

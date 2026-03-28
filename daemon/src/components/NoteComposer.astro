@@ -145,61 +145,6 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
     gap: var(--space-2);
   }
 
-  .composer__type-selector {
-    position: relative;
-  }
-
-  .composer__type-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-1) var(--space-2);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md, 0.375rem);
-    background: transparent;
-    font-size: var(--text-sm);
-    cursor: pointer;
-    color: var(--color-text);
-  }
-
-  .composer__type-btn:hover {
-    background: var(--color-surface-alt, #f5f5f5);
-  }
-
-  .composer__chevron {
-    font-size: 0.7em;
-    opacity: 0.6;
-  }
-
-  .composer__type-dropdown {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    z-index: 50;
-    background: var(--color-surface, #fff);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md, 0.375rem);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    min-width: 140px;
-    overflow: hidden;
-  }
-
-  .composer__type-option {
-    display: block;
-    width: 100%;
-    padding: var(--space-2) var(--space-3);
-    text-align: left;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: var(--text-sm);
-    color: var(--color-text);
-  }
-
-  .composer__type-option:hover {
-    background: var(--color-surface-alt, #f5f5f5);
-  }
-
   .composer__draft-indicator {
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
@@ -214,9 +159,12 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
 
   .composer__verb-fields {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--space-2);
-    align-items: center;
+  }
+
+  .composer__verb-fields > :first-child {
+    align-self: flex-start;
   }
 
   .composer__url-input,
@@ -228,10 +176,8 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
     background: transparent;
     font-size: var(--text-sm);
     color: var(--color-text);
+    font-family: inherit;
   }
-
-  .composer__verb-fields .composer__select { width: auto; }
-  .composer__verb-fields .composer__url-input { flex: 1; min-width: 120px; }
 
   .composer__rating {
     border: none;
@@ -511,7 +457,7 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
         }
       });
 
-      typeDropdown.querySelectorAll('.composer__type-option').forEach(btn => {
+      typeDropdown.querySelectorAll('[role="option"]').forEach(btn => {
         btn.addEventListener('click', () => {
           const value = (btn as HTMLElement).dataset.value ?? 'note';
           const icon = (btn as HTMLElement).dataset.icon ?? '';
