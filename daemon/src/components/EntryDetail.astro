@@ -5,6 +5,9 @@ import Markdown from '@indiepub/astro/components/Markdown.astro';
 import PhotoCarousel from '@indiepub/astro/components/PhotoCarousel.astro';
 import TagList from './TagList.astro';
 import HCard from './HCard.astro';
+import VerbCallout from './VerbCallout.astro';
+import StarRating from './StarRating.astro';
+import Responses from './Responses.astro';
 import { formatDate, isoDate, hostname } from '../lib/format.ts';
 
 interface Props {
@@ -27,11 +30,11 @@ type ResponseItem = {
   sourceLabel: string;
 };
 
-const responses: ResponseItem[] = [];
+const allResponses: ResponseItem[] = [];
 
 for (const ix of interactions) {
   if (ix.type !== 'like' && ix.type !== 'repost' && ix.type !== 'comment') continue;
-  responses.push({
+  allResponses.push({
     type: ix.type,
     authorName: ix.authorName,
     authorUrl: ix.authorUrl,
@@ -45,7 +48,7 @@ for (const ix of interactions) {
 for (const wm of webmentions) {
   const wmType = wm.type === 'reply' || wm.type === 'mention' ? 'comment' : wm.type === 'like' ? 'like' : wm.type === 'repost' ? 'repost' : null;
   if (!wmType) continue;
-  responses.push({
+  allResponses.push({
     type: wmType,
     authorName: wm.authorName,
     authorUrl: wm.authorUrl,
@@ -56,10 +59,6 @@ for (const wm of webmentions) {
   });
 }
 
-const responseLikes = responses.filter(r => r.type === 'like');
-const responseReposts = responses.filter(r => r.type === 'repost');
-const responseComments = responses.filter(r => r.type === 'comment');
-const hasResponses = responses.length > 0;
 const pubDate = entry.publishedAt ?? entry.createdAt;
 const config = Astro.locals.indiepub?.config;
 
@@ -70,53 +69,33 @@ const attachments = entry.attachments?.length
     : [];
 ---
 
-<article class="entry-detail h-entry">
-  <header class="entry-detail__header">
+<article class="h-entry">
+  <header>
     {entry.name && (
-      <h1 class="p-name entry-detail__title">{entry.name}</h1>
+      <h1 class="p-name">{entry.name}</h1>
     )}
-    <div class="entry-detail__meta">
-      <a href={`/posts/${entry.slug}`} class="u-url entry-detail__permalink">
+    <div class="meta">
+      <a href={`/posts/${entry.slug}`} class="u-url permalink">
         <time class="dt-published" datetime={isoDate(pubDate)}>
           {formatDate(pubDate)}
         </time>
       </a>
       {entry.updatedAt && entry.updatedAt > pubDate && (
-        <span class="entry-detail__updated text-sm text-secondary">
+        <span class="text-sm text-secondary">
           Updated <time class="dt-updated" datetime={isoDate(entry.updatedAt)}>{formatDate(entry.updatedAt)}</time>
         </span>
       )}
     </div>
 
     {entry.verb && entry.objectName && (
-      <div class="entry-detail__verb-callout">
-        <span class="entry-detail__verb-emoji">
-          {entry.verb === 'watch' ? '📺' : entry.verb === 'read' ? '📚' : entry.verb === 'listen' ? '🎧' : entry.verb === 'play' ? '🎮' : ''}
-        </span>
-        <span class="entry-detail__verb-text">
-          {entry.verb === 'watch' ? 'Watched' : entry.verb === 'read' ? 'Read' : entry.verb === 'listen' ? 'Listened to' : entry.verb === 'play' ? 'Played' : entry.verb}
-          {' '}
-          {entry.objectUrl ? (
-            <a href={entry.objectUrl} rel="noopener" target="_blank">
-              {entry.objectName}
-              <Icon name="external-link" aria-hidden="true" />
-            </a>
-          ) : (
-            <strong>{entry.objectName}</strong>
-          )}
-        </span>
-      </div>
+      <VerbCallout verb={entry.verb} objectName={entry.objectName} objectUrl={entry.objectUrl} size="large" />
     )}
     {entry.rating != null && entry.rating > 0 && (
-      <div class="entry-detail__rating" aria-label={`Rating: ${entry.rating} out of 5`}>
-        {[1,2,3,4,5].map(n => (
-          <span class={n <= entry.rating! ? 'star-filled' : 'star-empty'}>{n <= entry.rating! ? '★' : '☆'}</span>
-        ))}
-      </div>
+      <StarRating rating={entry.rating} size="xl" />
     )}
 
     {entry.inReplyTo && (
-      <p class="entry-detail__reply-to">
+      <p class="reply-to">
         <Icon name="corner-down-right" aria-hidden="true" />
         <span>in reply to </span>
         <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">{hostname(entry.inReplyTo)}</a>
@@ -129,7 +108,7 @@ const attachments = entry.attachments?.length
       attachments={attachments}
       fallbackAlt={entry.summary ?? entry.name ?? ''}
       sizes="(min-width: 768px) 65ch, 100vw"
-      class="entry-detail__media"
+      class="entry-media"
     />
   )}
 
@@ -137,11 +116,11 @@ const attachments = entry.attachments?.length
     <Markdown content={entry.content} class="e-content entry-detail__content prose" />
   )}
 
-  <footer class="entry-detail__footer">
+  <footer>
     <TagList tags={entry.tags} />
 
     {entry.syndicationUrls && entry.syndicationUrls.length > 0 && (
-      <div class="entry-detail__syndication">
+      <div class="syndication">
         <p class="text-sm text-secondary">Syndicated to:</p>
         <ul>
           {entry.syndicationUrls.map((url: string) => (
@@ -157,21 +136,21 @@ const attachments = entry.attachments?.length
     )}
 
     {(counts.likes > 0 || counts.comments > 0 || counts.reposts > 0) && (
-      <div class="entry-detail__counts">
+      <div class="counts">
         {counts.likes > 0 && (
-          <span class="interaction-count">
+          <span>
             <Icon name="heart" aria-hidden="true" />
             {counts.likes} {counts.likes === 1 ? 'like' : 'likes'}
           </span>
         )}
         {counts.reposts > 0 && (
-          <span class="interaction-count">
+          <span>
             <Icon name="repeat-2" aria-hidden="true" />
             {counts.reposts} {counts.reposts === 1 ? 'repost' : 'reposts'}
           </span>
         )}
         {counts.comments > 0 && (
-          <span class="interaction-count">
+          <span>
             <Icon name="message-square" aria-hidden="true" />
             {counts.comments} {counts.comments === 1 ? 'comment' : 'comments'}
           </span>
@@ -180,188 +159,52 @@ const attachments = entry.attachments?.length
     )}
 
     {entry.author && (
-      <div class="entry-detail__author">
-        <HCard author={entry.author} config={config} variant="compact" />
-      </div>
+      <HCard author={entry.author} config={config} variant="compact" />
     )}
   </footer>
 </article>
 
-{hasResponses && (
-  <section class="responses" aria-labelledby="responses-heading">
-    <h2 id="responses-heading" class="responses__heading">
-      Responses <span class="responses__count">({responses.length})</span>
-    </h2>
-
-    {responseLikes.length > 0 && (
-      <div class="responses__pile" aria-label={`${responseLikes.length} ${responseLikes.length === 1 ? 'like' : 'likes'}`}>
-        <p class="responses__pile-label text-sm text-secondary">
-          <Icon name="heart" aria-hidden="true" />
-          {responseLikes.length} {responseLikes.length === 1 ? 'like' : 'likes'}
-        </p>
-        <div class="responses__avatars">
-          {responseLikes.slice(0, 12).map(r => (
-            r.authorPhoto ? (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
-                <img class="responses__avatar" src={r.authorPhoto} alt={r.authorName ?? ''} width="32" height="32" />
-              </a>
-            ) : (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
-                 class="responses__avatar responses__avatar--placeholder">
-                <Icon name="user" aria-hidden="true" />
-              </a>
-            )
-          ))}
-          {responseLikes.length > 12 && (
-            <span class="responses__overflow">+{responseLikes.length - 12}</span>
-          )}
-        </div>
-      </div>
-    )}
-
-    {responseReposts.length > 0 && (
-      <div class="responses__pile" aria-label={`${responseReposts.length} ${responseReposts.length === 1 ? 'repost' : 'reposts'}`}>
-        <p class="responses__pile-label text-sm text-secondary">
-          <Icon name="repeat-2" aria-hidden="true" />
-          {responseReposts.length} {responseReposts.length === 1 ? 'repost' : 'reposts'}
-        </p>
-        <div class="responses__avatars">
-          {responseReposts.slice(0, 12).map(r => (
-            r.authorPhoto ? (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}>
-                <img class="responses__avatar" src={r.authorPhoto} alt={r.authorName ?? ''} width="32" height="32" />
-              </a>
-            ) : (
-              <a href={r.authorUrl ?? r.sourceUrl} rel="noopener" target="_blank" title={r.authorName ?? undefined}
-                 class="responses__avatar responses__avatar--placeholder">
-                <Icon name="user" aria-hidden="true" />
-              </a>
-            )
-          ))}
-          {responseReposts.length > 12 && (
-            <span class="responses__overflow">+{responseReposts.length - 12}</span>
-          )}
-        </div>
-      </div>
-    )}
-
-    {responseComments.length > 0 && (
-      <div class="responses__comments">
-        <p class="responses__comments-label text-sm text-secondary">
-          <Icon name="message-square" aria-hidden="true" />
-          {responseComments.length} {responseComments.length === 1 ? 'reply' : 'replies'}
-        </p>
-        <ul class="responses__comment-list">
-          {responseComments.map(r => (
-            <li class="response-comment">
-              {r.authorPhoto && (
-                <img class="response-comment__photo" src={r.authorPhoto} alt={r.authorName ?? ''} width="32" height="32" />
-              )}
-              <div class="response-comment__body">
-                <a href={r.authorUrl ?? r.sourceUrl} class="response-comment__author" rel="noopener" target="_blank">
-                  {r.authorName ?? r.sourceLabel}
-                </a>
-                {r.content && (
-                  <p class="response-comment__content">{r.content}</p>
-                )}
-                <a href={r.sourceUrl} class="response-comment__source text-xs text-secondary" rel="noopener" target="_blank">
-                  {r.sourceLabel}
-                </a>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </section>
+{allResponses.length > 0 && (
+  <Responses responses={allResponses} />
 )}
 
 <style>
-  .entry-detail {
+  article {
     max-width: var(--max-width-content);
   }
 
-  .entry-detail__header {
+  header {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     margin-bottom: var(--space-6);
   }
 
-  .entry-detail__title {
+  h1 {
     font-size: var(--text-3xl);
     font-weight: var(--weight-bold);
     line-height: var(--leading-tight);
     color: var(--color-text-primary);
   }
 
-  .entry-detail__meta {
+  .meta {
     display: flex;
     align-items: center;
     gap: var(--space-4);
   }
 
-  .entry-detail__permalink {
+  .permalink {
     font-size: var(--text-sm);
     color: var(--color-text-tertiary);
     text-decoration: none;
   }
 
-  .entry-detail__permalink:hover {
+  .permalink:hover {
     color: var(--color-text-secondary);
     text-decoration: none;
   }
 
-  .entry-detail__verb-callout {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4);
-    background-color: var(--color-surface-2, var(--color-surface));
-    border-radius: var(--radius-md);
-    font-size: var(--text-lg);
-    line-height: var(--leading-snug);
-  }
-
-  .entry-detail__verb-emoji {
-    font-size: var(--text-2xl);
-    flex-shrink: 0;
-  }
-
-  .entry-detail__verb-text a {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-decoration: none;
-  }
-
-  .entry-detail__verb-text a:hover {
-    color: var(--color-text-link);
-  }
-
-  .entry-detail__verb-text :global(svg) {
-    width: 0.875rem;
-    height: 0.875rem;
-    color: var(--color-text-tertiary);
-  }
-
-  .entry-detail__rating {
-    display: flex;
-    gap: 0.125rem;
-    font-size: var(--text-xl);
-  }
-
-  .star-filled {
-    color: var(--color-text-link, var(--color-accent));
-  }
-
-  .star-empty {
-    color: var(--color-border);
-  }
-
-  .entry-detail__reply-to {
+  .reply-to {
     display: flex;
     align-items: center;
     gap: var(--space-1);
@@ -369,19 +212,19 @@ const attachments = entry.attachments?.length
     color: var(--color-text-secondary);
   }
 
-  .entry-detail__reply-to svg {
+  .reply-to :global(svg) {
     width: 0.875rem;
     height: 0.875rem;
     color: var(--color-text-tertiary);
     flex-shrink: 0;
   }
 
-  .entry-detail__media {
+  .entry-media {
     margin-bottom: var(--space-6);
     border-radius: var(--radius-lg);
   }
 
-  .entry-detail__footer {
+  footer {
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
@@ -390,7 +233,7 @@ const attachments = entry.attachments?.length
     border-top: 1px solid var(--color-border);
   }
 
-  .entry-detail__syndication ul {
+  .syndication ul {
     list-style: none;
     padding: 0;
     display: flex;
@@ -398,24 +241,24 @@ const attachments = entry.attachments?.length
     margin-top: var(--space-2);
   }
 
-  .entry-detail__syndication a {
+  .syndication a {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
     font-size: var(--text-sm);
   }
 
-  .entry-detail__syndication svg {
+  .syndication :global(svg) {
     width: 0.75rem;
     height: 0.75rem;
   }
 
-  .entry-detail__counts {
+  .counts {
     display: flex;
     gap: var(--space-4);
   }
 
-  .interaction-count {
+  .counts > span {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -423,162 +266,8 @@ const attachments = entry.attachments?.length
     color: var(--color-text-secondary);
   }
 
-  .interaction-count svg {
+  .counts :global(svg) {
     width: 1rem;
     height: 1rem;
   }
-
-  /* Responses */
-  .responses {
-    margin-top: var(--space-12);
-    padding-top: var(--space-8);
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-  }
-
-  .responses__heading {
-    font-size: var(--text-lg);
-  }
-
-  .responses__count {
-    font-weight: var(--weight-normal);
-    color: var(--color-text-secondary);
-  }
-
-  .responses__pile {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .responses__pile-label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .responses__pile-label svg {
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-  }
-
-  .responses__avatars {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-    align-items: center;
-  }
-
-  .responses__avatar {
-    display: block;
-    width: 2rem;
-    height: 2rem;
-    border-radius: var(--radius-full);
-    object-fit: cover;
-    border: 2px solid var(--color-bg);
-    margin-left: -0.375rem;
-    transition: transform var(--transition);
-  }
-
-  .responses__avatars a:first-child .responses__avatar,
-  .responses__avatars a:first-child {
-    margin-left: 0;
-  }
-
-  .responses__avatar:hover {
-    transform: translateY(-2px);
-    z-index: 1;
-    position: relative;
-  }
-
-  .responses__avatar--placeholder {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--color-surface-2, var(--color-surface));
-    color: var(--color-text-tertiary);
-    text-decoration: none;
-  }
-
-  .responses__avatar--placeholder :global(svg) {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .responses__overflow {
-    font-size: var(--text-xs);
-    color: var(--color-text-secondary);
-    margin-left: var(--space-2);
-  }
-
-  .responses__comments {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .responses__comments-label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .responses__comments-label svg {
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-  }
-
-  .responses__comment-list {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .response-comment {
-    display: flex;
-    gap: var(--space-3);
-    align-items: flex-start;
-  }
-
-  .response-comment__photo {
-    width: 2rem;
-    height: 2rem;
-    border-radius: var(--radius-full);
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  .response-comment__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    min-width: 0;
-  }
-
-  .response-comment__author {
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-decoration: none;
-  }
-
-  .response-comment__author:hover { color: var(--color-text-link); }
-
-  .response-comment__content {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    line-height: var(--leading-relaxed);
-  }
-
-  .response-comment__source {
-    text-decoration: none;
-  }
-
-  .response-comment__source:hover { color: var(--color-text-link) !important; }
 </style>
