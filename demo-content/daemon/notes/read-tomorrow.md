@@ -4,7 +4,7 @@ type: read
 published: 2026-02-20T21:00:00Z
 visibility: public
 tags: [books]
-verb: finished
+verb: read
 object_name: "Tomorrow, and Tomorrow, and Tomorrow"
 object_url: "https://www.gabriellezevin.com/tomorrow"
 rating: 5
