@@ -16,7 +16,7 @@ const memberTier = Astro.locals.member?.tier ?? null;
 const [author, recentArticles, recentNotes] = await Promise.all([
   content.getAuthor(),
   content.getEntries('article', { memberTier, limit: 5 }),
-  content.getEntries('note', { memberTier, limit: 10 }),
+  content.getEntries(['note', 'watch', 'read', 'listen', 'play'], { memberTier, limit: 10 }),
 ]);
 
 const allIds = [...recentArticles, ...recentNotes].map(e => e.id);

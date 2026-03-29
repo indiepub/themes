@@ -10,7 +10,7 @@ if (!Astro.locals.indiepub) {
 
 const { content } = Astro.locals.indiepub;
 const memberTier = Astro.locals.member?.tier ?? null;
-const notes = await content.getEntries('note', { memberTier, limit: 30 });
+const notes = await content.getEntries(['note', 'watch', 'read', 'listen', 'play'], { memberTier, limit: 30 });
 const countsMap = await content.getBatchInteractionCounts(notes.map(e => e.id));
 
 setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
