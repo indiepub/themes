@@ -11,7 +11,7 @@ const PER_PAGE = 20;
 const page = Math.max(1, parseInt(Astro.url.searchParams.get('page') ?? '1', 10) || 1);
 const offset = (page - 1) * PER_PAGE;
 
-const fetched = await content.getEntries('note', { memberTier, limit: PER_PAGE + 1, offset });
+const fetched = await content.getEntries(['note', 'watch', 'read', 'listen', 'play'], { memberTier, limit: PER_PAGE + 1, offset });
 const hasNext = fetched.length > PER_PAGE;
 const notes = hasNext ? fetched.slice(0, PER_PAGE) : fetched;
 const hasPrev = page > 1;
@@ -30,6 +30,16 @@ const hasPrev = page > 1;
             </time>
           </a>
         </header>
+        {note.verb && note.objectName && (
+          <p class="verb-callout">
+            {note.verb === 'watch' ? '📺 Watched' : note.verb === 'read' ? '📚 Read' : note.verb === 'listen' ? '🎧 Listened to' : note.verb === 'play' ? '🎮 Played' : note.verb}
+            {' '}
+            {note.objectUrl ? <a href={note.objectUrl} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a> : <strong>{note.objectName}</strong>}
+            {note.rating != null && note.rating > 0 && (
+              <span class="rating"> {'★'.repeat(note.rating)}{'☆'.repeat(5 - note.rating)}</span>
+            )}
+          </p>
+        )}
         <Markdown content={note.content ?? ''} class="e-content" />
       </article>
     ))}
