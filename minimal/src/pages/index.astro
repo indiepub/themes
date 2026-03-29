@@ -36,9 +36,19 @@ const hasPrev = page > 1;
             </time>
           )}
         </header>
+        {entry.verb && entry.objectName && (
+          <p class="verb-callout">
+            {entry.verb === 'watch' ? '📺 Watched' : entry.verb === 'read' ? '📚 Read' : entry.verb === 'listen' ? '🎧 Listened to' : entry.verb === 'play' ? '🎮 Played' : entry.verb}
+            {' '}
+            {entry.objectUrl ? <a href={entry.objectUrl} rel="noopener" target="_blank"><strong>{entry.objectName}</strong></a> : <strong>{entry.objectName}</strong>}
+            {entry.rating != null && entry.rating > 0 && (
+              <span class="rating"> {'★'.repeat(entry.rating)}{'☆'.repeat(5 - entry.rating)}</span>
+            )}
+          </p>
+        )}
         {entry.summary
           ? <p class="p-summary">{entry.summary}</p>
-          : entry.type === 'note' && <Markdown content={entry.content ?? ''} class="e-content" />
+          : !entry.name && entry.content && <Markdown content={entry.content} class="e-content" />
         }
       </article>
     ))}

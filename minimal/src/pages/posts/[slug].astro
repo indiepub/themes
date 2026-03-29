@@ -38,12 +38,23 @@ const permalink = `${siteUrl}/posts/${entry.slug}`;
       )}
     </header>
 
-    <Markdown content={entry.content ?? ''} class="e-content" itemprop="articleBody" />
+    {entry.verb && entry.objectName && (
+      <p class="verb-callout">
+        {entry.verb === 'watch' ? '📺 Watched' : entry.verb === 'read' ? '📚 Read' : entry.verb === 'listen' ? '🎧 Listened to' : entry.verb === 'play' ? '🎮 Played' : entry.verb}
+        {' '}
+        {entry.objectUrl ? <a href={entry.objectUrl} rel="noopener" target="_blank"><strong>{entry.objectName}</strong></a> : <strong>{entry.objectName}</strong>}
+        {entry.rating != null && entry.rating > 0 && (
+          <span class="rating"> {'★'.repeat(entry.rating)}{'☆'.repeat(5 - entry.rating)}</span>
+        )}
+      </p>
+    )}
+
+    <Markdown content={entry.content ?? ''} class="e-content" />
 
     {tags.length > 0 && (
       <footer>
         {tags.map(tag => (
-          <a href={`/tags/${tag.slug}`} rel="tag" class="p-category">{tag.name}</a>
+          <a href={`/tags/${tag}`} rel="tag" class="p-category">{tag}</a>
           <>{' '}</>
         ))}
       </footer>
