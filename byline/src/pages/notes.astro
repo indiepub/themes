@@ -19,7 +19,7 @@ const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
 const offset = (page - 1) * PER_PAGE;
 
 // Fetch one extra to know whether there's a next page
-const fetched = await content.getEntries('note', { memberTier, limit: PER_PAGE + 1, offset });
+const fetched = await content.getEntries(['note', 'watch', 'read', 'listen', 'play'], { memberTier, limit: PER_PAGE + 1, offset });
 const hasNext = fetched.length > PER_PAGE;
 const notes = hasNext ? fetched.slice(0, PER_PAGE) : fetched;
 const hasPrev = page > 1;
@@ -30,7 +30,14 @@ interface NoteItem {
   content: string;
   isoDate: string | undefined;
   date: string;
+  verb?: string | undefined;
+  objectName?: string | undefined;
+  objectUrl?: string | undefined;
+  rating?: number | undefined;
 }
+
+const VERB_EMOJI: Record<string, string> = { watch: '📺', read: '📚', listen: '🎧', play: '🎮' };
+const VERB_LABEL: Record<string, string> = { watch: 'Watched', read: 'Read', listen: 'Listened to', play: 'Played' };
 
 const noteItems: NoteItem[] = notes.map(entry => ({
   slug: entry.slug,
@@ -39,6 +46,10 @@ const noteItems: NoteItem[] = notes.map(entry => ({
   date: entry.publishedAt
     ? entry.publishedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : '',
+  verb: entry.verb ?? undefined,
+  objectName: entry.objectName ?? undefined,
+  objectUrl: entry.objectUrl ?? undefined,
+  rating: entry.rating ?? undefined,
 }));
 
 setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
@@ -63,6 +74,27 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
                 <time datetime={note.isoDate}>{note.date}</time>
               </a>
             </header>
+          )}
+          {note.verb && note.objectName && (
+            <div class="verb-callout">
+              <span class="verb-emoji">{VERB_EMOJI[note.verb] ?? ''}</span>
+              <span>
+                {VERB_LABEL[note.verb] ?? note.verb}
+                {' '}
+                {note.objectUrl ? (
+                  <a href={note.objectUrl} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a>
+                ) : (
+                  <strong>{note.objectName}</strong>
+                )}
+              </span>
+            </div>
+          )}
+          {note.rating != null && note.rating > 0 && (
+            <div class="verb-rating" aria-label={`Rating: ${note.rating} out of 5`}>
+              {[1,2,3,4,5].map(n => (
+                <span>{n <= note.rating! ? '★' : '☆'}</span>
+              ))}
+            </div>
           )}
           <Markdown content={note.content} class="note-body" />
           <footer>
@@ -161,6 +193,41 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
   .stream footer a:hover {
     color: var(--color-text-secondary);
     text-decoration: none;
+  }
+
+  /* ── Verb callout ── */
+  .verb-callout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-surface-2, var(--color-surface));
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .verb-emoji {
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+  }
+
+  .verb-callout a {
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .verb-callout a:hover {
+    color: var(--color-accent);
+  }
+
+  .verb-rating {
+    display: flex;
+    gap: 0.125rem;
+    font-size: var(--text-base);
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
   }
 
   /* ── Pagination ── */
