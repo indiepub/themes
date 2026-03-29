@@ -44,7 +44,7 @@ setEntryCacheHeaders(Astro.response, entry);
 ---
 
 <Page title={pageTitle} description={pageDescription} ogImage={ogImage} narrow>
-  {entry.type === 'note' ? (
+  {['note', 'watch', 'read', 'listen', 'play'].includes(entry.type) ? (
     /* ── Note card UI ── */
     <div class="note-wrap">
       <a href="/notes" class="back">← Notes</a>
