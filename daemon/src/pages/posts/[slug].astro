@@ -46,18 +46,20 @@ const ogImage = `/og/${entry.slug}`;
 
 setEntryCacheHeaders(Astro.response, entry);
 
+const VERB_TYPES = new Set(['watch', 'read', 'listen', 'play']);
 const typeLabels: Record<string, string> = {
   note: 'Notes',
   article: 'Articles',
   photo: 'Photos',
   bookmark: 'Bookmarks',
 };
-const backLabel = typeLabels[entry.type] ?? 'Back';
+const backLabel = VERB_TYPES.has(entry.type) ? 'Notes' : (typeLabels[entry.type] ?? 'Back');
+const backHref = VERB_TYPES.has(entry.type) ? '/notes' : `/${entry.type}s`;
 ---
 
 <Page title={pageTitle} description={pageDescription} ogImage={ogImage} hideSidebar>
   <nav class="back-nav">
-    <a href={`/${entry.type}s`} class="back-link">← {backLabel}</a>
+    <a href={backHref} class="back-link">← {backLabel}</a>
   </nav>
 
   {isPaidLocked ? (
