@@ -12,22 +12,22 @@ const { config } = Astro.props;
 
 <div>
   <p class="text-xs text-secondary">Subscribe</p>
-  <div class="feed-links">
-    <a href="/feed.xml" title="RSS feed">
+  <ul class="feed-links">
+    <li><a href="/feed.xml" title="RSS feed">
       <Icon name="rss" aria-hidden="true" />
       <span>RSS</span>
-    </a>
-    <a href="/feed.atom" title="Atom feed">
+    </a></li>
+    <li><a href="/feed.atom" title="Atom feed">
       <Icon name="rss" aria-hidden="true" />
       <span>Atom</span>
-    </a>
-    <a href="/feed.json" title="JSON Feed">
+    </a></li>
+    <li><a href="/feed.json" title="JSON Feed">
       <Icon name="rss" aria-hidden="true" />
       <span>JSON</span>
-    </a>
-  </div>
+    </a></li>
+  </ul>
   {config.subscriptions?.enabled && (
-    <SubscribeForm compact />
+    <SubscribeForm />
   )}
 </div>
 
@@ -46,8 +46,16 @@ const { config } = Astro.props;
 
   .feed-links {
     display: flex;
+    flex-direction: row;
     gap: var(--space-2);
     flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .feed-links li + li {
+    margin-top: 0;
   }
 
   .feed-links a {

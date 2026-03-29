@@ -2,18 +2,7 @@
 /**
  * Embeddable email subscription form.
  * POSTs to /api/subscribe; handles success/error via ?subscribed= query param on redirect.
- *
- * Usage:
- *   <SubscribeForm />
- *   <SubscribeForm compact />
  */
-
-interface Props {
-  /** Compact variant — single row, no heading */
-  compact?: boolean | undefined;
-}
-
-const { compact = false } = Astro.props;
 
 const url = new URL(Astro.request.url);
 const subscribed = url.searchParams.get('subscribed');
@@ -28,48 +17,40 @@ const duplicate = subscribed === 'dup';
   </div>
 ) : (
   <form
-    class:list={['subscribe-form', { 'subscribe-form--compact': compact }]}
+    class="subscribe-form"
     method="post"
     action={`/api/subscribe?next=${encodeURIComponent(url.pathname + '?subscribed=1')}`}
   >
-    {!compact && (
-      <p class="subscribe-form__heading">Get updates</p>
-    )}
-
     {duplicate && (
       <p class="subscribe-form__note" role="status">You're already subscribed.</p>
     )}
 
     <div>
-      {!compact && (
-        <div>
-          <label for="subscribe-name">Name <span>(optional)</span></label>
-          <input
-            type="text"
-            id="subscribe-name"
-            name="name"
-            placeholder="Your name"
-            autocomplete="name"
-          />
-        </div>
-      )}
-
-      <div>
-        <label for="subscribe-email">{compact ? 'Email' : 'Email address'}</label>
-        <input
-          type="email"
-          id="subscribe-email"
-          name="email"
-          placeholder="you@example.com"
-          autocomplete="email"
-          required
-        />
-      </div>
-
-      <button type="submit">
-        Subscribe
-      </button>
+      <label for="subscribe-name">Name <span>(optional)</span></label>
+      <input
+        type="text"
+        id="subscribe-name"
+        name="name"
+        placeholder="Your name"
+        autocomplete="name"
+      />
     </div>
+
+    <div>
+      <label for="subscribe-email">Email address</label>
+      <input
+        type="email"
+        id="subscribe-email"
+        name="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      />
+    </div>
+
+    <button type="submit">
+      Subscribe
+    </button>
   </form>
 )}
 
@@ -91,41 +72,32 @@ const duplicate = subscribed === 'dup';
     font-size: var(--text-base);
   }
 
-  .subscribe-form__heading {
-    font-size: var(--text-base);
-    font-weight: var(--weight-semibold);
-    margin-bottom: var(--space-4);
-  }
-
-  .subscribe-form__note {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-3);
-  }
-
-  label span {
-    color: var(--color-text-tertiary);
-    font-weight: var(--weight-normal);
-  }
-
-  /* Default (stacked) layout */
-  form > div {
+  .subscribe-form {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
   }
 
-  form > div > div {
+  .subscribe-form > div {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    width: 100%;
+  }
+
+  .subscribe-form__note {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
   }
 
   label {
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
     color: var(--color-text-secondary);
+  }
+
+  label span {
+    color: var(--color-text-tertiary);
+    font-weight: var(--weight-normal);
   }
 
   input[type="text"],
@@ -148,6 +120,7 @@ const duplicate = subscribed === 'dup';
 
   button {
     align-self: flex-start;
+    margin-top: var(--space-1);
     padding: var(--space-2) var(--space-5);
     background: var(--color-brand);
     color: var(--color-text-on-brand);
@@ -162,30 +135,5 @@ const duplicate = subscribed === 'dup';
 
   button:hover {
     background: var(--color-text-link-hover);
-  }
-
-  /* Compact: single-row layout */
-  .subscribe-form--compact > div {
-    flex-direction: row;
-    align-items: flex-end;
-  }
-
-  .subscribe-form--compact > div > div {
-    flex: 1;
-  }
-
-  .subscribe-form--compact button {
-    align-self: auto;
-    white-space: nowrap;
-  }
-
-  @media (max-width: 480px) {
-    .subscribe-form--compact > div {
-      flex-direction: column;
-    }
-
-    .subscribe-form--compact button {
-      align-self: flex-start;
-    }
   }
 </style>
