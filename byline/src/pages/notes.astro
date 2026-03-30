@@ -82,9 +82,9 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
                 {VERB_LABEL[note.verb] ?? note.verb}
                 {' '}
                 {note.objectUrl ? (
-                  <a href={note.objectUrl} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a>
+                  <a href={note.objectUrl} class={`u-${note.verb}-of`} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a>
                 ) : (
-                  <strong>{note.objectName}</strong>
+                  <strong class={`p-${note.verb}-of`}>{note.objectName}</strong>
                 )}
               </span>
             </div>

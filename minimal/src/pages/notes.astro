@@ -34,7 +34,7 @@ const hasPrev = page > 1;
           <p class="verb-callout">
             {note.verb === 'watch' ? '📺 Watched' : note.verb === 'read' ? '📚 Read' : note.verb === 'listen' ? '🎧 Listened to' : note.verb === 'play' ? '🎮 Played' : note.verb}
             {' '}
-            {note.objectUrl ? <a href={note.objectUrl} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a> : <strong>{note.objectName}</strong>}
+            {note.objectUrl ? <a href={note.objectUrl} class={`u-${note.verb}-of`} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a> : <strong class={`p-${note.verb}-of`}>{note.objectName}</strong>}
             {note.rating != null && note.rating > 0 && (
               <span class="rating"> {'★'.repeat(note.rating)}{'☆'.repeat(5 - note.rating)}</span>
             )}

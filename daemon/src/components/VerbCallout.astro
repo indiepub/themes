@@ -27,12 +27,12 @@ const label = labelMap[verb] ?? verb;
   <span>
     {label}{' '}
     {objectUrl ? (
-      <a href={objectUrl} rel="noopener" target="_blank">
+      <a href={objectUrl} class={`u-${verb}-of`} rel="noopener" target="_blank">
         {objectName ?? objectUrl}
         <Icon name="external-link" aria-hidden="true" />
       </a>
     ) : (
-      <strong>{objectName}</strong>
+      <strong class={`p-${verb}-of`}>{objectName}</strong>
     )}
   </span>
 </div>

@@ -40,7 +40,7 @@ const hasPrev = page > 1;
           <p class="verb-callout">
             {entry.verb === 'watch' ? '📺 Watched' : entry.verb === 'read' ? '📚 Read' : entry.verb === 'listen' ? '🎧 Listened to' : entry.verb === 'play' ? '🎮 Played' : entry.verb}
             {' '}
-            {entry.objectUrl ? <a href={entry.objectUrl} rel="noopener" target="_blank"><strong>{entry.objectName}</strong></a> : <strong>{entry.objectName}</strong>}
+            {entry.objectUrl ? <a href={entry.objectUrl} class={`u-${entry.verb}-of`} rel="noopener" target="_blank"><strong>{entry.objectName}</strong></a> : <strong class={`p-${entry.verb}-of`}>{entry.objectName}</strong>}
             {entry.rating != null && entry.rating > 0 && (
               <span class="rating"> {'★'.repeat(entry.rating)}{'☆'.repeat(5 - entry.rating)}</span>
             )}
