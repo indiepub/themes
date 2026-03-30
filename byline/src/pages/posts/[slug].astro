@@ -66,12 +66,12 @@ setEntryCacheHeaders(Astro.response, entry);
               {entry.verb === 'watch' ? 'Watched' : entry.verb === 'read' ? 'Read' : entry.verb === 'listen' ? 'Listened to' : entry.verb === 'play' ? 'Played' : entry.verb}
               {' '}
               {entry.objectUrl ? (
-                <a href={entry.objectUrl} rel="noopener" target="_blank">
+                <a href={entry.objectUrl} class={`u-${entry.verb}-of`} rel="noopener" target="_blank">
                   {entry.objectName}
                   <Icon name="external-link" aria-hidden="true" width="13" height="13" />
                 </a>
               ) : (
-                <strong>{entry.objectName}</strong>
+                <strong class={`p-${entry.verb}-of`}>{entry.objectName}</strong>
               )}
             </span>
           </div>
