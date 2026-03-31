@@ -244,12 +244,12 @@ blockquote {
   font-style: italic;
 }
 
-ul, ol {
+.prose :is(ul, ol) {
   padding-left: var(--space-6);
   line-height: var(--leading-relaxed);
 }
 
-li + li {
+.prose li + li {
   margin-top: var(--space-1);
 }
 

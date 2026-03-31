@@ -13,12 +13,14 @@ const { title, description, canonicalUrl, ogImage } = Astro.props;
 
 const indiepub = Astro.locals.indiepub;
 const config = indiepub?.config;
-const [author, topTags] = indiepub
+const [author, topTags, nowEntries] = indiepub
   ? await Promise.all([
       indiepub.content.getAuthor(),
       indiepub.content.getTopTags(20),
+      indiepub.content.getEntries('note', { tag: 'now', limit: 1 }),
     ])
-  : [null, []];
+  : [null, [], []];
+const nowEntry = nowEntries[0] ?? null;
 const activePath = Astro.url.pathname;
 ---
 
@@ -41,7 +43,7 @@ const activePath = Astro.url.pathname;
   <!-- Mobile menu overlay -->
   <div class="mobile-menu" id="mobile-menu" aria-hidden="true" aria-label="Navigation menu">
     {author && config && (
-      <SideProfile author={author} config={config} activePath={activePath} topTags={topTags} mobile />
+      <SideProfile author={author} config={config} activePath={activePath} topTags={topTags} nowEntry={nowEntry} mobile />
     )}
   </div>
 
@@ -50,7 +52,7 @@ const activePath = Astro.url.pathname;
     <!-- Desktop sidebar -->
     {author && config && (
       <aside class="app-sidebar">
-        <SideProfile author={author} config={config} activePath={activePath} topTags={topTags} />
+        <SideProfile author={author} config={config} activePath={activePath} topTags={topTags} nowEntry={nowEntry} />
       </aside>
     )}
 

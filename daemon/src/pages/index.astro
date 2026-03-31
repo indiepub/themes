@@ -4,6 +4,7 @@ import HCard from '../components/HCard.astro';
 import EntryCard from '../components/EntryCard.astro';
 import FeedLinks from '../components/FeedLinks.astro';
 import NoteComposer from '../components/NoteComposer.astro';
+import NowCallout from '../components/NowCallout.astro';
 import { setCollectionCacheHeaders } from '../lib/cache';
 
 if (!Astro.locals.indiepub) {
@@ -13,11 +14,13 @@ if (!Astro.locals.indiepub) {
 const { content, config } = Astro.locals.indiepub;
 
 const memberTier = Astro.locals.member?.tier ?? null;
-const [author, recentArticles, recentNotes] = await Promise.all([
+const [author, recentArticles, recentNotes, nowEntries] = await Promise.all([
   content.getAuthor(),
   content.getEntries('article', { memberTier, limit: 5 }),
   content.getEntries(['note', 'watch', 'read', 'listen', 'play'], { memberTier, limit: 10 }),
+  content.getEntries('note', { tag: 'now', limit: 1 }),
 ]);
+const nowEntry = nowEntries[0] ?? null;
 
 const allIds = [...recentArticles, ...recentNotes].map(e => e.id);
 const countsMap = await content.getBatchInteractionCounts(allIds);
@@ -33,6 +36,8 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, [...recentArti
     </section>
 
     <NoteComposer />
+
+    <NowCallout entry={nowEntry} />
 
     <div class="landing__grid">
       <div class="landing__primary">
@@ -141,4 +146,5 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, [...recentArti
     flex-direction: column;
     gap: var(--space-3);
   }
+
 </style>

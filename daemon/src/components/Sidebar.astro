@@ -6,6 +6,7 @@ const currentPath = Astro.url.pathname;
 const subscriptionsEnabled = Astro.locals.indiepub?.config.subscriptions?.enabled ?? false;
 
 const sections = [
+  { href: '/now',       label: 'Now',       icon: 'clock' },
   { href: '/notes',     label: 'Notes',     icon: 'message-circle' },
   { href: '/articles',  label: 'Articles',  icon: 'file-text' },
   { href: '/photos',    label: 'Photos',    icon: 'image' },

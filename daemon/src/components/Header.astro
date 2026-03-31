@@ -10,6 +10,7 @@ const member = Astro.locals.member ?? null;
 const isAdmin = Astro.locals.isAdmin ?? false;
 
 const nav = [
+  { href: '/now',       label: 'Now',       icon: 'clock' },
   { href: '/notes',     label: 'Notes',     icon: 'message-circle' },
   { href: '/articles',  label: 'Articles',  icon: 'file-text' },
   { href: '/photos',    label: 'Photos',    icon: 'image' },
