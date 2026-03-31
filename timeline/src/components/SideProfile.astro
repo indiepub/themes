@@ -1,7 +1,8 @@
 ---
-import type { Author, IndiePubConfig } from '@indiepub/types';
+import type { Author, IndiePubConfig, Entry } from '@indiepub/types';
 import ThemeToggle from './ThemeToggle.astro';
 import SideProfileSubscribe from './SideProfileSubscribe.astro';
+import SideProfileNow from './SideProfileNow.astro';
 import SideProfileTagCloud from './SideProfileTagCloud.astro';
 import SideProfileSocial from './SideProfileSocial.astro';
 
@@ -10,14 +11,16 @@ interface Props {
   config: IndiePubConfig;
   activePath: string;
   topTags?: Array<{ name: string; slug: string; count: number }> | undefined;
+  nowEntry?: Entry | null | undefined;
   /** True when rendered inside the mobile overlay */
   mobile?: boolean | undefined;
 }
 
-const { author, config, activePath, topTags = [], mobile = false } = Astro.props;
+const { author, config, activePath, topTags = [], nowEntry = null, mobile = false } = Astro.props;
 
 const navLinks = [
   { href: '/',           label: 'All posts' },
+  { href: '/now',        label: 'Now' },
   { href: '/notes',      label: 'Notes' },
   { href: '/articles',   label: 'Articles' },
   { href: '/photos',     label: 'Photos' },
@@ -75,6 +78,7 @@ const authorDomain = author.url ? new URL(author.url).hostname.replace(/^www\./,
   <hr />
 
   <SideProfileSubscribe config={config} />
+  <SideProfileNow entry={nowEntry} />
   <SideProfileTagCloud tags={topTags} activePath={activePath} />
   <SideProfileSocial links={socialLinks} />
 

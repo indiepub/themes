@@ -22,11 +22,7 @@ const { tags, class: className } = Astro.props;
 }
 
 <style>
-  li + li {
-    margin-top: 0;
-  }
-
-  .tag-list {
+  ul {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
