@@ -220,10 +220,6 @@ p {
   color: var(--color-text-primary);
 }
 
-p + p {
-  margin-top: var(--space-4);
-}
-
 a {
   color: var(--color-text-link);
   text-decoration: none;
@@ -289,24 +285,6 @@ pre code {
   font-weight: var(--shiki-dark-font-weight, inherit);
 }
 
-blockquote {
-  border-left: 3px solid var(--color-rule);
-  padding-left: var(--space-5);
-  color: var(--color-text-secondary);
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: var(--text-lg);
-}
-
-.prose :is(ul, ol) {
-  padding-left: var(--space-6);
-  line-height: var(--leading-relaxed);
-}
-
-.prose li + li {
-  margin-top: var(--space-2);
-}
-
 hr {
   border: none;
   height: 1px;
@@ -335,24 +313,7 @@ img, video {
   display: block;
 }
 
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
 
-th, td {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-}
-
-th {
-  font-weight: var(--weight-semibold);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
 
 /* ── Focus ──────────────────────────────────────────────────── */
 :focus-visible {
@@ -384,208 +345,18 @@ th {
   border-width: 0;
 }
 
-/* ── Prose ───────────────────────────────────────────────────
-   Applied to markdown-rendered content (e.g. blog post bodies).
-   Must live in global CSS — Astro scoped styles cannot pierce
-   set:html content rendered by child components.
+/* ── Byline prose overrides ──────────────────────────────────
+   Article content uses serif font with generous spacing.
+   Set via CSS custom properties consumed by <Markdown>.
    ─────────────────────────────────────────────────────────── */
-.prose {
-  font-family: var(--font-serif);
-  font-size: var(--text-lg);
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-primary);
-}
-
-.prose h2,
-.prose h3,
-.prose h4,
-.prose h5,
-.prose h6 {
-  font-family: var(--font-serif);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-snug);
-  color: var(--color-text-primary);
-}
-
-.prose h2 {
-  font-size: var(--text-2xl);
-  margin-top: var(--space-16);
-  margin-bottom: var(--space-4);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border);
-}
-
-.prose h3 {
-  font-size: var(--text-xl);
-  margin-top: var(--space-12);
-  margin-bottom: var(--space-3);
-}
-
-.prose h4 {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  margin-top: var(--space-10);
-  margin-bottom: var(--space-2);
-}
-
-.prose h5,
-.prose h6 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  margin-top: var(--space-8);
-  margin-bottom: var(--space-2);
-  color: var(--color-text-secondary);
-}
-
-/* Don't add extra space when a heading is the first element */
-.prose h2:first-child,
-.prose h3:first-child,
-.prose h4:first-child {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-}
-
-.prose p {
-  margin-bottom: var(--space-5);
-}
-
-.prose ul,
-.prose ol {
-  padding-left: var(--space-6);
-  margin-bottom: var(--space-6);
-}
-
-.prose li {
-  margin-bottom: var(--space-2);
-  line-height: var(--leading-relaxed);
-}
-
-.prose li > ul,
-.prose li > ol {
-  margin-top: var(--space-2);
-  margin-bottom: 0;
-}
-
-.prose blockquote {
-  margin-block: var(--space-10);
-  padding: var(--space-4) var(--space-6);
-  border-left: 3px solid var(--color-rule);
-  background-color: var(--color-bg-alt);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  font-size: var(--text-xl);
-  font-style: italic;
-  color: var(--color-text-secondary);
-}
-
-.prose blockquote p:last-child {
-  margin-bottom: 0;
-}
-
-.prose pre {
-  margin-block: var(--space-8);
-}
-
-/* Inline code in prose — slightly smaller than the mono default */
-.prose :not(pre) > code {
-  font-size: 0.85em;
-}
-
-.prose img {
-  border-radius: var(--radius-md);
-  margin-block: var(--space-10);
-  width: 100%;
-}
-
-.prose figure {
-  margin-block: var(--space-10);
-}
-
-.prose figure img {
-  margin-block: 0;
-}
-
-.prose figcaption {
-  margin-top: var(--space-3);
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  text-align: center;
-  font-style: normal;
-}
-
-.prose hr {
-  margin-block: var(--space-12);
-}
-
-.prose table {
-  margin-block: var(--space-8);
-  font-size: var(--text-base);
-}
-
-/* ── Note body ───────────────────────────────────────────────
-   Lightweight markdown rendering for short-form notes.
-   Sans-serif, conversational — not editorial.
-   Like .prose but stripped down and in the UI font.
-   ─────────────────────────────────────────────────────────── */
-.note-body {
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-primary);
-}
-
-.note-body p {
-  margin-bottom: var(--space-3);
-}
-
-.note-body p:last-child {
-  margin-bottom: 0;
-}
-
-.note-body a {
-  color: var(--color-text-link);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.note-body a:hover {
-  color: var(--color-text-link-hover);
-}
-
-.note-body strong {
-  font-weight: var(--weight-semibold);
-}
-
-.note-body em {
-  font-style: italic;
-}
-
-.note-body ul,
-.note-body ol {
-  padding-left: var(--space-5);
-  margin-bottom: var(--space-3);
-}
-
-.note-body li {
-  margin-bottom: var(--space-1);
-  line-height: var(--leading-relaxed);
-}
-
-.note-body code {
-  font-size: 0.875em;
-}
-
-.note-body blockquote {
-  border-left: 2px solid var(--color-border-strong);
-  padding-left: var(--space-4);
-  color: var(--color-text-secondary);
-  font-style: italic;
-  margin-block: var(--space-4);
-}
-
-.note-body img {
-  border-radius: var(--radius-md);
-  margin-block: var(--space-4);
-  width: 100%;
+.byline-article-prose {
+  --prose-font-family: var(--font-serif);
+  --prose-font-size: var(--text-lg);
+  --prose-li-gap: var(--space-2);
+  --prose-img-margin: var(--space-10);
+  --prose-bq-border: 3px solid var(--color-rule);
+  --prose-bq-padding: var(--space-4) var(--space-6);
+  --prose-bq-margin: var(--space-10);
+  --prose-bq-color: var(--color-text-secondary);
+  --prose-hr-margin: var(--space-12);
 }

@@ -48,7 +48,7 @@ const targetUrl = entry.likeOf ?? entry.repostOf ?? entry.inReplyTo;
     </blockquote>
   )}
   {entry.content && entry.type === 'reply' && (
-    <Markdown content={linkifyHashtags(entry.content)} class="e-content card-content" />
+    <Markdown content={linkifyHashtags(entry.content)} class="e-content" />
   )}
   <CardFooter detailUrl={detailUrl} pubDate={pubDate} />
 </div>

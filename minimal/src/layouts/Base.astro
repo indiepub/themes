@@ -12,7 +12,6 @@ const author = Astro.locals.indiepub
   ? await Astro.locals.indiepub.content.getAuthor()
   : null;
 const pageTitle = title ? `${title} · ${siteTitle}` : siteTitle;
-const siteUrl = config?.siteUrl ?? Astro.url.origin;
 const isAdmin = !!Astro.locals.isAdmin;
 ---
 
@@ -45,7 +44,7 @@ const isAdmin = !!Astro.locals.isAdmin;
   </main>
 
   <footer>
-    <span>&copy; {new Date().getFullYear()} {author?.displayName ?? siteTitle}</span>
+    <span>&copy; {new Date().getFullYear()} {author?.name ?? siteTitle}</span>
     <nav>
       <a href="/subscribe">Subscribe</a>
       <a href="/feed.xml">RSS</a>
