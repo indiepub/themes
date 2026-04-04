@@ -33,7 +33,7 @@ const { entry, counts, detailUrl, pubDate, badgeLabel } = Astro.props;
     <StarRating rating={entry.rating} />
   )}
   {entry.content && (
-    <Markdown content={linkifyHashtags(entry.content)} class="e-content card-content" />
+    <Markdown content={linkifyHashtags(entry.content)} class="e-content" />
   )}
   <CardFooter detailUrl={detailUrl} pubDate={pubDate} counts={counts} syndicationUrls={entry.syndicationUrls} />
 </div>

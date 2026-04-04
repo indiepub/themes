@@ -107,7 +107,7 @@ const backLabel =
       {isPaidLocked ? (
         <PaywallCTA />
       ) : entry.content && (
-        <Markdown content={entry.content} class="e-content post-detail__prose prose" />
+        <Markdown content={entry.content} variant="article" class="e-content" />
       )}
     </div>
   )}
@@ -155,7 +155,7 @@ const backLabel =
       {isPaidLocked ? (
         <PaywallCTA />
       ) : entry.content && (
-        <Markdown content={entry.content} class="e-content post-detail__content" />
+        <Markdown content={entry.content} variant="compact" class="e-content" />
       )}
 
       {entry.likeOf && (

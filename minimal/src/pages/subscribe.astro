@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const config = Astro.locals.indiepub?.config;
 const subscriberCount = Astro.locals.indiepub
   ? await Astro.locals.indiepub.content.getSubscriberCount()
   : 0;

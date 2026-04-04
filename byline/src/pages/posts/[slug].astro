@@ -85,7 +85,7 @@ setEntryCacheHeaders(Astro.response, entry);
         )}
 
         {entry.content && (
-          <Markdown content={entry.content} class="note-body e-content" />
+          <Markdown content={entry.content} variant="compact" class="e-content" />
         )}
 
         <footer>
@@ -120,7 +120,7 @@ setEntryCacheHeaders(Astro.response, entry);
       </header>
 
       {entry.content && (
-        <Markdown content={entry.content} class="prose e-content" />
+        <Markdown content={entry.content} variant="article" class="byline-article-prose e-content" />
       )}
     </article>
   )}

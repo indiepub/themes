@@ -14,6 +14,14 @@
   --bg-subtle: #f9fafb;
   --border: #e5e7eb;
   --radius: 4px;
+
+  /* Map to prose custom properties */
+  --color-border: var(--border);
+  --color-text-secondary: var(--text-muted);
+  --color-surface-2: var(--bg-subtle);
+  --color-text-link: var(--accent);
+  --radius-md: var(--radius);
+  --radius-sm: var(--radius);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -133,57 +141,6 @@ h1, h2, h3 {
 h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
 h2 { font-size: 1.375rem; margin-bottom: 0.5rem; }
 h3 { font-size: 1.125rem; }
-
-/* ── Prose (entry content) ─────────────────────────────────── */
-
-.e-content p,
-.e-content ul,
-.e-content ol {
-  margin-block: 0 1rem;
-}
-
-.e-content blockquote {
-  margin: 1.5rem 0;
-  padding-left: 1rem;
-  border-left: 3px solid var(--border);
-  color: var(--text-muted);
-}
-
-.e-content pre {
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  overflow-x: auto;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin-block: 1.5rem;
-}
-
-.e-content code {
-  font-family: var(--font-mono);
-  font-size: 0.875em;
-  background: var(--bg-subtle);
-  padding: 0.15em 0.35em;
-  border-radius: var(--radius);
-}
-
-.e-content pre code {
-  background: none;
-  padding: 0;
-}
-
-.e-content img {
-  border-radius: var(--radius);
-  margin-block: 1.5rem;
-}
-
-.e-content hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin-block: 2rem;
-}
 
 /* ── Feed / entry list ─────────────────────────────────────── */
 

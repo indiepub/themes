@@ -35,7 +35,7 @@ const { entry, counts, detailUrl, pubDate } = Astro.props;
     </p>
   )}
   {entry.content && (
-    <Markdown content={linkifyHashtags(entry.content)} class="e-content card-content" />
+    <Markdown content={linkifyHashtags(entry.content)} class="e-content" />
   )}
   {entry.attachments && entry.attachments.length > 0 && (
     <PhotoCarousel

@@ -201,10 +201,6 @@ p {
   color: var(--color-text-primary);
 }
 
-p+p {
-  margin-top: var(--space-4);
-}
-
 a {
   color: var(--color-text-link);
   text-decoration: none;
@@ -271,22 +267,6 @@ pre code {
   font-weight: var(--shiki-dark-font-weight, inherit);
 }
 
-blockquote {
-  border-left: 3px solid var(--color-brand);
-  padding-left: var(--space-4);
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-.prose :is(ul, ol) {
-  padding-left: var(--space-6);
-  line-height: var(--leading-relaxed);
-}
-
-.prose li+li {
-  margin-top: var(--space-1);
-}
-
 hr {
   border: none;
   border-top: 1px solid var(--color-border);
@@ -298,24 +278,6 @@ video {
   max-width: 100%;
   height: auto;
   display: block;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th,
-td {
-  text-align: left;
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-}
-
-th {
-  font-weight: var(--weight-semibold);
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
 }
 
 /* ── Focus ──────────────────────────────────────────────────── */
@@ -358,166 +320,6 @@ th {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* ── Prose — full article content ───────────────────────────────
-   Must live in global CSS so styles reach inside <Markdown>
-   component output (child component has no parent Astro cid attr).
-   ─────────────────────────────────────────────────────────────── */
-.prose {
-  color: var(--color-text-primary);
-  line-height: var(--leading-relaxed);
-  font-size: var(--text-base);
-}
-
-.prose h1 {
-  font-size: var(--text-3xl);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-  color: var(--color-text-primary);
-  margin-top: var(--space-12);
-  margin-bottom: var(--space-4);
-}
-
-.prose h2 {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-snug);
-  color: var(--color-text-primary);
-  margin-top: var(--space-12);
-  margin-bottom: var(--space-4);
-}
-
-.prose h3 {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  color: var(--color-text-primary);
-  margin-top: var(--space-10);
-  margin-bottom: var(--space-3);
-}
-
-.prose h4 {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  color: var(--color-text-primary);
-  margin-top: var(--space-8);
-  margin-bottom: var(--space-2);
-}
-
-.prose> :first-child {
-  margin-top: 0;
-}
-
-.prose p {
-  margin-bottom: var(--space-5);
-}
-
-.prose a {
-  color: var(--color-text-link);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.prose a:hover {
-  color: var(--color-text-link-hover);
-}
-
-.prose ul,
-.prose ol {
-  margin-bottom: var(--space-5);
-}
-
-.prose blockquote {
-  margin: var(--space-6) 0;
-  padding: var(--space-3) var(--space-4);
-}
-
-.prose blockquote p {
-  margin-bottom: 0;
-}
-
-.prose pre {
-  margin: var(--space-6) 0;
-}
-
-.prose hr {
-  margin: var(--space-10) 0;
-}
-
-.prose img {
-  border-radius: var(--radius-md);
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: var(--space-8) 0;
-}
-
-.prose picture {
-  display: block;
-  margin: var(--space-8) 0;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.prose picture img {
-  margin: 0;
-  border-radius: 0;
-  width: 100%;
-  height: auto;
-}
-
-/* ── Post detail content (non-article full-post view) ──────────── */
-.post-detail__content {
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-primary);
-  word-break: break-word;
-}
-
-.post-detail__content p {
-  margin-bottom: var(--space-3);
-}
-
-.post-detail__content p:last-child {
-  margin-bottom: 0;
-}
-
-.post-detail__content a {
-  color: var(--color-text-link);
-}
-
-/* ── Card content (FeedCard + PostDetail enlarged card) ─────────
-   Markdown inside feed cards and enlarged non-article post views.
-   ─────────────────────────────────────────────────────────────── */
-.card-content {
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-primary);
-  word-break: break-word;
-}
-
-.card-content p {
-  margin-bottom: var(--space-2);
-}
-
-.card-content p:last-child {
-  margin-bottom: 0;
-}
-
-.card-content a {
-  color: var(--color-text-link);
-}
-
-.card-content blockquote {
-  border-left: 2px solid var(--color-border-strong);
-  padding: var(--space-2) var(--space-4);
-  margin-block: var(--space-3);
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-.card-content blockquote p {
-  margin-bottom: 0;
 }
 
 /* Lock body scroll when mobile menu is open */

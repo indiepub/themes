@@ -9,11 +9,11 @@ const socialLinks = author?.socialLinks ?? [];
 
 <Base title="About">
   <div class="h-card">
-    {author?.avatarUrl && (
-      <img src={author.avatarUrl} alt={author.displayName} class="u-photo" width="96" height="96" style="border-radius: 50%; margin-bottom: 1rem;" />
+    {author?.photo && (
+      <img src={author.photo} alt={author.name} class="u-photo" width="96" height="96" style="border-radius: 50%; margin-bottom: 1rem;" />
     )}
 
-    <h1 class="p-name">{author?.displayName ?? 'About'}</h1>
+    <h1 class="p-name">{author?.name ?? 'About'}</h1>
 
     {author?.bio && <p class="p-note">{author.bio}</p>}
 
