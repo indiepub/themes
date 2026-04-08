@@ -34,9 +34,9 @@ npx wrangler d1 create my-site-db
 npx wrangler r2 bucket create my-site-bucket
 ```
 
-Copy the returned IDs into `wrangler.toml`:
+Copy the returned IDs into `wrangler.toml` and `scheduler/wrangler.toml`:
 
-- `database_id` under `[[d1_databases]]`
+- `database_id` under `[[d1_databases]]` (in both files)
 - `bucket_name` under `[[r2_buckets]]` (should already match)
 
 ### 2. Configure environment variables
@@ -89,17 +89,26 @@ npm run build
 npx wrangler pages deploy dist --project-name=my-site
 ```
 
+### Deploy the backfeed scheduler
+
+If you've connected Bluesky or Mastodon accounts, deploy the scheduler to sync interactions:
+
+```bash
+npx wrangler deploy -c scheduler/wrangler.toml
+```
+
+Make sure `scheduler/wrangler.toml` has the same `database_id` as your site's `wrangler.toml`. See [Backfeed](https://indiepub.dev/concepts/backfeed/) for details.
+
 ### GitHub Actions (CI/CD)
 
-If you enabled GitHub Actions during scaffolding, a workflow is generated at `.github/workflows/deploy.yml`. Add these repository secrets:
+If you enabled GitHub Actions during scaffolding, a workflow is generated at `.github/workflows/deploy.yml` that deploys both the site and the scheduler. Add these repository secrets:
 
 | Secret | Description |
 |---|---|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token with **Pages:Edit** permission |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token with **Workers deploy** permission |
 | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID |
-| `INDIEPUB_TOKEN` | Same admin token as `.dev.vars` |
 | `NPM_TOKEN` | Your IndiePub license token |
 
-Add any optional secrets your site uses (e.g. `RESEND_API_KEY` for email subscriptions). Set these as [Cloudflare Pages environment variables](https://developers.cloudflare.com/pages/configuration/environment-variables/) so they're available at runtime.
+Add any optional secrets your site uses (e.g. `RESEND_API_KEY` for email subscriptions). Set these as [Cloudflare environment variables](https://developers.cloudflare.com/workers/configuration/environment-variables/) so they're available at runtime.
 
 Pushes to `main` will automatically build and deploy.

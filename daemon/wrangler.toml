@@ -19,7 +19,5 @@ migrations_dir = "node_modules/@indiepub/db/migrations"
 binding = "BUCKET"
 bucket_name = "indiepub-media"
 
-# Scheduled workers for syndication scraping will be added when
-# @indiepub/atproto and @indiepub/activitypub packages are implemented.
-# [triggers]
-# crons = ["*/30 * * * *"]
+# Backfeed scheduler: deploy separately via scheduler/wrangler.toml.
+# See https://indiepub.dev/concepts/backfeed/ for details.
