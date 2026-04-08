@@ -18,6 +18,3 @@ migrations_dir = "node_modules/@indiepub/db/migrations"
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "indiepub-media"
-
-# Backfeed scheduler: deploy separately via scheduler/wrangler.toml.
-# See https://indiepub.dev/concepts/backfeed/ for details.

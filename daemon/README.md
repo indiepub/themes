@@ -45,7 +45,7 @@ npx wrangler d1 create my-site-db
 npx wrangler r2 bucket create my-site-bucket
 ```
 
-Copy the returned IDs into `wrangler.toml` and `scheduler/wrangler.toml`:
+Copy the returned IDs into `wrangler.toml` and `wrangler.scheduler.toml`:
 
 - `database_id` under `[[d1_databases]]` (in both files)
 - `bucket_name` under `[[r2_buckets]]` (should already match)
@@ -100,10 +100,10 @@ npx wrangler pages deploy dist --project-name=my-site
 If you've connected Bluesky or Mastodon accounts, deploy the scheduler to sync interactions:
 
 ```bash
-npx wrangler deploy -c scheduler/wrangler.toml
+npx wrangler deploy -c wrangler.scheduler.toml
 ```
 
-Make sure `scheduler/wrangler.toml` has the same `database_id` as your site's `wrangler.toml`. See [Backfeed](https://indiepub.dev/concepts/backfeed/) for details.
+Make sure `wrangler.scheduler.toml` has the same `database_id` as your site's `wrangler.toml`. See [Backfeed](https://indiepub.dev/concepts/backfeed/) for details.
 
 ### GitHub Actions (CI/CD)
 
