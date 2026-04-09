@@ -68,6 +68,18 @@ const { icon, label, items } = Astro.props;
     align-items: center;
   }
 
+  .avatars a {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    margin-left: -0.375rem;
+  }
+
+  .avatars a:first-child {
+    margin-left: 0;
+  }
+
   .avatars img,
   .avatars .placeholder {
     display: block;
@@ -76,14 +88,8 @@ const { icon, label, items } = Astro.props;
     border-radius: var(--radius-full);
     object-fit: cover;
     border: 2px solid var(--color-bg);
-    margin-left: -0.375rem;
     transition: transform var(--transition);
     text-decoration: none;
-  }
-
-  .avatars a:first-child img,
-  .avatars a:first-child.placeholder {
-    margin-left: 0;
   }
 
   .avatars img:hover,
