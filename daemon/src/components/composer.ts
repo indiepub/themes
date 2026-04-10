@@ -1,4 +1,4 @@
-(function () {
+function initComposer() {
   const composer = document.getElementById('note-composer');
   if (!composer) return;
 
@@ -274,4 +274,6 @@
     errorEl.textContent = msg;
     errorEl.hidden = false;
   }
-})();
+}
+
+initComposer();
