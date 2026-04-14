@@ -189,6 +189,12 @@ const currentType = types.find((t) => t.value === defaultType) ?? types[0];
     <!-- Attachment previews -->
     <div class="attachments" id="attachment-previews"></div>
 
+    <!-- Slug -->
+    <div class="slug-field">
+      <span class="slug-prefix">/posts/</span>
+      <input type="text" name="slug" id="composer-slug" class="slug-input" placeholder="auto-generated from content" />
+    </div>
+
     <!-- Footer -->
     <div class="composer-footer">
       <button
@@ -489,6 +495,36 @@ const currentType = types.find((t) => t.value === defaultType) ?? types[0];
     text-align: center;
   }
 
+  .slug-field {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .slug-prefix {
+    padding: var(--space-1) 0 var(--space-1) var(--space-2);
+    white-space: nowrap;
+  }
+
+  .slug-input {
+    flex: 1;
+    padding: var(--space-1) var(--space-2) var(--space-1) 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    outline: none;
+  }
+
+  .slug-input::placeholder {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+  }
+
   .composer-footer {
     display: flex;
     align-items: center;
@@ -588,6 +624,7 @@ const currentType = types.find((t) => t.value === defaultType) ?? types[0];
 <script>
   import { createNoteEditor } from "@indiepub/admin/composer";
   import "@indiepub/admin/composer/styles.css";
+  import { slugifyContent } from "@indiepub/core";
 
   const composer = document.getElementById("note-composer");
   if (composer) {
@@ -631,8 +668,19 @@ const currentType = types.find((t) => t.value === defaultType) ?? types[0];
 
     if (draftContent) showDraftIndicator();
 
+    // Slug auto-update from content
+    const slugInput = document.getElementById("composer-slug") as HTMLInputElement;
+    let slugDirty = false;
+    slugInput?.addEventListener("input", () => { slugDirty = true; });
+
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
     editor.tiptap.on("update", () => {
+      // Auto-update slug while user hasn't manually edited it
+      if (slugInput && !slugDirty) {
+        const markdown = editor.getMarkdown();
+        slugInput.value = markdown ? slugifyContent(markdown) : "";
+      }
+
       if (saveTimer) clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
         try {
@@ -664,6 +712,7 @@ const currentType = types.find((t) => t.value === defaultType) ?? types[0];
       }
       editor.clear();
       attachmentPreviews.innerHTML = "";
+      if (slugInput) { slugInput.value = ""; slugDirty = false; }
       hideDraftIndicator();
     });
 

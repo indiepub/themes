@@ -90,6 +90,12 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
     <!-- Attachment previews -->
     <div class="composer__attachments" id="attachment-previews"></div>
 
+    <!-- Slug -->
+    <div class="composer__slug">
+      <span class="composer__slug-prefix">/posts/</span>
+      <input type="text" name="slug" id="composer-slug" class="composer__slug-input" placeholder="auto-generated from content" />
+    </div>
+
     <!-- Footer bar -->
     <div class="composer__footer">
       <button type="button" class="composer__tool" id="attach-btn" title="Attach image">
@@ -313,6 +319,35 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
     text-align: center;
   }
 
+  .composer__slug {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .composer__slug-prefix {
+    padding: var(--space-1) 0 var(--space-1) var(--space-2);
+    white-space: nowrap;
+  }
+
+  .composer__slug-input {
+    flex: 1;
+    padding: var(--space-1) var(--space-2) var(--space-1) 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    outline: none;
+  }
+
+  .composer__slug-input::placeholder {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+  }
+
   .composer__footer {
     display: flex;
     align-items: center;
@@ -377,6 +412,7 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
 <script>
   import { createNoteEditor } from '@indiepub/admin/composer';
   import '@indiepub/admin/composer/styles.css';
+  import { slugifyContent } from '@indiepub/core';
 
   const composer = document.getElementById('note-composer');
   if (composer) {
@@ -407,9 +443,19 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
 
     if (draftContent) showDraftIndicator();
 
+    // Slug auto-update from content
+    const slugInput = document.getElementById('composer-slug') as HTMLInputElement;
+    let slugDirty = false;
+    slugInput?.addEventListener('input', () => { slugDirty = true; });
+
     // Draft persistence — save as TipTap JSON
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
     editor.tiptap.on('update', () => {
+      if (slugInput && !slugDirty) {
+        const markdown = editor.getMarkdown();
+        slugInput.value = markdown ? slugifyContent(markdown) : '';
+      }
+
       if (saveTimer) clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
         try {
@@ -435,6 +481,7 @@ const currentType = types.find(t => t.value === defaultType) ?? types[0];
     discardBtn?.addEventListener('click', () => {
       try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
       editor.clear();
+      if (slugInput) { slugInput.value = ''; slugDirty = false; }
       attachmentPreviews.innerHTML = '';
       hideDraftIndicator();
     });
