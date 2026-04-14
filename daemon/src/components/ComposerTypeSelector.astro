@@ -47,16 +47,16 @@ const { types, currentType } = Astro.props;
     gap: var(--space-1);
     padding: var(--space-1) var(--space-2);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md, 0.375rem);
+    border-radius: var(--radius-md);
     background: transparent;
     font-size: var(--text-sm);
     font-family: inherit;
     cursor: pointer;
-    color: var(--color-text);
+    color: var(--color-text-primary);
   }
 
   [aria-haspopup]:hover {
-    background: var(--color-surface-2, var(--color-surface-alt, #f5f5f5));
+    background: var(--color-surface-2);
   }
 
   .chevron {
@@ -69,10 +69,10 @@ const { types, currentType } = Astro.props;
     top: calc(100% + 4px);
     left: 0;
     z-index: 50;
-    background: var(--color-surface-1, var(--color-surface, #fff));
+    background: var(--color-surface-1);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md, 0.375rem);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
     min-width: 140px;
     overflow: hidden;
   }
@@ -94,12 +94,12 @@ const { types, currentType } = Astro.props;
     font-family: inherit;
     font-size: var(--text-sm);
     cursor: pointer;
-    color: var(--color-text);
+    color: var(--color-text-primary);
     transition: background var(--transition);
   }
 
   [role="option"]:hover {
-    background: var(--color-surface-2, var(--color-surface-alt, #f5f5f5));
+    background: var(--color-surface-2);
   }
 
   [role="option"] + [role="option"] {

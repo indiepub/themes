@@ -1,0 +1,23 @@
+/* ── Shared ProseMirror editor styles ─────────────────────────
+   Imported by article and note editor pages.
+   ─────────────────────────────────────────────────────────── */
+
+/* Remove default outline */
+.ProseMirror {
+  outline: none;
+}
+
+/* Placeholder text for empty editor */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* @mention styling */
+.mention {
+  color: var(--color-accent);
+  font-weight: var(--weight-medium);
+}

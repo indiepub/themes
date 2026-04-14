@@ -8,7 +8,7 @@ if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
 }
 
-const { content, config } = Astro.locals.indiepub;
+const { content } = Astro.locals.indiepub;
 const author = await content.getAuthor();
 
 setStaticCacheHeaders(Astro.response);
@@ -56,41 +56,6 @@ setStaticCacheHeaders(Astro.response);
           </a>
         ))}
       </nav>
-    )}
-
-    <!-- Syndication profiles -->
-    {(config?.syndication?.bluesky || config?.syndication?.mastodon) && (
-      <section class="about__section" aria-labelledby="syndication-heading">
-        <h2 id="syndication-heading">Find me on</h2>
-        <ul class="about__link-list">
-          {config.syndication.bluesky && (
-            <li>
-              <a
-                href={`https://bsky.app/profile/${config.syndication.bluesky.handle}`}
-                class="u-url"
-                rel="me noopener"
-                target="_blank"
-              >
-                <Icon name="social/bluesky" aria-hidden="true" />
-                @{config.syndication.bluesky.handle}
-              </a>
-            </li>
-          )}
-          {config.syndication.mastodon && (
-            <li>
-              <a
-                href={`https://${config.syndication.mastodon.instance}/@${config.syndication.mastodon.handle}`}
-                class="u-url"
-                rel="me noopener"
-                target="_blank"
-              >
-                <Icon name="social/mastodon" aria-hidden="true" />
-                @{config.syndication.mastodon.handle}@{config.syndication.mastodon.instance}
-              </a>
-            </li>
-          )}
-        </ul>
-      </section>
     )}
 
     <!-- Feed links -->

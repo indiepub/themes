@@ -56,9 +56,11 @@
   --color-border-strong: var(--neutral-300);
 
   /* Feedback — hue-independent */
-  --color-success: oklch(52% 0.15 145);
-  --color-warning: oklch(68% 0.15  70);
-  --color-error:   oklch(52% 0.20  25);
+  --color-success:    oklch(52% 0.15 145);
+  --color-warning:    oklch(68% 0.15  70);
+  --color-error:      oklch(52% 0.20  25);
+  --color-error-bg:   oklch(95% 0.02 25);
+  --color-error-text: oklch(45% 0.18 25);
 
   /* ── Typography ─────────────────────────────────────────── */
   --font-sans: system-ui, sans-serif;
@@ -128,6 +130,9 @@
   --color-brand-muted:    var(--palette-900);
   --color-border:         var(--neutral-800);
   --color-border-strong:  var(--neutral-700);
+
+  --color-error-bg:   oklch(20% 0.04 25);
+  --color-error-text: oklch(72% 0.14 25);
 }
 
 /* ── Reset & base ───────────────────────────────────────────── */

@@ -1,5 +1,6 @@
 ---
 import Page from '../../layouts/Page.astro';
+import VerbCallout from '../../components/VerbCallout.astro';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import { Icon } from 'astro-icon/components';
 import { setEntryCacheHeaders } from '../../lib/cache';
@@ -57,32 +58,7 @@ setEntryCacheHeaders(Astro.response, entry);
           </header>
         )}
 
-        {entry.verb && entry.objectName && (
-          <div class="verb-callout">
-            <span class="verb-emoji">
-              {entry.verb === 'watch' ? '📺' : entry.verb === 'read' ? '📚' : entry.verb === 'listen' ? '🎧' : entry.verb === 'play' ? '🎮' : ''}
-            </span>
-            <span>
-              {entry.verb === 'watch' ? 'Watched' : entry.verb === 'read' ? 'Read' : entry.verb === 'listen' ? 'Listened to' : entry.verb === 'play' ? 'Played' : entry.verb}
-              {' '}
-              {entry.objectUrl ? (
-                <a href={entry.objectUrl} class={`u-${entry.verb}-of`} rel="noopener" target="_blank">
-                  {entry.objectName}
-                  <Icon name="external-link" aria-hidden="true" width="13" height="13" />
-                </a>
-              ) : (
-                <strong class={`p-${entry.verb}-of`}>{entry.objectName}</strong>
-              )}
-            </span>
-          </div>
-        )}
-        {entry.rating != null && entry.rating > 0 && (
-          <div class="verb-rating" aria-label={`Rating: ${entry.rating} out of 5`}>
-            {[1,2,3,4,5].map(n => (
-              <span>{n <= entry.rating! ? '★' : '☆'}</span>
-            ))}
-          </div>
-        )}
+        <VerbCallout verb={entry.verb ?? undefined} objectName={entry.objectName ?? undefined} objectUrl={entry.objectUrl ?? undefined} rating={entry.rating ?? undefined} />
 
         {entry.content && (
           <Markdown content={entry.content} variant="compact" class="e-content" />
@@ -206,44 +182,6 @@ setEntryCacheHeaders(Astro.response, entry);
   .note-wrap footer a:hover {
     color: var(--color-text-secondary);
     text-decoration: none;
-  }
-
-  /* ── Verb callout ── */
-  .verb-callout {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    background-color: var(--color-surface-2, var(--color-surface));
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-3);
-    font-size: var(--text-sm);
-  }
-
-  .verb-emoji {
-    font-size: var(--text-lg);
-    flex-shrink: 0;
-  }
-
-  .verb-callout a {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-decoration: none;
-  }
-
-  .verb-callout a:hover {
-    color: var(--color-accent);
-  }
-
-  .verb-rating {
-    display: flex;
-    gap: 0.125rem;
-    font-size: var(--text-base);
-    color: var(--color-accent);
-    margin-bottom: var(--space-3);
   }
 
   /* ── Article ── */

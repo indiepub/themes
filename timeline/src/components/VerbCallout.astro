@@ -1,5 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
+import { VERB_EMOJI, VERB_LABEL } from '../lib/verbs';
 
 interface Props {
   verb: string;
@@ -11,15 +12,8 @@ interface Props {
 
 const { verb, objectName, objectUrl, size = 'compact' } = Astro.props;
 
-const emojiMap: Record<string, string> = {
-  watch: '📺', read: '📚', listen: '🎧', play: '🎮',
-};
-const labelMap: Record<string, string> = {
-  watch: 'Watched', read: 'Read', listen: 'Listened to', play: 'Played',
-};
-
-const emoji = emojiMap[verb] ?? '';
-const label = labelMap[verb] ?? verb;
+const emoji = VERB_EMOJI[verb] ?? '';
+const label = VERB_LABEL[verb] ?? verb;
 ---
 
 <div class={`callout--${size}`}>

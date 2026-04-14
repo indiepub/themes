@@ -19,7 +19,7 @@ const snippet = entry.content?.replace(/<[^>]*>/g, '').slice(0, 180) ?? '';
       Updated {formatDate(entry.publishedAt ?? entry.createdAt)}
     </time>
   </header>
-  {snippet && <p set:html={snippet} />}
+  {snippet && <p>{snippet}</p>}
 </a>
 
 <style>
@@ -30,7 +30,7 @@ const snippet = entry.content?.replace(/<[^>]*>/g, '').slice(0, 180) ?? '';
     padding: var(--space-4) var(--space-5);
     background-color: var(--color-surface-1);
     border: 1px solid var(--color-border);
-    border-left: 3px solid var(--color-accent, var(--color-text-link));
+    border-left: 3px solid var(--color-text-link);
     border-radius: var(--radius-md);
     text-decoration: none;
     color: var(--color-text-primary);

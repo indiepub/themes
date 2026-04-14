@@ -11,7 +11,7 @@ if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
 }
 
-const { content, config } = Astro.locals.indiepub;
+const { content } = Astro.locals.indiepub;
 
 const memberTier = Astro.locals.member?.tier ?? null;
 const [author, recentArticles, recentNotes, nowEntries] = await Promise.all([
@@ -32,7 +32,7 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, [...recentArti
   <div class="landing">
 
     <section class="landing__hero">
-      <HCard author={author} config={config} variant="hero" />
+      <HCard author={author} variant="hero" />
     </section>
 
     <NoteComposer />

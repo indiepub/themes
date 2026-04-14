@@ -1,6 +1,7 @@
 ---
 import Page from '../layouts/Page.astro';
 import NoteComposer from '../components/NoteComposer.astro';
+import VerbCallout from '../components/VerbCallout.astro';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
 import { Icon } from 'astro-icon/components';
 import { setCollectionCacheHeaders } from '../lib/cache';
@@ -35,9 +36,6 @@ interface NoteItem {
   objectUrl?: string | undefined;
   rating?: number | undefined;
 }
-
-const VERB_EMOJI: Record<string, string> = { watch: '📺', read: '📚', listen: '🎧', play: '🎮' };
-const VERB_LABEL: Record<string, string> = { watch: 'Watched', read: 'Read', listen: 'Listened to', play: 'Played' };
 
 const noteItems: NoteItem[] = notes.map(entry => ({
   slug: entry.slug,
@@ -75,27 +73,7 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
               </a>
             </header>
           )}
-          {note.verb && note.objectName && (
-            <div class="verb-callout">
-              <span class="verb-emoji">{VERB_EMOJI[note.verb] ?? ''}</span>
-              <span>
-                {VERB_LABEL[note.verb] ?? note.verb}
-                {' '}
-                {note.objectUrl ? (
-                  <a href={note.objectUrl} class={`u-${note.verb}-of`} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a>
-                ) : (
-                  <strong class={`p-${note.verb}-of`}>{note.objectName}</strong>
-                )}
-              </span>
-            </div>
-          )}
-          {note.rating != null && note.rating > 0 && (
-            <div class="verb-rating" aria-label={`Rating: ${note.rating} out of 5`}>
-              {[1,2,3,4,5].map(n => (
-                <span>{n <= note.rating! ? '★' : '☆'}</span>
-              ))}
-            </div>
-          )}
+          <VerbCallout verb={note.verb} objectName={note.objectName} objectUrl={note.objectUrl} rating={note.rating} />
           <Markdown content={note.content} />
           <footer>
             <a href={`/posts/${note.slug}`} aria-label="Permalink to this note">
@@ -193,41 +171,6 @@ setCollectionCacheHeaders(Astro.response, !!Astro.locals.isAdmin, notes);
   .stream footer a:hover {
     color: var(--color-text-secondary);
     text-decoration: none;
-  }
-
-  /* ── Verb callout ── */
-  .verb-callout {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    background-color: var(--color-surface-2, var(--color-surface));
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-3);
-    font-size: var(--text-sm);
-  }
-
-  .verb-emoji {
-    font-size: var(--text-lg);
-    flex-shrink: 0;
-  }
-
-  .verb-callout a {
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-decoration: none;
-  }
-
-  .verb-callout a:hover {
-    color: var(--color-accent);
-  }
-
-  .verb-rating {
-    display: flex;
-    gap: 0.125rem;
-    font-size: var(--text-base);
-    color: var(--color-accent);
-    margin-bottom: var(--space-3);
   }
 
   /* ── Pagination ── */

@@ -1,21 +1,18 @@
 ---
 import Page from '../../layouts/Page.astro';
-import { createDb } from '@indiepub/astro/lib/db';
 import { redirects } from '@indiepub/db/schema';
 import type { DbRedirect } from '@indiepub/db';
 import { eq, asc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import type { D1Database } from '@cloudflare/workers-types';
-import { getEnv } from '@indiepub/astro/lib/env';
+import { getDb } from '../../lib/db';
+import { formatDate } from '../../lib/format';
 
 if (!Astro.locals.isAdmin) return Astro.redirect('/');
 
 const indiepub = Astro.locals.indiepub;
 if (!indiepub) return new Response('Service unavailable', { status: 503 });
 
-const d1BindingName = indiepub.config.d1BindingName ?? 'DB';
-const d1 = getEnv()[d1BindingName] as D1Database;
-const db = createDb(d1);
+const db = getDb(indiepub);
 
 let error: string | null = null;
 
@@ -56,9 +53,6 @@ if (Astro.request.method === 'POST') {
 
 const rows: DbRedirect[] = await db.select().from(redirects).orderBy(asc(redirects.createdAt));
 
-function formatDate(d: Date): string {
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
 ---
 
 <Page title="Redirects">
@@ -178,7 +172,7 @@ function formatDate(d: Date): string {
   }
 
   .form-error {
-    color: oklch(45% 0.18 25);
+    color: var(--color-error-text);
     font-size: var(--text-sm);
     margin-bottom: var(--space-3);
   }
@@ -217,7 +211,7 @@ function formatDate(d: Date): string {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     font-size: var(--text-sm);
-    background-color: var(--color-surface);
+    background-color: var(--color-surface-1);
     color: var(--color-text-primary);
     width: 100%;
   }
@@ -310,13 +304,13 @@ function formatDate(d: Date): string {
   }
 
   .pill-perm {
-    background-color: oklch(90% 0.04 145);
-    color: oklch(30% 0.10 145);
+    background-color: var(--color-pill-published-bg);
+    color: var(--color-pill-published-text);
   }
 
   .pill-temp {
-    background-color: oklch(90% 0.03 250);
-    color: oklch(30% 0.08 250);
+    background-color: var(--color-pill-draft-bg);
+    color: var(--color-pill-draft-text);
   }
 
   /* ── Delete ── */
@@ -331,8 +325,8 @@ function formatDate(d: Date): string {
   }
 
   .btn-delete:hover {
-    color: oklch(45% 0.18 25);
-    background-color: oklch(95% 0.02 25);
+    color: var(--color-error-text);
+    background-color: var(--color-error-bg);
   }
 
   .empty {

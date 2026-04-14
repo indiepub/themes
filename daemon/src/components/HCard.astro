@@ -1,16 +1,15 @@
 ---
 import { Icon } from 'astro-icon/components';
 import SocialIcon from './SocialIcon.astro';
-import type { Author, IndiePubConfig } from '@indiepub/types';
+import type { Author } from '@indiepub/types';
 
 interface Props {
   author: Author;
-  config?: IndiePubConfig | undefined;
   /** 'hero' on home/about, 'compact' in entry cards */
   variant?: 'hero' | 'compact' | undefined;
 }
 
-const { author, config: _config, variant = 'hero' } = Astro.props;
+const { author, variant = 'hero' } = Astro.props;
 const links = author.socialLinks ?? [];
 const photoSize = variant === 'hero' ? 96 : 40;
 ---

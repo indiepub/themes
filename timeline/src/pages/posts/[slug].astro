@@ -2,6 +2,7 @@
 import Feed from '../../layouts/Feed.astro';
 import PostDetail from '../../components/PostDetail.astro';
 import { setEntryCacheHeaders } from '../../lib/cache';
+import { plainText } from '../../lib/format';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -45,7 +46,7 @@ const [webmentions, interactions, interactionCounts] = await Promise.all([
   content.getInteractionCounts(entry.id),
 ]);
 
-const pageTitle = entry.name ?? (entry.content ? entry.content.replace(/<[^>]*>/g, '').slice(0, 60) : 'Post');
+const pageTitle = entry.name ?? (entry.content ? plainText(entry.content, 60) : 'Post');
 const pageDescription = entry.summary ?? undefined;
 const ogImage = `/og/${entry.slug}`;
 

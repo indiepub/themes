@@ -7,7 +7,7 @@ if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
 }
 
-const { content, config } = Astro.locals.indiepub;
+const { content } = Astro.locals.indiepub;
 const author = await content.getAuthor();
 
 setStaticCacheHeaders(Astro.response);
@@ -15,7 +15,7 @@ setStaticCacheHeaders(Astro.response);
 
 <Page title="About">
   <article class="about-page">
-    <HCard author={author} config={config} variant="hero" />
+    <HCard author={author} variant="hero" />
 
     <div class="about-page__body">
       {author.bio && (
@@ -35,30 +35,13 @@ setStaticCacheHeaders(Astro.response);
               </a>
             </li>
           )}
-          {config?.syndication?.bluesky && (
+          {author.socialLinks?.map(link => (
             <li>
-              <a
-                href={`https://bsky.app/profile/${config.syndication.bluesky.handle}`}
-                class="u-url"
-                rel="me noopener"
-                target="_blank"
-              >
-                Bluesky — @{config.syndication.bluesky.handle}
+              <a href={link.url} class="u-url" rel="me noopener" target="_blank">
+                {link.label}
               </a>
             </li>
-          )}
-          {config?.syndication?.mastodon && (
-            <li>
-              <a
-                href={`https://${config.syndication.mastodon.instance}/@${config.syndication.mastodon.handle}`}
-                class="u-url"
-                rel="me noopener"
-                target="_blank"
-              >
-                Mastodon — @{config.syndication.mastodon.handle}@{config.syndication.mastodon.instance}
-              </a>
-            </li>
-          )}
+          ))}
         </ul>
       </section>
 

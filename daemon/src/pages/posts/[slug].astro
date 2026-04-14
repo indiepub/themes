@@ -2,6 +2,7 @@
 import Page from '../../layouts/Page.astro';
 import EntryDetail from '../../components/EntryDetail.astro';
 import { setEntryCacheHeaders } from '../../lib/cache';
+import { VERB_TYPES } from '../../lib/verbs';
 
 if (!Astro.locals.indiepub) {
   return new Response('Service unavailable', { status: 503 });
@@ -46,7 +47,6 @@ const ogImage = `/og/${entry.slug}`;
 
 setEntryCacheHeaders(Astro.response, entry);
 
-const VERB_TYPES = new Set(['watch', 'read', 'listen', 'play']);
 const typeLabels: Record<string, string> = {
   note: 'Notes',
   article: 'Articles',
@@ -109,7 +109,7 @@ const backHref = VERB_TYPES.has(entry.type) ? '/notes' : `/${entry.type}s`;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     text-align: center;
-    background: var(--color-surface);
+    background: var(--color-surface-1);
   }
 
   .paywall-cta p {
@@ -120,8 +120,8 @@ const backHref = VERB_TYPES.has(entry.type) ? '/notes' : `/${entry.type}s`;
   .paywall-btn {
     display: inline-block;
     padding: var(--space-2) var(--space-6);
-    background: var(--color-accent);
-    color: var(--color-on-accent, #fff);
+    background: var(--color-brand);
+    color: var(--color-text-on-brand);
     border-radius: var(--radius-md);
     text-decoration: none;
     font-weight: var(--weight-medium);

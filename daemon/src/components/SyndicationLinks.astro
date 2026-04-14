@@ -1,0 +1,128 @@
+---
+import { Icon } from 'astro-icon/components';
+import { syndicationMeta } from './card-utils.ts';
+
+interface Props {
+  urls: string[];
+  /** 'compact' for cards (pill-style), 'detail' for entry detail pages */
+  variant?: 'compact' | 'detail';
+}
+
+const { urls, variant = 'compact' } = Astro.props;
+if (!urls || urls.length === 0) return;
+---
+
+{variant === 'compact' ? (
+  <div class="syndication syndication--compact">
+    <span class="syndication__label">Also on</span>
+    {urls.map((url: string) => {
+      const { icon, label } = syndicationMeta(url);
+      return (
+        <a
+          href={url}
+          class="syndication__link u-syndication"
+          rel="syndication noopener"
+          target="_blank"
+          aria-label={`${label} (opens in new tab)`}
+        >
+          <Icon name={icon} aria-hidden="true" />
+          <span class="syndication__name">{label}</span>
+        </a>
+      );
+    })}
+  </div>
+) : (
+  <div class="syndication syndication--detail">
+    <p class="syndication__label">Syndicated to:</p>
+    <ul>
+      {urls.map((url: string) => {
+        const { label } = syndicationMeta(url);
+        return (
+          <li>
+            <a href={url} class="u-syndication" rel="syndication noopener" target="_blank">
+              {label}
+              <Icon name="external-link" aria-hidden="true" />
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+)}
+
+<style>
+  /* ── Compact variant (cards) ── */
+  .syndication--compact {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .syndication--compact .syndication__label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+
+  .syndication__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0.2rem var(--space-2);
+    border-radius: var(--radius-md);
+    color: var(--color-text-tertiary);
+    background-color: var(--color-surface-2);
+    text-decoration: none;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    transition:
+      color var(--transition),
+      background-color var(--transition);
+  }
+
+  .syndication__link:hover {
+    color: var(--color-text-link);
+    background-color: var(--color-brand-muted);
+    text-decoration: none;
+  }
+
+  .syndication__link :global(svg) {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .syndication__name {
+    line-height: 1;
+  }
+
+  /* ── Detail variant ── */
+  .syndication--detail .syndication__label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .syndication--detail ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  .syndication--detail a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .syndication--detail :global(svg) {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+</style>

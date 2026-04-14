@@ -1,12 +1,11 @@
 ---
 import Page from '../../../layouts/Page.astro';
 import { Icon } from 'astro-icon/components';
-import { createDb } from '@indiepub/astro/lib/db';
 import { entries, tags, entryTags } from '@indiepub/db/schema';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import type { D1Database } from '@cloudflare/workers-types';
-import { getEnv } from '@indiepub/astro/lib/env';
+import { getDb } from '../../../lib/db';
+import { slugify } from '../../../lib/slugify';
 
 if (!Astro.locals.isAdmin) return Astro.redirect('/');
 
@@ -16,13 +15,7 @@ if (!id) return Astro.redirect('/write');
 const indiepub = Astro.locals.indiepub;
 if (!indiepub) return new Response('Service unavailable', { status: 503 });
 
-const d1BindingName = indiepub.config.d1BindingName ?? 'DB';
-const d1 = getEnv()[d1BindingName] as D1Database;
-const db = createDb(d1);
-
-function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
+const db = getDb(indiepub);
 
 // ── POST: save or publish ─────────────────────────────────────
 if (Astro.request.method === 'POST') {
@@ -142,6 +135,7 @@ const currentTags = entryTagRows.map((r) => r.name).join(', ');
 <script>
   import { createNoteEditor } from '@indiepub/admin/composer';
   import '@indiepub/admin/composer/styles.css';
+  import '../../../styles/editor.css';
 
   const editorEl = document.getElementById('editor') as HTMLElement | null;
   const contentInput = document.getElementById('content-input') as HTMLInputElement | null;
@@ -200,16 +194,7 @@ const currentTags = entryTagRows.map((r) => r.name).join(', ');
   }
 
   #editor :global(.ProseMirror) {
-    outline: none;
     min-height: 200px;
-  }
-
-  #editor :global(.ProseMirror p.is-editor-empty:first-child::before) {
-    content: attr(data-placeholder);
-    color: var(--color-text-tertiary);
-    pointer-events: none;
-    float: left;
-    height: 0;
   }
 
   #editor :global(.note-editor-content) {
@@ -235,11 +220,6 @@ const currentTags = entryTagRows.map((r) => r.name).join(', ');
     margin: var(--space-4) 0;
     color: var(--color-text-secondary);
     font-style: italic;
-  }
-
-  #editor :global(.mention) {
-    color: var(--color-accent);
-    font-weight: var(--weight-medium);
   }
 
   .meta {

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Markdown from '@indiepub/astro/components/Markdown.astro';
+import { verbLabel } from '../lib/verbs';
 
 if (!Astro.locals.indiepub) return new Response('Service unavailable', { status: 503 });
 
@@ -32,7 +33,7 @@ const hasPrev = page > 1;
         </header>
         {note.verb && note.objectName && (
           <p class="verb-callout">
-            {note.verb === 'watch' ? '📺 Watched' : note.verb === 'read' ? '📚 Read' : note.verb === 'listen' ? '🎧 Listened to' : note.verb === 'play' ? '🎮 Played' : note.verb}
+            {verbLabel(note.verb)}
             {' '}
             {note.objectUrl ? <a href={note.objectUrl} class={`u-${note.verb}-of`} rel="noopener" target="_blank"><strong>{note.objectName}</strong></a> : <strong class={`p-${note.verb}-of`}>{note.objectName}</strong>}
             {note.rating != null && note.rating > 0 && (

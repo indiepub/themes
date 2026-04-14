@@ -14,6 +14,7 @@
   --bg-subtle: #f9fafb;
   --border: #e5e7eb;
   --radius: 4px;
+  --button-text: #fff;
 
   /* Map to prose custom properties */
   --color-border: var(--border);
@@ -32,6 +33,7 @@
     --bg-subtle: #1a1a1a;
     --border: #333;
     --accent: #60a5fa;
+    --button-text: #111;
   }
 }
 
@@ -246,7 +248,7 @@ button,
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--button-text);
   background: var(--accent);
   border: none;
   border-radius: var(--radius);
@@ -287,7 +289,6 @@ button:hover,
 
 /* ── Pagination ────────────────────────────────────────────── */
 
-nav[aria-label*="pagination"],
 nav[aria-label*="Pagination"] {
   display: flex;
   justify-content: space-between;
@@ -332,6 +333,46 @@ dl dd a:hover {
 
 dl dd time {
   margin-left: 0.5rem;
+}
+
+/* ── Verb callout ──────────────────────────────────────────── */
+
+.verb-callout {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0;
+}
+
+.verb-callout strong {
+  color: var(--text);
+}
+
+.rating {
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* ── About page ────────────────────────────────────────────── */
+
+.h-card .u-photo {
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.h-card ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ── Subscribe hint ────────────────────────────────────────── */
+
+.subscribe-hint {
+  margin-top: 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
 }
 
 /* ── Utility ───────────────────────────────────────────────── */
