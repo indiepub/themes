@@ -38,6 +38,22 @@ export default defineConfig({
       // (or wrangler.toml [vars]) for production. Leave empty for local dev.
       mediaUrl: process.env.MEDIA_URL ?? '',
     }),
-    indiepubAdmin(),
+    indiepubAdmin({
+      palette: {
+        providers: [
+          {
+            id: 'write',
+            section: 'Write',
+            priority: 1,
+            items: [
+              { id: 'write-note', label: 'New note (writer)', keywords: ['create', 'write'], action: { type: 'navigate', href: '/write/new?type=note' } },
+              { id: 'write-article', label: 'New article (writer)', keywords: ['create', 'write'], action: { type: 'navigate', href: '/write/new?type=article' } },
+              { id: 'write-dashboard', label: 'Writer dashboard', keywords: ['write', 'posts', 'drafts'], action: { type: 'navigate', href: '/write' } },
+              { id: 'write-redirects', label: 'Redirects (writer)', keywords: ['urls', 'routing'], action: { type: 'navigate', href: '/write/redirects' } },
+            ],
+          },
+        ],
+      },
+    }),
   ],
 });
