@@ -15,7 +15,7 @@
 
 :root {
   --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
-  --font-sans:  system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:  system-ui, -apple-system, BlinkMacSystemFont, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   --font-mono:  ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
 
   /* ── Typography scale ────────────────────────────────────── */
