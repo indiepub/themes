@@ -1,0 +1,347 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import type { InteractionGroups } from '@indiepub/stator/server/entries'
+import { count, renderBodyMarkdown, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { icon } from '../lib/icons.ts'
+import { audienceLabel, backLink, formatDate, hostname, pubDate } from '../lib/format.ts'
+import Gate from './gate.stator'
+import PhotoCarousel from './photo-carousel.stator'
+import Responses from './responses.stator'
+import StarRating from './star-rating.stator'
+import TagList from './tag-list.stator'
+import VerbCallout from './verb-callout.stator'
+
+const { entry, groups, back = true } = Stator.props<{
+  entry: Shown
+  groups: InteractionGroups
+  /** Show the "← Section" link above the post. */
+  back?: boolean
+}>()
+const date = pubDate(entry)
+const href = `/${entry.slug}`
+const [backHref, backLabel] = backLink(entry)
+const isArticle = entry.type === 'article'
+const audience = audienceLabel(entry)
+const photos = entry.attachments?.length ? entry.attachments : entry.photo ? [{ url: entry.photo }] : []
+const likes = groups.likes.length
+const reposts = groups.reposts.length
+const replies = groups.comments.length + groups.mentions.length
+const syndication = entry.syndicationUrls ?? []
+const tags = entry.tags ?? []
+const hasFooter = tags.length > 0 || syndication.length > 0 || likes + reposts + replies > 0
+---
+<article class="h-entry">
+  {back ? (
+    <nav class="back">
+      <a href={backHref}>← {backLabel}</a>
+    </nav>
+  ) : null}
+
+  {isArticle ? (
+    <div class="article-layout">
+      {audience ? <span class="visibility-badge">{icon('lock')}{audience}</span> : null}
+      {entry.name ? <h1 class="p-name">{entry.name}</h1> : null}
+      <div class="byline">
+        <a href={href} class="u-url permalink">
+          <time class="dt-published" datetime={date.toISOString()}>{formatDate(date)}</time>
+        </a>
+        {entry.updatedAt && entry.updatedAt.getTime() - date.getTime() > 86_400_000 ? (
+          <span class="text-sm text-secondary">
+            Updated <time class="dt-updated" datetime={entry.updatedAt.toISOString()}>{formatDate(entry.updatedAt)}</time>
+          </span>
+        ) : null}
+      </div>
+      {entry.summary ? <p class="p-summary lead">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+      {entry.gated ? <Gate entry={entry} /> : null}
+      {!entry.gated && entry.content ? (
+        <div class="e-content prose prose--article">{raw(renderBodyMarkdown(entry.content))}</div>
+      ) : null}
+    </div>
+  ) : (
+    <div class="card-layout">
+      {audience ? <span class="visibility-badge">{icon('lock')}{audience}</span> : null}
+      <VerbCallout entry={entry} size="large" />
+      {entry.rating ? <StarRating rating={entry.rating} size="xl" /> : null}
+
+      {entry.inReplyTo ? (
+        <p class="reply-to">
+          {icon('corner-down-right')}
+          <span class="text-secondary text-sm">in reply to </span>
+          <a href={entry.inReplyTo} class="u-in-reply-to" rel="noopener" target="_blank">{hostname(entry.inReplyTo)}</a>
+        </p>
+      ) : null}
+
+      {photos.length > 0 ? (
+        <div class="card-media">
+          <PhotoCarousel photos={photos} fallbackAlt={entry.summary ?? entry.name ?? ''} priority />
+        </div>
+      ) : null}
+
+      {entry.name && entry.type !== 'bookmark' ? <h1 class="p-name card-name">{entry.name}</h1> : null}
+
+      {entry.gated ? (
+        <>
+          {entry.summary ? <p class="p-summary">{entry.summary}</p> : null}
+          <Gate entry={entry} />
+        </>
+      ) : entry.content ? (
+        <div class="e-content prose prose--compact">{raw(renderBodyMarkdown(entry.content))}</div>
+      ) : null}
+
+      {entry.likeOf ? (
+        <blockquote class="interaction-target">
+          <span class="text-secondary text-sm">liked </span>
+          <a href={entry.likeOf} class="u-like-of" rel="noopener" target="_blank">{hostname(entry.likeOf)}</a>
+        </blockquote>
+      ) : null}
+
+      {entry.repostOf ? (
+        <blockquote class="interaction-target">
+          <span class="text-secondary text-sm">reposted </span>
+          <a href={entry.repostOf} class="u-repost-of" rel="noopener" target="_blank">{hostname(entry.repostOf)}</a>
+        </blockquote>
+      ) : null}
+
+      {entry.bookmarkOf ? (
+        <p class="bookmark-of">
+          {icon('bookmark')}
+          <a href={entry.bookmarkOf} class="u-bookmark-of" rel="noopener" target="_blank">
+            {entry.name ?? hostname(entry.bookmarkOf)}
+            {icon('external-link')}
+          </a>
+        </p>
+      ) : null}
+
+      <div class="byline">
+        <a href={href} class="u-url permalink">
+          <time class="dt-published" datetime={date.toISOString()}>{formatDate(date)}</time>
+        </a>
+      </div>
+    </div>
+  )}
+
+  {hasFooter ? (
+    <footer>
+      <TagList tags={tags} />
+
+      {syndication.length > 0 ? (
+        <div class="syndication-list">
+          <p class="syndication-label text-xs text-secondary">Syndicated to</p>
+          <ul>
+            {syndication.map((url) => (
+              <li>
+                <a href={url} class="u-syndication" rel="syndication noopener" target="_blank">
+                  {icon('external-link')}
+                  {hostname(url)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {likes > 0 || reposts > 0 || replies > 0 ? (
+        <div class="interaction-bar">
+          {likes > 0 ? <span>{icon('heart')}{count(likes, 'like')}</span> : null}
+          {reposts > 0 ? <span>{icon('repeat-2')}{count(reposts, 'repost')}</span> : null}
+          {replies > 0 ? <span>{icon('message-square')}{count(replies, 'reply', 'replies')}</span> : null}
+        </div>
+      ) : null}
+    </footer>
+  ) : null}
+</article>
+
+<Responses groups={groups} />
+
+<style>
+  .back {
+    margin-bottom: var(--space-6);
+  }
+
+  .back a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .back a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .article-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  .article-layout > * {
+    align-self: stretch;
+  }
+
+  .article-layout > .visibility-badge {
+    align-self: flex-start;
+  }
+
+  .article-layout h1 {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .permalink {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .permalink:hover {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .lead {
+    font-size: var(--text-lg);
+    font-style: italic;
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .card-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    padding: var(--space-5);
+  }
+
+  .card-layout > .visibility-badge {
+    align-self: flex-start;
+  }
+
+  .card-name {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  .card-media {
+    margin: calc(var(--space-5) * -1) calc(var(--space-5) * -1) 0;
+  }
+
+  .reply-to {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .reply-to :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .interaction-target {
+    border-left: 3px solid var(--color-border-strong);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background-color: var(--color-surface-2);
+  }
+
+  .bookmark-of {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .bookmark-of :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .bookmark-of a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-2);
+  }
+
+  .syndication-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .syndication-label {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: var(--weight-semibold);
+  }
+
+  .syndication-list ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .syndication-list a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .syndication-list :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .interaction-bar {
+    display: flex;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .interaction-bar > span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .interaction-bar :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+</style>

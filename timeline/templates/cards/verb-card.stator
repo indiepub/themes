@@ -1,0 +1,36 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { InteractionCounts } from '../../lib/types.ts'
+import type { Shown } from '@indiepub/stator/server/access'
+import { renderBodyMarkdown } from '@indiepub/stator/server/render'
+import { pubDate } from '../../lib/format.ts'
+import CardFooter from '../card-footer.stator'
+import StarRating from '../star-rating.stator'
+import VerbCallout from '../verb-callout.stator'
+import CardHeader from './card-header.stator'
+import GatedTeaser from './gated-teaser.stator'
+
+const { entry, counts, href, badge } = Stator.props<{
+  entry: Shown
+  counts?: InteractionCounts | undefined
+  href: string
+  badge?: string | undefined
+}>()
+---
+<div class="card">
+  <CardHeader entry={entry} badge={badge} />
+  <VerbCallout entry={entry} />
+  {entry.rating ? <StarRating rating={entry.rating} /> : null}
+  {entry.gated ? <GatedTeaser entry={entry} href={href} /> : null}
+  {!entry.gated && entry.content ? <div class="e-content prose">{raw(renderBodyMarkdown(entry.content))}</div> : null}
+  <CardFooter href={href} date={pubDate(entry)} counts={counts} syndicationUrls={entry.syndicationUrls} />
+</div>
+
+<style>
+  .card {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+</style>

@@ -1,0 +1,173 @@
+---
+import { raw } from '@statorjs/stator/template'
+import { getAuthor, socialLinks } from '@indiepub/stator/server/entries'
+import { renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { icon } from '../lib/icons.ts'
+import { hostname, socialIcon } from '../lib/format.ts'
+import Layout from '../templates/layout.stator'
+
+const author = getAuthor()
+const links = socialLinks()
+---
+<Layout title="About" path="/about" description={author.bio ?? undefined}>
+  <article class="about h-card">
+    {author.photo ? <img class="u-photo avatar" src={author.photo} alt={author.name} width="96" height="96" /> : null}
+
+    <div class="identity">
+      <h1 class="p-name">{author.name}</h1>
+      {author.url ? <a href={author.url} class="u-url url" rel="me">{hostname(author.url)}</a> : null}
+      {author.bio ? <p class="p-note bio">{raw(renderInlineMarkdown(author.bio))}</p> : null}
+    </div>
+
+    {links.length > 0 ? (
+      <nav class="social" aria-label="Social profiles">
+        {links.map((link) => (
+          <a href={link.url} class="u-url" rel="me noopener" target="_blank">
+            {icon(socialIcon(link.icon))}
+            <span>{link.label}</span>
+          </a>
+        ))}
+      </nav>
+    ) : null}
+
+    <section aria-labelledby="feeds-heading">
+      <h2 id="feeds-heading">Subscribe</h2>
+      <ul>
+        <li><a href="/subscribe">{icon('mail')}By email</a></li>
+        <li><a href="/feed.xml">{icon('rss')}RSS feed</a></li>
+        <li><a href="/feed.atom">{icon('rss')}Atom feed</a></li>
+        <li><a href="/feed.json">{icon('rss')}JSON Feed</a></li>
+      </ul>
+      <p class="note text-sm text-secondary">
+        <a href="https://en.wikipedia.org/wiki/Webmention">Webmentions</a> are supported. Built with
+        <a href="https://indiepub.dev">IndiePub</a>.
+      </p>
+    </section>
+  </article>
+</Layout>
+
+<style>
+  .about {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: var(--feed-max-width);
+  }
+
+  .avatar {
+    width: 6rem;
+    height: 6rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+  }
+
+  .identity {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .url {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-family: var(--font-mono);
+  }
+
+  .url:hover {
+    color: var(--color-text-link);
+  }
+
+  .bio {
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+    max-width: 55ch;
+  }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .social a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition), border-color var(--transition), background-color var(--transition);
+  }
+
+  .social a:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-border-strong);
+    background-color: var(--color-surface-2);
+    text-decoration: none;
+  }
+
+  .social :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  h2 {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  ul a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+
+  ul a:hover {
+    text-decoration: underline;
+  }
+
+  ul :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+  }
+
+  .note {
+    line-height: var(--leading-relaxed);
+  }
+</style>

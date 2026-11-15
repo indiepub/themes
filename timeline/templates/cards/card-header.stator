@@ -1,0 +1,24 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import { icon } from '../../lib/icons.ts'
+import { audienceLabel } from '../../lib/format.ts'
+
+const { entry, badge } = Stator.props<{ entry: Shown; badge?: string | undefined }>()
+const audience = audienceLabel(entry)
+---
+{badge || audience ? (
+  <header>
+    {badge ? <span class="type-badge">{badge}</span> : null}
+    {audience ? <span class="visibility-badge">{icon('lock')}{audience}</span> : null}
+    <children />
+  </header>
+) : null}
+
+<style>
+  header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import { kindLine } from '@indiepub/stator/server/render'
+import { icon } from '../lib/icons.ts'
+import { capitalize } from '../lib/format.ts'
+
+const { entry, size = 'compact' } = Stator.props<{ entry: Shown; size?: 'compact' | 'large' }>()
+const kind = kindLine(entry)
+---
+{kind && kind.cite !== undefined ? (
+  <div class={`callout callout--${size}`}>
+    <span class="glyph" aria-hidden="true">{kind.glyph}</span>
+    <span>
+      {capitalize(kind.label)}{' '}
+      {kind.url ? (
+        <a href={kind.url} class={kind.mf2} rel="noopener" target="_blank">
+          {kind.cite ?? kind.url}
+          {icon('external-link')}
+        </a>
+      ) : (
+        <strong>{kind.cite}</strong>
+      )}
+    </span>
+  </div>
+) : null}
+
+<style>
+  .callout {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    line-height: var(--leading-snug);
+  }
+
+  .callout--compact {
+    gap: var(--space-2);
+    padding: var(--space-3);
+    font-size: var(--text-base);
+  }
+
+  .callout--large {
+    gap: var(--space-3);
+    padding: var(--space-4);
+    font-size: var(--text-lg);
+  }
+
+  .glyph {
+    flex-shrink: 0;
+  }
+
+  .callout--compact .glyph {
+    font-size: var(--text-xl);
+  }
+
+  .callout--large .glyph {
+    font-size: var(--text-2xl);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-text-link);
+  }
+
+  a :global(svg) {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .callout--large a :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+</style>

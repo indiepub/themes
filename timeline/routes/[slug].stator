@@ -1,0 +1,37 @@
+---
+import { interactionsFor, readEntry } from '@indiepub/stator/server/entries'
+import { entrySummary, entryTitle } from '@indiepub/stator/server/render'
+import Layout from '../templates/layout.stator'
+import PostDetail from '../templates/post-detail.stator'
+
+const entry = readEntry(String(Stator.request.params.slug), Stator.request, Stator.response)
+const groups = entry ? interactionsFor(entry.id) : null
+---
+<Layout
+  title={entry ? entryTitle(entry) || 'Post' : 'Not found'}
+  description={entry ? entrySummary(entry) : undefined}
+  path={entry ? `/${entry.slug}` : undefined}
+  ogImage={entry ? `/og/${entry.slug}.png` : undefined}
+>
+  {entry && groups ? (
+    <PostDetail entry={entry} groups={groups} />
+  ) : (
+    <div class="missing">
+      <h1>Not found</h1>
+      <p class="text-secondary">That post doesn't exist, or isn't yours to read. <a href="/">Back to the feed</a>.</p>
+    </div>
+  )}
+</Layout>
+
+<style>
+  .missing {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6) 0;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+</style>
