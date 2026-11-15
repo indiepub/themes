@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  stator-themes:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: [minimal]
+    defaults:
+      run:
+        working-directory: ${{ matrix.theme }}
+    env:
+      INDIEPUB_NPM_TOKEN: ${{ secrets.INDIEPUB_NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ matrix.theme }}/.node-version
+          cache: pnpm
+          cache-dependency-path: ${{ matrix.theme }}/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm build
