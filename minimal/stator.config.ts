@@ -10,5 +10,8 @@ export default defineConfig({
     // Must equal SITE_MEDIA_PATH.
     path: '/media',
     widths: [192, 400, 800, 1200, 1600],
+    // One encode and one libvips thread at a time suits a 512 MB machine.
+    concurrency: 1,
+    threads: 1,
   },
 });
