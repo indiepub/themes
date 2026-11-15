@@ -1,0 +1,137 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { InteractionGroups } from '@indiepub/stator/server/entries'
+import { count, renderReply } from '@indiepub/stator/server/render'
+import { shortDate } from '../lib/format.ts'
+
+const { interactions } = Stator.props<{ interactions: InteractionGroups }>()
+const { likes, reposts, comments } = interactions
+const tallies = [
+  likes.length > 0 ? count(likes.length, 'like') : '',
+  reposts.length > 0 ? count(reposts.length, 'repost') : '',
+].filter(Boolean)
+const people = [...likes, ...reposts]
+---
+{people.length > 0 || comments.length > 0 ? (
+  <section aria-labelledby="responses">
+    <h2 id="responses">Responses</h2>
+    {people.length > 0 ? (
+      <div class="people">
+        <p>{tallies.join(' · ')}</p>
+        <ul>
+          {people.map((i) => (
+            <li class={i.type === 'like' ? 'u-like h-cite' : 'u-repost h-cite'}>
+              {i.authorUrl ? (
+                <a href={i.authorUrl} class="p-author h-card" rel="nofollow noopener" title={i.authorName ?? undefined}>
+                  {i.authorPhoto ? <img src={i.authorPhoto} alt={i.authorName ?? ''} width="32" height="32" class="u-photo" /> : <span class="p-name">{i.authorName ?? 'Someone'}</span>}
+                </a>
+              ) : (
+                <span class="p-author h-card p-name">{i.authorName ?? 'Someone'}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : null}
+    {comments.length > 0 ? (
+      <ol class="comments">
+        {comments.map((i) => (
+          <li class="p-comment h-cite">
+            <header>
+              {i.authorUrl ? (
+                <a href={i.authorUrl} class="p-author h-card" rel="nofollow noopener">{i.authorName ?? 'Someone'}</a>
+              ) : (
+                <span class="p-author h-card">{i.authorName ?? 'Someone'}</span>
+              )}
+              {i.externalUrl ? (
+                <a href={i.externalUrl} class="u-url" rel="nofollow noopener">
+                  <time class="dt-published" datetime={i.createdAt.toISOString()}>{shortDate(i.createdAt)}</time>
+                </a>
+              ) : (
+                <time class="dt-published" datetime={i.createdAt.toISOString()}>{shortDate(i.createdAt)}</time>
+              )}
+            </header>
+            {i.content ? <div class="p-content prose">{raw(renderReply(i.content))}</div> : null}
+          </li>
+        ))}
+      </ol>
+    ) : null}
+  </section>
+) : null}
+
+<style>
+  section {
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  h2 {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .people p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .people ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .people span,
+  .people a {
+    font-size: var(--text-sm);
+  }
+
+  .people img {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+  }
+
+  .comments {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .comments li {
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .comments header {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .comments header > a:first-child,
+  .comments header > span {
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  time {
+    color: var(--color-text-tertiary);
+  }
+</style>

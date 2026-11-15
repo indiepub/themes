@@ -1,0 +1,65 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import { kindLine, stars } from '@indiepub/stator/server/render'
+
+const { entry } = Stator.props<{ entry: Shown }>()
+const kind = kindLine(entry)
+const label = kind ? kind.label.charAt(0).toUpperCase() + kind.label.slice(1) : ''
+---
+{kind ? (
+  <div class="callout">
+    <span class="glyph" aria-hidden="true">{kind.glyph}</span>
+    <span>
+      {label}{' '}
+      {kind.url ? (
+        <a href={kind.url} class={kind.mf2} rel="noopener" target="_blank"><strong>{kind.cite ?? kind.url}</strong></a>
+      ) : kind.cite ? (
+        <strong>{kind.cite}</strong>
+      ) : null}
+    </span>
+  </div>
+) : entry.bookmarkOf ? (
+  <div class="callout">
+    <span class="glyph" aria-hidden="true">🔖</span>
+    <span>
+      Bookmarked{' '}
+      <a href={entry.bookmarkOf} class="u-bookmark-of" rel="noopener" target="_blank"><strong>{entry.name ?? entry.bookmarkOf}</strong></a>
+    </span>
+  </div>
+) : null}
+{kind?.rating ? <div class="rating" aria-label={`Rating: ${kind.rating} out of 5`}>{stars(kind.rating)}</div> : null}
+
+<style>
+  .callout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .glyph {
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+  }
+
+  a {
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  a:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .rating {
+    font-size: var(--text-base);
+    letter-spacing: 0.125rem;
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
+  }
+</style>

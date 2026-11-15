@@ -1,0 +1,191 @@
+---
+import { raw } from '@statorjs/stator/template'
+import SubscribeForm from '@indiepub/stator/components/subscribe-form.stator'
+import { interactionsFor, readEntry } from '@indiepub/stator/server/entries'
+import { ACTIVITY_VERBS, entrySummary, entryTitle, renderBodyMarkdown, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { SITE_NAME, SITE_ORIGIN } from '@indiepub/stator/server/site'
+import { longDate } from '../lib/format.ts'
+import Gate from '../templates/gate.stator'
+import Layout from '../templates/layout.stator'
+import NoteCard from '../templates/note-card.stator'
+import Responses from '../templates/responses.stator'
+import VerbCallout from '../templates/verb-callout.stator'
+
+const entry = readEntry(String(Stator.request.params.slug), Stator.request, Stator.response)
+const interactions = entry ? interactionsFor(entry.id) : null
+const isNote = entry ? entry.type === 'note' || (ACTIVITY_VERBS as readonly string[]).includes(entry.type) : false
+const tags = entry?.tags ?? []
+const syndication = entry?.syndicationUrls ?? []
+const showCta = entry?.audience === 'public' && !entry.gated
+---
+<Layout
+  title={entry ? entryTitle(entry) || 'Post' : 'Not found'}
+  description={entry ? entrySummary(entry) : undefined}
+  path={entry ? `/${entry.slug}` : undefined}
+  ogImage={entry ? `/og/${entry.slug}.png` : undefined}
+  width="narrow"
+>
+  {!entry ? (
+    <div class="missing">
+      <h1>Not found</h1>
+      <p>There's no post here. <a href="/">Go to the front page</a>.</p>
+    </div>
+  ) : isNote ? (
+    <div class="note">
+      <a href="/notes" class="back">← Notes</a>
+      <NoteCard entry={entry} audience={entry.audience} single />
+    </div>
+  ) : (
+    <article class="article h-entry">
+      <header>
+        <a href="/" class="back">← Back</a>
+        {entry.name && entry.type !== 'bookmark' ? <h1 class="p-name">{entry.name}</h1> : null}
+        <div class="byline">
+          {entry.publishedAt ? (
+            <time class="dt-published" datetime={entry.publishedAt.toISOString()}>{longDate(entry.publishedAt)}</time>
+          ) : null}
+        </div>
+        {entry.summary ? <p class="deck p-summary">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+      </header>
+      <VerbCallout entry={entry} />
+      {entry.content ? <div class="e-content prose prose-article">{raw(renderBodyMarkdown(entry.content))}</div> : null}
+      {entry.gated ? <Gate entry={entry} audience={entry.audience} /> : null}
+      {tags.length > 0 || syndication.length > 0 ? (
+        <footer>
+          {tags.length > 0 ? (
+            <p class="tags">
+              {tags.map((tag) => (
+                <a href={`/tags/${tag}`} rel="tag" class="p-category">#{tag}</a>
+              ))}
+            </p>
+          ) : null}
+          {syndication.length > 0 ? (
+            <p>
+              Also on{' '}
+              {syndication.map((u, i) => (
+                <>
+                  {i > 0 ? ', ' : ''}
+                  <a class="u-syndication" rel="syndication" href={u}>{new URL(u).hostname}</a>
+                </>
+              ))}
+            </p>
+          ) : null}
+        </footer>
+      ) : null}
+      <a href={`${SITE_ORIGIN}/${entry.slug}`} class="u-url visually-hidden">Permalink</a>
+    </article>
+  )}
+
+  {interactions ? <Responses interactions={interactions} /> : null}
+
+  {showCta ? (
+    <aside>
+      <p class="kicker">Enjoyed this?</p>
+      <h2>Subscribe to {SITE_NAME}</h2>
+      <p>New posts delivered to your inbox. No spam, unsubscribe any time.</p>
+      <SubscribeForm id="cta" placeholder="your@email.com" />
+    </aside>
+  ) : null}
+</Layout>
+
+<style>
+  .back {
+    display: inline-block;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .back:hover {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .missing {
+    padding-block: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .note,
+  .article {
+    padding-block-end: var(--space-10);
+  }
+
+  .article header {
+    margin-bottom: var(--space-10);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .article h1 {
+    font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-5);
+  }
+
+  .deck {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  .article footer {
+    margin-top: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .tags a {
+    color: var(--color-text-secondary);
+  }
+
+  aside {
+    margin-top: var(--space-16);
+    padding-top: var(--space-10);
+    border-top: 2px solid var(--color-accent);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .kicker {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  aside h2 {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.01em;
+  }
+
+  aside h2 + p {
+    color: var(--color-text-secondary);
+  }
+</style>
