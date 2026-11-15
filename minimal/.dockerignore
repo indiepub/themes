@@ -1,0 +1,9 @@
+media/
+*.db
+*.db-*
+dist/
+node_modules/
+.git/
+.env
+.env.*
+.stator/
