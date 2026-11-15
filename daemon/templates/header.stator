@@ -1,0 +1,302 @@
+---
+import { adminPath, SITE_NAME } from '@indiepub/stator/server/site'
+import { NAV } from '../lib/sections.ts'
+import type { Viewer } from '../lib/viewer.ts'
+import Icon from './icon.stator'
+
+const { path = '', viewer } = Stator.props<{ path?: string; viewer?: Viewer }>()
+const current = (href: string) => (path.startsWith(href) ? 'page' : undefined)
+const audience = viewer?.audience ?? 'public'
+const THEMES = [
+  { value: 'light', icon: 'sun', label: 'Light', title: 'Light mode' },
+  { value: 'dark', icon: 'moon', label: 'Dark', title: 'Dark mode' },
+  { value: 'auto', icon: 'monitor', label: 'Auto', title: 'Auto (system)' },
+]
+---
+<header>
+  <div class="inner">
+    <a href="/" class="logo">{SITE_NAME}</a>
+
+    <nav aria-label="Main navigation">
+      <ul>
+        {NAV.map((item) => (
+          <li>
+            <a href={item.href} class="nav-link" aria-current={current(item.href)}>
+              <Icon name={item.icon} />
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <div class="theme-toggle" role="group" aria-label="Color theme">
+        {THEMES.map((t) => (
+          <button type="button" data-theme-value={t.value} title={t.title} aria-pressed="false">
+            <Icon name={t.icon} />
+            <span class="sr-only">{t.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {audience === 'owner' ? (
+        <a href={adminPath()} class="pill admin-link" aria-label="Admin">
+          <Icon name="lock" />
+          <span>Admin</span>
+        </a>
+      ) : audience === 'members' || audience === 'paid' ? (
+        <form method="post" action="/subscribe/signout" class="member">
+          {viewer?.email ? <span class="member-email" title={viewer.email}>{viewer.email}</span> : null}
+          <button type="submit" class="icon-btn" aria-label="Sign out" title="Sign out">
+            <Icon name="log-out" />
+          </button>
+        </form>
+      ) : (
+        <a href="/subscribe" class="pill" aria-label="Login">
+          <Icon name="user" />
+          <span>Login</span>
+        </a>
+      )}
+
+      <button type="button" class="icon-btn menu-btn" aria-expanded="false" aria-controls="mobile-nav" aria-label="Toggle menu">
+        <span class="icon-menu"><Icon name="menu" /></span>
+        <span class="icon-close"><Icon name="x" /></span>
+      </button>
+    </div>
+  </div>
+
+  <nav id="mobile-nav" class="mobile-nav" aria-hidden="true" aria-label="Mobile navigation">
+    <ul>
+      {NAV.map((item) => (
+        <li>
+          <a href={item.href} aria-current={current(item.href)}>{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-surface-1);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .inner {
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    padding: 0 var(--space-4);
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .logo {
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .logo:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  nav {
+    flex: 1;
+  }
+
+  nav ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: var(--space-1);
+  }
+
+  nav li {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-link,
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current='page'],
+  .pill:hover {
+    background-color: var(--color-brand-muted);
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .admin-link {
+    color: var(--color-text-link);
+    background-color: var(--color-brand-muted);
+  }
+
+  .admin-link:hover {
+    opacity: 0.8;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-left: auto;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-full);
+    padding: var(--space-1);
+  }
+
+  .theme-toggle button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: none;
+    border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .theme-toggle button:hover {
+    background-color: var(--color-surface-3);
+    color: var(--color-text-primary);
+  }
+
+  .theme-toggle button[aria-pressed='true'] {
+    background-color: var(--color-surface-1);
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .member {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .member-email {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition);
+  }
+
+  .icon-btn:hover {
+    background-color: var(--color-brand-muted);
+    color: var(--color-text-link);
+  }
+
+  .menu-btn {
+    --icon-size: 1.25rem;
+    display: none;
+  }
+
+  .icon-close {
+    display: none;
+  }
+
+  .menu-btn[aria-expanded='true'] .icon-menu {
+    display: none;
+  }
+
+  .menu-btn[aria-expanded='true'] .icon-close {
+    display: flex;
+  }
+
+  .mobile-nav {
+    display: none;
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-surface-1);
+  }
+
+  .mobile-nav[aria-hidden='false'] {
+    display: block;
+  }
+
+  .mobile-nav ul {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mobile-nav a {
+    display: block;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+
+  .mobile-nav a:hover,
+  .mobile-nav a[aria-current='page'] {
+    background-color: var(--color-brand-muted);
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  @media (max-width: 639px) {
+    .inner > nav {
+      display: none;
+    }
+    .menu-btn {
+      display: flex;
+    }
+    .member-email,
+    .pill span {
+      display: none;
+    }
+    .logo {
+      flex-shrink: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+</style>

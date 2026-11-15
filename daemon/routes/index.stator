@@ -1,0 +1,133 @@
+---
+import { interactionCounts, listEntries } from '@indiepub/stator/server/entries'
+import { NOTE_TYPES } from '../lib/sections.ts'
+import { viewerOf } from '../lib/viewer.ts'
+import EntryCard from '../templates/entry-card.stator'
+import FeedLinks from '../templates/feed-links.stator'
+import HCard from '../templates/h-card.stator'
+import Layout from '../templates/layout.stator'
+import NowCallout from '../templates/now-callout.stator'
+import OwnerCompose from '../templates/owner-compose.stator'
+
+const viewer = viewerOf(Stator.request, Stator.response)
+const { audience } = viewer
+const articles = listEntries({ types: ['article'], limit: 5, audience })
+const notes = listEntries({ types: NOTE_TYPES, limit: 10, audience })
+const now = listEntries({ types: ['note'], tag: 'now', limit: 1, audience })[0] ?? null
+const counts = interactionCounts([...articles, ...notes].map((e) => e.id))
+---
+<Layout path="/" hideSidebar viewer={viewer}>
+  <div class="landing">
+    <section class="hero">
+      <HCard variant="hero" />
+    </section>
+
+    <OwnerCompose viewer={viewer} />
+
+    <NowCallout entry={now} />
+
+    <div class="grid">
+      <div>
+        {articles.length > 0 ? (
+          <section aria-labelledby="articles-heading">
+            <div class="section-header">
+              <h2 id="articles-heading">Writing</h2>
+              <a href="/articles">All articles →</a>
+            </div>
+            <div class="h-feed list">
+              {articles.map((entry) => <EntryCard entry={entry} counts={counts.get(entry.id)} />)}
+            </div>
+          </section>
+        ) : null}
+      </div>
+
+      <div class="secondary">
+        {notes.length > 0 ? (
+          <section aria-labelledby="notes-heading">
+            <div class="section-header">
+              <h2 id="notes-heading">Notes</h2>
+              <a href="/notes">All notes →</a>
+            </div>
+            <div class="h-feed list">
+              {notes.map((entry) => <EntryCard entry={entry} counts={counts.get(entry.id)} />)}
+            </div>
+          </section>
+        ) : null}
+
+        <section class="follow" aria-labelledby="follow-heading">
+          <h2 id="follow-heading">Follow</h2>
+          <p class="text-sm text-secondary">
+            Stay up to date with new posts via your feed reader, or <a href="/subscribe">by email</a>.
+          </p>
+          <FeedLinks />
+        </section>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .landing {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .hero {
+    padding: var(--space-8) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .section-header h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+  }
+
+  .section-header a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .secondary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .follow {
+    gap: var(--space-3);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+</style>
