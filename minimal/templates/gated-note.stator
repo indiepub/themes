@@ -1,0 +1,9 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+
+const { entry } = Stator.props<{ entry: Shown }>()
+---
+<p class="gated">
+  {entry.summary ? <span class="p-summary">{entry.summary} </span> : null}
+  The rest is for subscribers. <a href="/subscribe">Subscribe to read it</a>; the link in your inbox signs you in.
+</p>

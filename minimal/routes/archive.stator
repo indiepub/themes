@@ -1,0 +1,33 @@
+---
+import { reader, type Shown } from '@indiepub/stator/server/access'
+import { listEntries } from '@indiepub/stator/server/entries'
+import { entryTitle } from '@indiepub/stator/server/render'
+import Layout from '../templates/layout.stator'
+
+const audience = reader(Stator.request, Stator.response)
+const byYear = new Map<number, Shown[]>()
+for (const entry of listEntries({ limit: 10_000, audience })) {
+  const year = entry.publishedAt?.getFullYear() ?? 0
+  byYear.set(year, [...(byYear.get(year) ?? []), entry])
+}
+const years = [...byYear.entries()].sort((a, b) => b[0] - a[0])
+
+const title = (entry: Shown): string => entryTitle(entry) || (entry.gated ? 'For subscribers' : '(untitled)')
+const day = (d: Date): string => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+---
+<Layout title="Archive" path="/archive">
+  <h1>Archive</h1>
+  <dl>
+    {years.map(([year, entries]) => (
+      <>
+        <dt>{year || 'Undated'}</dt>
+        {entries.map((entry) => (
+          <dd>
+            <a href={`/${entry.slug}`}>{title(entry)}</a>
+            {entry.publishedAt ? <time datetime={entry.publishedAt.toISOString()}>{day(entry.publishedAt)}</time> : null}
+          </dd>
+        ))}
+      </>
+    ))}
+  </dl>
+</Layout>

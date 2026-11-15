@@ -1,0 +1,15 @@
+---
+const { base, page, hasPrev, hasNext } = Stator.props<{
+  base: string
+  page: number
+  hasPrev: boolean
+  hasNext: boolean
+}>()
+const newer = page === 2 ? base : `${base}?page=${page - 1}`
+---
+{hasPrev || hasNext ? (
+  <nav aria-label="Pagination">
+    <span>{hasPrev ? <a href={newer}>&larr; Newer</a> : null}</span>
+    <span>{hasNext ? <a href={`${base}?page=${page + 1}`}>Older &rarr;</a> : null}</span>
+  </nav>
+) : null}
