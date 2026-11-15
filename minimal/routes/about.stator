@@ -1,0 +1,25 @@
+---
+import { getAuthor, socialLinks } from '@indiepub/stator/server/entries'
+import { renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { raw } from '@statorjs/stator/template'
+import Layout from '../templates/layout.stator'
+
+const author = getAuthor()
+const links = socialLinks()
+---
+<Layout title="About" path="/about">
+  <div class="h-card">
+    {author.photo ? <img src={author.photo} alt={author.name} class="u-photo" width="96" height="96" /> : null}
+    <h1 class="p-name">{author.name}</h1>
+    {author.bio ? <p class="p-note">{raw(renderInlineMarkdown(author.bio))}</p> : null}
+    {links.length > 0 ? (
+      <ul>
+        {links.map((link) => (
+          <li>
+            <a href={link.url} class="u-url" rel="me noopener" target="_blank">{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    ) : null}
+  </div>
+</Layout>

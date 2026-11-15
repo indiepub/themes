@@ -1,0 +1,39 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import { renderBodyMarkdown, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { shortDate } from '../lib/format.ts'
+import GatedNote from './gated-note.stator'
+import KindLine from './kind-line.stator'
+
+const { entry, full = false } = Stator.props<{
+  entry: Shown
+  /** Show the whole body even when the entry has a title or summary. */
+  full?: boolean
+}>()
+
+const href = `/${entry.slug}`
+const iso = entry.publishedAt?.toISOString()
+const titled = !full && !!entry.name
+const showBody = !entry.gated && !!entry.content && (full || (!entry.name && !entry.summary))
+---
+<article class="h-entry">
+  <header>
+    {titled ? (
+      <>
+        <a href={href} class="p-name u-url">{entry.name}</a>
+        {iso ? <time class="dt-published" datetime={iso}> {shortDate(entry.publishedAt)}</time> : null}
+      </>
+    ) : (
+      <a href={href} class="u-url">
+        <time class="dt-published" datetime={iso}>{shortDate(entry.publishedAt)}</time>
+      </a>
+    )}
+  </header>
+  <KindLine entry={entry} />
+  {entry.gated ? <GatedNote entry={entry} /> : null}
+  {!entry.gated && entry.summary && !showBody ? (
+    <p class="p-summary">{raw(renderInlineMarkdown(entry.summary))}</p>
+  ) : null}
+  {showBody ? <div class="e-content">{raw(renderBodyMarkdown(entry.content ?? ''))}</div> : null}
+</article>
