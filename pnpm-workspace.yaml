@@ -1,9 +1,0 @@
-packages:
-  - daemon
-  - byline
-  - timeline
-
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - workerd

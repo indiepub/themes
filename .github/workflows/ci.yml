@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        theme: [minimal]
+        theme: [minimal, byline, daemon, timeline]
     defaults:
       run:
         working-directory: ${{ matrix.theme }}
