@@ -1,0 +1,105 @@
+---
+import { raw } from '@statorjs/stator/template'
+import { getAuthor, socialLinks } from '@indiepub/stator/server/entries'
+import { SITE_NAME } from '@indiepub/stator/server/site'
+import { socialIcon } from '../lib/icons.ts'
+
+const author = getAuthor()
+const links = socialLinks()
+---
+<footer>
+  <div>
+    <span>{SITE_NAME}</span>
+
+    <nav aria-label="Footer navigation">
+      <a href="/archive">Archive</a>
+      <a href="/about">About</a>
+      <a href="/subscribe">Subscribe</a>
+      <a href="/feed.xml">RSS</a>
+    </nav>
+
+    {links.length > 0 ? (
+      <nav aria-label="Social links" class="social">
+        {links.map((link) => (
+          <a href={link.url} rel="me noopener" target="_blank" aria-label={link.label}>{raw(socialIcon(link.icon))}</a>
+        ))}
+      </nav>
+    ) : null}
+
+    <p>
+      &copy; {new Date().getFullYear()} {author.name || SITE_NAME} &middot; Powered by{' '}
+      <a href="https://indiepub.dev" target="_blank" rel="noopener">IndiePub</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-alt);
+    padding: var(--space-12) var(--space-6);
+    margin-top: var(--space-16);
+  }
+
+  footer > div {
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    text-align: center;
+  }
+
+  span {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    color: var(--color-text-primary);
+  }
+
+  nav {
+    display: flex;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  nav a {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  nav a:hover {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .social {
+    gap: var(--space-4);
+  }
+
+  .social a {
+    display: inline-flex;
+    color: var(--color-text-tertiary);
+  }
+
+  .social a:hover {
+    color: var(--color-text-secondary);
+  }
+
+  p {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  p a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  p a:hover {
+    color: var(--color-text-secondary);
+  }
+</style>

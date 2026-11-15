@@ -1,0 +1,50 @@
+---
+const { base, page, hasPrev, hasNext, label = 'Pagination' } = Stator.props<{
+  base: string
+  page: number
+  hasPrev: boolean
+  hasNext: boolean
+  label?: string
+}>()
+const newer = page === 2 ? base : `${base}?page=${page - 1}`
+---
+{hasPrev || hasNext ? (
+  <nav aria-label={label}>
+    <span>{hasPrev ? <a href={newer}>&larr; Newer</a> : null}</span>
+    <span class="page">Page {page}</span>
+    <span>{hasNext ? <a href={`${base}?page=${page + 1}`}>Older &rarr;</a> : null}</span>
+  </nav>
+) : null}
+
+<style>
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-10);
+    margin-top: var(--space-4);
+  }
+
+  span:last-child {
+    text-align: right;
+  }
+
+  a,
+  .page {
+    font-size: var(--text-sm);
+  }
+
+  a {
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+  }
+
+  a:hover {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .page {
+    color: var(--color-text-tertiary);
+  }
+</style>
