@@ -1,0 +1,18 @@
+---
+import Layout from '../templates/layout.stator'
+---
+<Layout title="Not found">
+  <div class="missing">
+    <h1>404</h1>
+    <p class="text-secondary">Page not found. <a href="/">Back to the feed</a>.</p>
+  </div>
+</Layout>
+
+<style>
+  .missing {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6) 0;
+  }
+</style>

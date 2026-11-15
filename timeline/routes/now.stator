@@ -1,0 +1,53 @@
+---
+import { reader } from '@indiepub/stator/server/access'
+import { interactionsFor, listEntries } from '@indiepub/stator/server/entries'
+import { entrySummary } from '@indiepub/stator/server/render'
+import Layout from '../templates/layout.stator'
+import PostDetail from '../templates/post-detail.stator'
+
+const audience = reader(Stator.request, Stator.response)
+const entry = listEntries({ types: ['note'], tag: 'now', limit: 1, audience })[0] ?? null
+const groups = entry ? interactionsFor(entry.id) : null
+---
+<Layout title="Now" path="/now" description={entry ? entrySummary(entry) : "What I'm up to right now."}>
+  <div class="now-page">
+    <h1>Now</h1>
+    {entry && groups ? (
+      <PostDetail entry={entry} groups={groups} back={false} />
+    ) : (
+      <div class="placeholder">
+        <p>
+          This is a <a href="https://nownownow.com/about" rel="noopener" target="_blank">/now page</a>, a snapshot of
+          what's happening in the site owner's life right now.
+        </p>
+        <p>
+          To update this page, publish a note and tag it with <strong>#now</strong>. The most recent
+          <code>now</code>-tagged note will appear here automatically.
+        </p>
+      </div>
+    )}
+  </div>
+</Layout>
+
+<style>
+  h1 {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    margin-bottom: var(--space-4);
+  }
+
+  .placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .placeholder p {
+    color: var(--color-text-secondary);
+  }
+</style>

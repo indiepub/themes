@@ -1,0 +1,51 @@
+---
+import type { InteractionCounts } from '../lib/types.ts'
+import type { Shown } from '@indiepub/stator/server/access'
+import { ACTIVITY_VERBS } from '@indiepub/stator/server/render'
+import { typeBadge } from '../lib/format.ts'
+import ArticleCard from './cards/article-card.stator'
+import BookmarkCard from './cards/bookmark-card.stator'
+import InteractionCard from './cards/interaction-card.stator'
+import NoteCard from './cards/note-card.stator'
+import PhotoCard from './cards/photo-card.stator'
+import VerbCard from './cards/verb-card.stator'
+
+const { entry, counts } = Stator.props<{ entry: Shown; counts?: InteractionCounts | undefined }>()
+const href = `/${entry.slug}`
+const badge = typeBadge(entry)
+const hasPhoto = (entry.attachments?.length ?? 0) > 0 || !!entry.photo
+const kind =
+  entry.type === 'article'
+    ? 'article'
+    : entry.type === 'photo' && (hasPhoto || entry.gated)
+      ? 'photo'
+      : entry.type === 'bookmark' && entry.bookmarkOf
+        ? 'bookmark'
+        : (ACTIVITY_VERBS as readonly string[]).includes(entry.type)
+          ? 'verb'
+          : entry.type === 'like' || entry.type === 'repost' || entry.type === 'reply'
+            ? 'interaction'
+            : 'note'
+---
+<article class="h-entry">
+  {kind === 'article' ? <ArticleCard entry={entry} counts={counts} href={href} badge={badge} /> : null}
+  {kind === 'photo' ? <PhotoCard entry={entry} counts={counts} href={href} badge={badge} /> : null}
+  {kind === 'bookmark' ? <BookmarkCard entry={entry} counts={counts} href={href} badge={badge} /> : null}
+  {kind === 'verb' ? <VerbCard entry={entry} counts={counts} href={href} badge={badge} /> : null}
+  {kind === 'interaction' ? <InteractionCard entry={entry} href={href} badge={badge} /> : null}
+  {kind === 'note' ? <NoteCard entry={entry} counts={counts} href={href} badge={badge} /> : null}
+</article>
+
+<style>
+  article {
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: background-color var(--transition);
+  }
+
+  article:hover {
+    background-color: var(--color-surface-2);
+  }
+</style>

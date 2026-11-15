@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.stator/
+.env*.local
+*.db
+*.db-*
+/media/
+.deployed-manifest.json

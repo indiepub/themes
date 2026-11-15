@@ -1,0 +1,18 @@
+---
+import SubscribeConfirm from '@indiepub/stator/components/subscribe-confirm.stator'
+import Layout from '../../templates/layout.stator'
+
+const { query } = Stator.request
+---
+<Layout title="Confirm your email">
+  <div class="confirm">
+    <SubscribeConfirm query={query} />
+  </div>
+</Layout>
+
+<style>
+  .confirm {
+    max-width: 28rem;
+    padding: var(--space-6) 0;
+  }
+</style>

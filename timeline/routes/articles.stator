@@ -1,0 +1,144 @@
+---
+import { raw } from '@statorjs/stator/template'
+import { reader } from '@indiepub/stator/server/access'
+import { interactionCounts, listEntries } from '@indiepub/stator/server/entries'
+import { renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { icon } from '../lib/icons.ts'
+import { audienceLabel, formatDateCompact, pageOf, paginate, pubDate } from '../lib/format.ts'
+import Layout from '../templates/layout.stator'
+import PageHeading from '../templates/page-heading.stator'
+import Pagination from '../templates/pagination.stator'
+import TagList from '../templates/tag-list.stator'
+
+const audience = reader(Stator.request, Stator.response)
+const page = pageOf(Stator.request.query)
+const { items, hasPrev, hasNext } = paginate(
+  (limit, offset) => listEntries({ types: ['article'], limit, offset, audience }),
+  page,
+)
+const counts = interactionCounts(items.map((e) => e.id))
+---
+<Layout title="Articles" path="/articles">
+  <PageHeading title="Articles" lede="Long-form writing." />
+
+  {items.length > 0 ? (
+    <ol class="article-list h-feed">
+      {items.map((entry) => {
+        const c = counts.get(entry.id)
+        const locked = audienceLabel(entry)
+        return (
+          <li class="h-entry">
+            <div class="date text-sm text-secondary">
+              <time class="dt-published" datetime={pubDate(entry).toISOString()}>{formatDateCompact(pubDate(entry))}</time>
+            </div>
+            <div class="body">
+              <h2>
+                <a href={`/${entry.slug}`} class="p-name u-url">{entry.name}</a>
+              </h2>
+              {locked ? <span class="visibility-badge">{icon('lock')}{locked}</span> : null}
+              {entry.summary ? <p class="p-summary text-sm text-secondary">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+              <TagList tags={entry.tags ?? []} />
+              {c && (c.likes > 0 || c.reposts > 0 || c.comments > 0) ? (
+                <div class="ix-bar">
+                  {c.likes > 0 ? <span>{icon('heart')}{c.likes}</span> : null}
+                  {c.reposts > 0 ? <span>{icon('repeat-2')}{c.reposts}</span> : null}
+                  {c.comments > 0 ? <span>{icon('message-square')}{c.comments}</span> : null}
+                </div>
+              ) : null}
+            </div>
+          </li>
+        )
+      })}
+    </ol>
+  ) : (
+    <p class="empty-state text-secondary">No articles yet.</p>
+  )}
+  <Pagination base="/articles" page={page} hasPrev={hasPrev} hasNext={hasNext} />
+</Layout>
+
+<style>
+  .article-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  li:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .date {
+    padding-top: 0.25rem;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  h2 {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  h2 a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .p-summary {
+    line-height: var(--leading-relaxed);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ix-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .ix-bar span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .ix-bar :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .empty-state {
+    padding: var(--space-8) 0;
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    li {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+  }
+</style>

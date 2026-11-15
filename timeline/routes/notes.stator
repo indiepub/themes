@@ -1,0 +1,20 @@
+---
+import { reader } from '@indiepub/stator/server/access'
+import { listEntries } from '@indiepub/stator/server/entries'
+import { ACTIVITY_VERBS } from '@indiepub/stator/server/render'
+import { pageOf, paginate } from '../lib/format.ts'
+import FeedList from '../templates/feed-list.stator'
+import Layout from '../templates/layout.stator'
+import PageHeading from '../templates/page-heading.stator'
+import Pagination from '../templates/pagination.stator'
+
+const audience = reader(Stator.request, Stator.response)
+const page = pageOf(Stator.request.query)
+const types = ['note', ...ACTIVITY_VERBS]
+const { items, hasPrev, hasNext } = paginate((limit, offset) => listEntries({ types, limit, offset, audience }), page)
+---
+<Layout title="Notes" path="/notes">
+  <PageHeading title="Notes" lede="Short posts and thoughts." />
+  <FeedList entries={items} label="Notes" empty="No notes yet." />
+  <Pagination base="/notes" page={page} hasPrev={hasPrev} hasNext={hasNext} />
+</Layout>
