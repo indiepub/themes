@@ -1,0 +1,80 @@
+---
+import { requiredAudience, type Shown } from '@indiepub/stator/server/access'
+import Icon from './icon.stator'
+
+/** What a reader who may not see a post gets in place of its body. */
+const { entry, size = 'compact' } = Stator.props<{ entry: Shown; size?: 'compact' | 'large' }>()
+const paid = requiredAudience(entry.visibility) === 'paid'
+---
+<div class={`gated gated--${size}`}>
+  <p class="lead">
+    <Icon name="lock" />
+    {paid ? 'This post is for paid subscribers.' : 'This post is for subscribers.'}
+  </p>
+  {size === 'large' ? (
+    <p>
+      {paid
+        ? 'Subscribe to unlock it.'
+        : 'Subscribe with your email to read it. Already subscribed? The same form sends you a sign-in link.'}
+    </p>
+  ) : null}
+  <a href="/subscribe" class={size === 'large' ? 'btn' : undefined}>{size === 'large' ? 'Subscribe to read' : 'Subscribe to read →'}</a>
+</div>
+
+<style>
+  .gated {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .gated--large {
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    background: var(--color-surface-1);
+  }
+
+  .lead {
+    --icon-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+  }
+
+  .gated--large .lead {
+    --icon-size: 1rem;
+    font-size: var(--text-base);
+    color: var(--color-text-primary);
+  }
+
+  p {
+    color: var(--color-text-secondary);
+  }
+
+  a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: var(--space-2) var(--space-6);
+    background: var(--color-brand);
+    color: var(--color-text-on-brand);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    color: var(--color-text-on-brand);
+    text-decoration: none;
+    filter: brightness(1.05);
+  }
+</style>

@@ -1,0 +1,34 @@
+---
+import { interactionCounts, listEntries } from '@indiepub/stator/server/entries'
+import { viewerOf } from '../lib/viewer.ts'
+import EntryCard from '../templates/entry-card.stator'
+import Layout from '../templates/layout.stator'
+import OwnerCompose from '../templates/owner-compose.stator'
+
+const viewer = viewerOf(Stator.request, Stator.response)
+const photos = listEntries({ types: ['photo'], limit: 30, audience: viewer.audience })
+const counts = interactionCounts(photos.map((e) => e.id))
+---
+<Layout title="Photos" path="/photos" viewer={viewer}>
+  <div class="page-header">
+    <h1>Photos</h1>
+  </div>
+
+  <OwnerCompose viewer={viewer} label="Post a photo" />
+
+  {photos.length > 0 ? (
+    <div class="h-feed grid" aria-label="Photos feed">
+      {photos.map((entry, i) => <EntryCard entry={entry} counts={counts.get(entry.id)} eager={i < 2} />)}
+    </div>
+  ) : (
+    <p class="text-secondary">No photos yet.</p>
+  )}
+</Layout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+  }
+</style>

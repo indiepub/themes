@@ -1,0 +1,40 @@
+---
+import type { Counts } from '../lib/types.ts'
+import Icon from './icon.stator'
+
+const { counts } = Stator.props<{ counts?: Counts }>()
+const items = counts
+  ? [
+      { icon: 'heart', n: counts.likes, label: 'likes' },
+      { icon: 'repeat-2', n: counts.reposts, label: 'reposts' },
+      { icon: 'message-square', n: counts.comments, label: 'responses' },
+    ].filter((i) => i.n > 0)
+  : []
+---
+{items.length > 0 ? (
+  <div>
+    {items.map((i) => (
+      <span title={`${i.n} ${i.label}`}>
+        <Icon name={i.icon} />
+        {i.n}
+      </span>
+    ))}
+  </div>
+) : null}
+
+<style>
+  div {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  span {
+    --icon-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+</style>

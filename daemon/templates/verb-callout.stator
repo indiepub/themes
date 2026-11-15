@@ -1,0 +1,105 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import { kindLine } from '@indiepub/stator/server/render'
+import { hostname } from '../lib/format.ts'
+import Icon from './icon.stator'
+import StarRating from './star-rating.stator'
+
+/** The "what kind of post" line: the reply target, or a boxed callout for a
+ *  like, repost or activity (watched, read, …) with its rating. */
+const { entry, size = 'compact' } = Stator.props<{ entry: Shown; size?: 'compact' | 'large' }>()
+const kind = kindLine(entry)
+const reply = kind?.mf2 === 'u-in-reply-to'
+const label = kind ? kind.label.charAt(0).toUpperCase() + kind.label.slice(1) : ''
+---
+{kind && reply && kind.url ? (
+  <p class="reply-to">
+    <Icon name="corner-down-right" />
+    <span>in reply to </span>
+    <a href={kind.url} class="u-in-reply-to" rel="noopener" target="_blank">{hostname(kind.url)}</a>
+  </p>
+) : kind && !reply ? (
+  <>
+    <div class={`callout callout--${size}`}>
+      <span class="glyph" aria-hidden="true">{kind.glyph}</span>
+      <span>
+        {label}{' '}
+        {kind.url ? (
+          <a href={kind.url} class={kind.mf2} rel="noopener" target="_blank">
+            {kind.cite ?? hostname(kind.url)}
+            <Icon name="external-link" />
+          </a>
+        ) : kind.cite ? (
+          <strong>{kind.cite}</strong>
+        ) : null}
+      </span>
+    </div>
+    {kind.rating ? <StarRating rating={kind.rating} size={size === 'large' ? 'xl' : 'base'} /> : null}
+  </>
+) : null}
+
+<style>
+  .reply-to {
+    --icon-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .reply-to > :first-child {
+    color: var(--color-text-tertiary);
+  }
+
+  .callout {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    line-height: var(--leading-snug);
+  }
+
+  .callout--compact {
+    --icon-size: 0.75rem;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .callout--large {
+    --icon-size: 0.875rem;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    font-size: var(--text-lg);
+  }
+
+  .glyph {
+    flex-shrink: 0;
+  }
+
+  .callout--compact .glyph {
+    font-size: var(--text-lg);
+  }
+
+  .callout--large .glyph {
+    font-size: var(--text-2xl);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-text-link);
+  }
+
+  .callout a > :last-child {
+    color: var(--color-text-tertiary);
+  }
+</style>

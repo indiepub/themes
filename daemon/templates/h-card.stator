@@ -1,0 +1,125 @@
+---
+import { raw } from '@statorjs/stator/template'
+import { getAuthor, socialLinks } from '@indiepub/stator/server/entries'
+import { renderInlineMarkdown } from '@indiepub/stator/server/render'
+import Icon from './icon.stator'
+
+const { variant = 'hero' } = Stator.props<{ variant?: 'hero' | 'compact' }>()
+const author = getAuthor()
+const links = variant === 'hero' ? socialLinks() : []
+const photoSize = variant === 'hero' ? 96 : 40
+---
+<div class={`h-card h-card--${variant}`}>
+  {author.photo ? (
+    <img class="u-photo" src={author.photo} alt={author.name} width={photoSize} height={photoSize} />
+  ) : null}
+  <div class="body">
+    <a class="p-name u-url name" href={author.url ?? '/'} rel="me">{author.name}</a>
+    {variant === 'hero' && author.bio ? <p class="p-note">{raw(renderInlineMarkdown(author.bio))}</p> : null}
+    {variant === 'hero' && (links.length > 0 || author.url) ? (
+      <div class="links-section">
+        <p class="links-label">Find me on</p>
+        <div class="links">
+          {links.length > 0 ? (
+            links.map((link) => (
+              <a href={link.url} class="u-url" rel="me noopener" target="_blank" aria-label={link.label}>
+                <Icon name={link.icon} social />
+              </a>
+            ))
+          ) : (
+            <a href={author.url} class="u-url" rel="me" aria-label="Website">
+              <Icon name="globe" />
+            </a>
+          )}
+        </div>
+      </div>
+    ) : null}
+  </div>
+</div>
+
+<style>
+  .h-card {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .u-photo {
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+    aspect-ratio: 1;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .name {
+    font-weight: var(--weight-bold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .name:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .h-card--hero .name {
+    font-size: var(--text-2xl);
+  }
+
+  .h-card--compact .name {
+    font-size: var(--text-sm);
+  }
+
+  .p-note {
+    color: var(--color-text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    max-width: var(--max-width-content);
+  }
+
+  .links-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  .links-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-tertiary);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .links a {
+    --icon-size: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: color var(--transition), background-color var(--transition);
+  }
+
+  .links a:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-2);
+    text-decoration: none;
+  }
+</style>

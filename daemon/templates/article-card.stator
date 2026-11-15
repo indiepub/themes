@@ -1,0 +1,111 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import { renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { formatDateCompact } from '../lib/format.ts'
+import type { Counts } from '../lib/types.ts'
+import Icon from './icon.stator'
+import InteractionBar from './interaction-bar.stator'
+
+const { entry, counts } = Stator.props<{ entry: Shown; counts?: Counts }>()
+const href = `/${entry.slug}`
+const pubDate = entry.publishedAt ?? entry.createdAt
+---
+<div class="article-card">
+  <h2 class="p-name">
+    <a href={href} class="u-url">{entry.name}</a>
+  </h2>
+  <p class="meta">
+    <time class="dt-published" datetime={pubDate.toISOString()}>{formatDateCompact(pubDate)}</time>
+    {entry.gated ? (
+      <span class="badge">
+        <Icon name="lock" />
+        Subscribers
+      </span>
+    ) : null}
+  </p>
+  {entry.summary ? <p class="p-summary">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+  <div class="actions">
+    <a href={href} class="read" aria-label={`Read: ${entry.name ?? 'article'}`}>
+      Read article
+      <Icon name="arrow-right" />
+    </a>
+    <InteractionBar counts={counts} />
+  </div>
+</div>
+
+<style>
+  .article-card {
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  h2 a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--color-text-link);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+
+  .badge {
+    --icon-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-link);
+    background-color: var(--color-brand-muted);
+    padding: 0.1em 0.6em;
+    border-radius: var(--radius-full);
+  }
+
+  .p-summary {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-1);
+  }
+
+  .read {
+    --icon-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .read > :last-child {
+    transition: transform var(--transition);
+  }
+
+  .read:hover > :last-child {
+    transform: translateX(2px);
+  }
+</style>

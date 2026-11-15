@@ -1,0 +1,169 @@
+---
+import { Picture } from '@statorjs/stator/components'
+import type { Shown } from '@indiepub/stator/server/access'
+import { variantUrl } from '@indiepub/stator/server/media'
+
+/** An entry's photos in a 4:3 frame, letterboxed over a blurred copy. Several
+ *  scroll-snap as a carousel; static/daemon.js wires its buttons and dots. */
+const { entry, sizes = '(min-width: 768px) 65ch, 100vw', eager = false } = Stator.props<{
+  entry: Shown
+  sizes?: string
+  eager?: boolean
+}>()
+
+const photos =
+  entry.attachments && entry.attachments.length > 0
+    ? entry.attachments.filter((a) => a.contentType.startsWith('image/'))
+    : entry.photo
+      ? [{ url: entry.photo, width: undefined, height: undefined, alt: undefined }]
+      : []
+const fallbackAlt = entry.summary ?? entry.name ?? ''
+const multi = photos.length > 1
+const WIDTHS = [400, 800, 1200, 1600]
+---
+{photos.length === 0 ? null : (
+  <div class={multi ? 'frame carousel' : 'frame'} data-carousel={multi ? '' : undefined}>
+    <div class="track" data-carousel-track={multi ? '' : undefined}>
+      {photos.map((photo, i) => (
+        <div class="slide">
+          <div class="bg" style={`background-image: url('${variantUrl(photo.url, 400)}')`} aria-hidden="true"></div>
+          {photo.width && photo.height ? (
+            <Picture
+              src={photo.url}
+              width={photo.width}
+              height={photo.height}
+              alt={photo.alt ?? fallbackAlt}
+              class="u-photo"
+              widths={WIDTHS}
+              sizes={sizes}
+              loading={eager && i === 0 ? 'eager' : 'lazy'}
+            />
+          ) : (
+            <img class="u-photo" src={photo.url} alt={photo.alt ?? fallbackAlt} loading={eager && i === 0 ? 'eager' : 'lazy'} />
+          )}
+        </div>
+      ))}
+    </div>
+    {multi ? (
+      <div class="controls">
+        <button type="button" class="btn" aria-label="Previous image" data-carousel-prev>‹</button>
+        <div class="dots">
+          {photos.map((_, i) => (
+            <button type="button" class={i === 0 ? 'dot is-active' : 'dot'} aria-label={`Image ${i + 1} of ${photos.length}`} data-carousel-dot></button>
+          ))}
+        </div>
+        <button type="button" class="btn" aria-label="Next image" data-carousel-next>›</button>
+      </div>
+    ) : null}
+  </div>
+)}
+
+<style>
+  .frame {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background-color: var(--color-surface-2);
+    border-radius: inherit;
+  }
+
+  .track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .carousel .track {
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .carousel .track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .slide {
+    position: relative;
+    flex: 0 0 100%;
+    height: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow: hidden;
+  }
+
+  .bg {
+    position: absolute;
+    inset: 0;
+    transform: scale(1.08);
+    background-size: cover;
+    background-position: center;
+    filter: blur(18px) brightness(0.55) saturate(1.2);
+  }
+
+  .slide :global(picture),
+  .slide :global(img) {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: contain;
+  }
+
+  .controls {
+    position: absolute;
+    bottom: var(--space-3);
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+  }
+
+  .carousel.is-ready .controls {
+    display: flex;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: var(--radius-full);
+    background: oklch(0% 0 0 / 0.5);
+    color: white;
+    font-size: var(--text-xl);
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .dots {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-full);
+    background: oklch(100% 0 0 / 0.5);
+    cursor: pointer;
+  }
+
+  .dot.is-active {
+    background: white;
+  }
+</style>
