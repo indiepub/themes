@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@indiepub/stator':
         specifier: 1.0.0-beta.73
-        version: 1.0.0-beta.73(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.0(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 1.0.0-beta.73(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.2(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@statorjs/stator':
-        specifier: 3.0.0
-        version: 3.0.0(@types/node@24.19.2)
+        specifier: 3.0.2
+        version: 3.0.2(@types/node@24.19.2)
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -527,8 +527,8 @@ packages:
     engines: {node: '>= 8.0.0'}
     hasBin: true
 
-  '@statorjs/stator@3.0.0':
-    resolution: {integrity: sha512-/65k+2hqXFFWPNVyJhszvAakvu3D1gRUd8HyiqcveTKfb38I9TagcclgUV6zeRb+yQGX78mqAYYNTu/mPIVCiw==}
+  '@statorjs/stator@3.0.2':
+    resolution: {integrity: sha512-GTm4il6xg1G8BKNyuaBoPqgU9i4xJJxSrW0Rhw4/3t5Ibp7iZytSWcxI5QTb9xuaKdRCGkNwb6BXSuHtA5od6A==}
     engines: {node: '>=24'}
     hasBin: true
 
@@ -1498,7 +1498,7 @@ snapshots:
       '@resvg/resvg-js': 2.6.2
       satori: 0.33.5
 
-  '@indiepub/stator@1.0.0-beta.73(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.0(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@indiepub/stator@1.0.0-beta.73(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.2(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@indiepub/atproto': 1.0.0-beta.58
       '@indiepub/core': 1.0.0-beta.58
@@ -1509,7 +1509,7 @@ snapshots:
       '@indiepub/og': 1.0.0-beta.61
       '@indiepub/types': 1.0.0-beta.58
       '@indiepub/webmentions': 1.0.0-beta.58
-      '@statorjs/stator': 3.0.0(@types/node@24.19.2)
+      '@statorjs/stator': 3.0.2(@types/node@24.19.2)
       highlight.js: 11.12.0
       image-size: 2.1.0
       marked: 17.0.6
@@ -1601,7 +1601,7 @@ snapshots:
       fflate: 0.7.3
       string.prototype.codepointat: 0.2.1
 
-  '@statorjs/stator@3.0.0(@types/node@24.19.2)':
+  '@statorjs/stator@3.0.2(@types/node@24.19.2)':
     dependencies:
       '@hono/node-server': 1.19.19(hono@4.13.18)
       chokidar: 4.0.3

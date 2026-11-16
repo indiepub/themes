@@ -35,11 +35,11 @@ const groups = [
 >
   {entry ? (
     <>
-      <article class="h-entry">
+      <article class="h-entry" itemscope itemtype="https://schema.org/Article">
         <header>
-          {entry.name && entry.type !== 'bookmark' ? <h1 class="p-name">{entry.name}</h1> : null}
+          {entry.name && entry.type !== 'bookmark' ? <h1 class="p-name" itemprop="headline">{entry.name}</h1> : null}
           {entry.publishedAt ? (
-            <time class="dt-published" datetime={entry.publishedAt.toISOString()}>
+            <time class="dt-published" itemprop="datePublished" datetime={entry.publishedAt.toISOString()}>
               {longDate(entry.publishedAt)}
             </time>
           ) : null}

@@ -9,7 +9,7 @@ import PhotoCard from './photo-card.stator'
 const { entry, counts, eager = false } = Stator.props<{ entry: Shown; counts?: Counts; eager?: boolean }>()
 const hasPhotos = (entry.attachments?.length ?? 0) > 0 || !!entry.photo
 ---
-<article class={`h-entry entry-card entry-card--${entry.type}`}>
+<article class={`h-entry entry-card entry-card--${entry.type}`} itemscope itemtype="https://schema.org/BlogPosting">
   {entry.type === 'article' ? (
     <ArticleCard entry={entry} counts={counts} />
   ) : entry.type === 'photo' && hasPhotos ? (
