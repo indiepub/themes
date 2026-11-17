@@ -9,15 +9,14 @@
     "build": "stator build",
     "start": "stator start",
     "check": "stator check",
-    "seed": "tsx scripts/seed-demo.mjs"
+    "seed": "node --import @statorjs/stator/register scripts/seed.mjs"
   },
   "dependencies": {
-    "@indiepub/stator": "1.0.0-beta.73",
+    "@indiepub/stator": "1.0.0-beta.75",
     "@statorjs/stator": "3.0.2"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.33.0"

@@ -1,21 +1,10 @@
 ---
+import SubscribeConfirm from '@indiepub/stator/components/subscribe-confirm.stator'
 import Layout from '../../templates/layout.stator'
 
 const { query } = Stator.request
-const q = (k: string): string => (typeof query[k] === 'string' ? (query[k] as string) : '')
-const complete = q('email') !== '' && q('exp') !== '' && q('token') !== ''
 ---
 <Layout title="Confirm your email">
   <h1>Confirm your email</h1>
-  {complete ? (
-    <form method="post" action="/subscribe/confirm">
-      <input type="hidden" name="email" value={q('email')} />
-      <input type="hidden" name="exp" value={q('exp')} />
-      <input type="hidden" name="token" value={q('token')} />
-      <p>Continue as <strong>{q('email')}</strong>.</p>
-      <button type="submit">Confirm</button>
-    </form>
-  ) : (
-    <p role="alert">This link is incomplete. <a href="/subscribe">Ask for a new one</a>.</p>
-  )}
+  <SubscribeConfirm query={query} />
 </Layout>

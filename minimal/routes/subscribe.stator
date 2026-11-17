@@ -1,53 +1,21 @@
 ---
-import { formStamp, subscriberOverview } from '@indiepub/stator/server/subscribe'
+import SubscribeForm from '@indiepub/stator/components/subscribe-form.stator'
+import { subscriberCount } from '@indiepub/stator/server/subscribe'
 import MemberMachine from '../machines/member.ts'
 import Layout from '../templates/layout.stator'
 
 const [member] = Stator.reads([MemberMachine])
+const subscribers = subscriberCount()
 const { query } = Stator.request
-const subscribers = subscriberOverview().active.length
-const NOTICES: Record<string, string> = {
-  sent: 'If that address can subscribe, a confirmation email is on its way. The link works once, for 24 hours.',
-  confirmed: 'Confirmed. New posts will reach you by email.',
-  'link-expired': 'That link expired. Ask for a new one below.',
-  'link-used': 'That link was already used. Ask for a new one below.',
-  'link-invalid': "That link isn't valid. Ask for a new one below.",
-}
-const error = typeof query.error === 'string' ? query.error : null
-const notice = query.sent === '1' ? NOTICES.sent : query.confirmed === '1' ? NOTICES.confirmed : error ? NOTICES[error] : undefined
 ---
 <Layout title="Subscribe" description="Follow this site by email or feed." path="/subscribe">
   <h1>Subscribe</h1>
-  {notice ? <p role={error ? 'alert' : 'status'}>{notice}</p> : null}
+  <p>
+    Get new posts delivered to your inbox. Already subscribed? The same form sends you a sign-in link.
+    {subscribers > 0 ? ` Join ${subscribers} ${subscribers === 1 ? 'subscriber' : 'subscribers'}.` : ''}
+  </p>
 
-  {when(read(member, (m) => m.authed), () => (
-    <form method="post" action="/subscribe/signout">
-      <p>
-        Subscribed as <strong>{read(member, (m) => m.email)}</strong>. Posts for subscribers open for you while you
-        are signed in.
-      </p>
-      <button type="submit">Sign out</button>
-    </form>
-  ))}
-
-  {when(read(member, (m) => !m.authed), () => (
-    <>
-      <p>
-        Get new posts delivered to your inbox. Already subscribed? The same form sends you a sign-in link.
-        {subscribers > 0 ? ` Join ${subscribers} ${subscribers === 1 ? 'subscriber' : 'subscribers'}.` : ''}
-      </p>
-      <form method="post" action="/subscribe">
-        <label for="email">Email address</label>
-        <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com" />
-        <div class="hp" aria-hidden="true">
-          <label for="subscribe-website">Website</label>
-          <input id="subscribe-website" type="text" name="website" tabindex="-1" autocomplete="off" />
-        </div>
-        <input type="hidden" name="stamp" value={formStamp()} />
-        <button type="submit">Subscribe</button>
-      </form>
-    </>
-  ))}
+  <SubscribeForm query={query} member={member} />
 
   <p class="subscribe-hint">
     You can also follow via <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a>, or
