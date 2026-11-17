@@ -12,7 +12,7 @@
     "seed": "node --import @statorjs/stator/register scripts/seed.mjs"
   },
   "dependencies": {
-    "@indiepub/stator": "1.0.0-beta.74",
+    "@indiepub/stator": "1.0.0-beta.75",
     "@statorjs/stator": "3.0.2"
   },
   "devDependencies": {
