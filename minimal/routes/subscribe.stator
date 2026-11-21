@@ -19,6 +19,6 @@ const { query } = Stator.request
 
   <p class="subscribe-hint">
     You can also follow via <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a>, or
-    <a href="/feed.json">JSON Feed</a>.
+    <a href="/feed.json">JSON Feed</a>. Past issues are in the <a href="/newsletter">archive</a>.
   </p>
 </Layout>

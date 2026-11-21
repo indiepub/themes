@@ -7,7 +7,7 @@ A bare-bones [IndiePub](https://indiepub.dev) theme on [Stator](https://statorjs
 - `routes/*.stator`: the public pages (home, notes, articles, archive, about, tags, the post page at `/<slug>`, subscribe, 404).
 - `templates/`: the layout and the small pieces the pages share.
 - `static/global.css`: the whole look. Override the custom properties at the top to restyle it.
-- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin`, Micropub, IndieAuth, webmentions, feeds, subscriptions, syndication and the Open Graph cards.
+- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin`, Micropub, IndieAuth, webmentions, feeds, subscriptions, the newsletter and its archive at `/newsletter`, syndication and the Open Graph cards.
 
 ## Local development
 
