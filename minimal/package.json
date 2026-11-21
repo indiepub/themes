@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@indiepub/stator": "1.0.0-beta.75",
-    "@statorjs/stator": "3.0.2"
+    "@statorjs/stator": "^3.0.3"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
