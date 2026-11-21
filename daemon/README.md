@@ -9,7 +9,7 @@ A full-featured [IndiePub](https://indiepub.dev) theme on [Stator](https://stato
 - `/now`: the most recent note tagged `#now`
 - `/about`: profile and links
 - `/<slug>`: every post, with its likes, reposts and replies
-- `/tags/<tag>`, `/subscribe`
+- `/tags/<tag>`, `/subscribe`, `/newsletter` (past issues)
 
 Old `/posts/<slug>`, `/notes/<slug>`, `/articles/<slug>` and `/photos/<slug>` links redirect to `/<slug>`.
 
@@ -19,7 +19,7 @@ Old `/posts/<slug>`, `/notes/<slug>`, `/articles/<slug>` and `/photos/<slug>` li
 - `templates/`: the layout and the cards, callouts and lists the pages share.
 - `static/global.css`: the tokens and base styles. Change `--brand-hue` at the top to repaint the site. `static/daemon.js` runs the theme toggle, the mobile menu and the photo carousels.
 - `lib/icons.ts`: the inline SVG icons.
-- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin`, Micropub, IndieAuth, webmentions, feeds, subscriptions, syndication and the Open Graph cards.
+- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin`, Micropub, IndieAuth, webmentions, feeds, subscriptions, the newsletter and its archive at `/newsletter`, syndication and the Open Graph cards.
 
 Posts are written in the admin's composer at `/admin`; signed in as the owner, the site's header links there.
 

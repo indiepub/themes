@@ -8,7 +8,7 @@ A writer-focused [IndiePub](https://indiepub.dev) theme on [Stator](https://stat
 - `templates/`: the layout, header, footer and the pieces the pages share.
 - `static/global.css`: the tokens, palettes, base styles and prose. Each template styles itself in a scoped `<style>`.
 - `lib/icons.ts`: the few inline SVG icons.
-- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin` (`/write` sends you there), Micropub, IndieAuth, webmentions, feeds, subscriptions, members-only posts, syndication and the Open Graph cards.
+- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin` (`/write` sends you there), Micropub, IndieAuth, webmentions, feeds, subscriptions, the newsletter and its archive at `/newsletter`, members-only posts, syndication and the Open Graph cards.
 
 ## Look
 

@@ -8,7 +8,7 @@ A feed-based [IndiePub](https://indiepub.dev) theme on [Stator](https://statorjs
 - `/notes`, `/articles`, `/photos`, `/bookmarks`: filtered sections (`/photos` is a grid)
 - `/now`: the latest note tagged `#now`; `/tags/now` keeps the history
 - `/<slug>`: the post page (old `/posts/<slug>` links redirect)
-- `/tags/<tag>`, `/about`, `/subscribe`
+- `/tags/<tag>`, `/about`, `/subscribe`, `/newsletter` (past issues)
 
 ## What's here
 
@@ -16,7 +16,7 @@ A feed-based [IndiePub](https://indiepub.dev) theme on [Stator](https://statorjs
 - `templates/`: the layout, the sidebar, the feed cards and the post page.
 - `static/global.css`: tokens, base styles and prose. Change `--brand-hue` at the top to repaint the site; dark mode follows the toggle or the system.
 - `static/timeline.js`: the mobile menu and the theme toggle.
-- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin`, Micropub, IndieAuth, webmentions, feeds, subscriptions, syndication and the Open Graph cards.
+- Everything else under `routes/` and `machines/` is a one-line mount of `@indiepub/stator`: the admin at `/admin`, Micropub, IndieAuth, webmentions, feeds, subscriptions, the newsletter and its archive at `/newsletter`, syndication and the Open Graph cards.
 
 ## Local development
 

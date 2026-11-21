@@ -12,13 +12,14 @@ const viewer = viewerOf(Stator.request, Stator.response)
 const subscribers = subscriberCount()
 const { query } = Stator.request
 ---
-<Layout title="Subscribe" description={`Subscribe to ${SITE_NAME} for updates delivered to your inbox.`} path="/subscribe" hideSidebar viewer={viewer}>
+<Layout title="Subscribe" description={`Subscribe to ${SITE_NAME} for new issues delivered to your inbox.`} path="/subscribe" hideSidebar viewer={viewer}>
   <div class="subscribe">
     <div>
       <h1>Subscribe</h1>
       <p>
-        Get new posts from {SITE_NAME} delivered to your inbox. No spam, unsubscribe any time. Already subscribed? The
-        same form sends you a sign-in link for posts that are just for subscribers.
+        New issues from {SITE_NAME} delivered to your inbox. No spam, unsubscribe any time. Already subscribed? The
+        same form sends you a sign-in link for posts that are just for subscribers. Read
+        <a href="/newsletter">past issues</a>.
         {subscribers > 0 ? ` Join ${subscribers} ${subscribers === 1 ? 'subscriber' : 'subscribers'}.` : ''}
       </p>
     </div>
