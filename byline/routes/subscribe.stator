@@ -27,7 +27,8 @@ const { query } = Stator.request
     <SubscribeForm query={query} member={member} placeholder="your@email.com" />
 
     <p class="feeds">
-      Or follow by <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a> or <a href="/feed.json">JSON Feed</a>.
+      Read <a href="/newsletter">past issues</a>, or follow by <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a>
+      or <a href="/feed.json">JSON Feed</a>.
     </p>
   </div>
 </Layout>
