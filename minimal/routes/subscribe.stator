@@ -11,7 +11,7 @@ const { query } = Stator.request
 <Layout title="Subscribe" description="Follow this site by email or feed." path="/subscribe">
   <h1>Subscribe</h1>
   <p>
-    Get new posts delivered to your inbox. Already subscribed? The same form sends you a sign-in link.
+    New issues delivered to your inbox. Already subscribed? The same form sends you a sign-in link.
     {subscribers > 0 ? ` Join ${subscribers} ${subscribers === 1 ? 'subscriber' : 'subscribers'}.` : ''}
   </p>
 

@@ -8,11 +8,11 @@ const [member] = Stator.reads([MemberMachine])
 const subscribers = subscriberCount()
 const { query } = Stator.request
 ---
-<Layout title="Subscribe" description="Get new posts delivered to your inbox." path="/subscribe">
+<Layout title="Subscribe" description="New issues delivered to your inbox." path="/subscribe">
   <div class="subscribe-page">
     <h1>Subscribe</h1>
     <p class="desc">
-      Get new posts delivered to your inbox. No spam, unsubscribe anytime. Already subscribed? The same form sends you a
+      New issues delivered to your inbox. No spam, unsubscribe anytime. Already subscribed? The same form sends you a
       sign-in link.
     </p>
     {subscribers > 0 ? (
