@@ -1,0 +1,275 @@
+---
+import { visibilityOptions } from '@indiepub/stator/server/access'
+import { adminPath } from '@indiepub/stator/server/site'
+import RichEditor from '@indiepub/stator/components/editor/rich-editor.stator'
+import { icon } from '../lib/icons.ts'
+
+const KINDS = [
+  { value: 'note', icon: 'pen-line', label: 'Note' },
+  { value: 'reply', icon: 'reply', label: 'Reply' },
+  { value: 'like', icon: 'heart', label: 'Like' },
+  { value: 'bookmark', icon: 'bookmark', label: 'Bookmark' },
+  { value: 'repost', icon: 'repeat-2', label: 'Repost' },
+  { value: 'activity', icon: 'clapperboard', label: 'Activity' },
+]
+const visibilities = visibilityOptions()
+---
+<form class="composer" method="post" action={adminPath('publish')} enctype="multipart/form-data">
+  <input type="hidden" name="compose_mode" value="note" />
+  <div class="kinds" role="radiogroup" aria-label="Post kind">
+    {KINDS.map((k, i) => (
+      <label>
+        <input type="radio" name="note_kind" value={k.value} checked={i === 0} />
+        {icon(k.icon)}
+        <span>{k.label}</span>
+      </label>
+    ))}
+  </div>
+
+  <input class="field kind-reply" type="url" name="in_reply_to" placeholder="Replying to… (URL)" aria-label="Replying to URL" />
+  <input class="field kind-like" type="url" name="like_of" placeholder="Like of… (URL)" aria-label="Like of URL" />
+  <input class="field kind-bookmark" type="url" name="bookmark_of" placeholder="Bookmark of… (URL)" aria-label="Bookmark of URL" />
+  <input class="field kind-repost" type="url" name="repost_of" placeholder="Repost of… (URL)" aria-label="Repost of URL" />
+  <div class="field kind-activity verb-fields">
+    <select name="verb" aria-label="Activity">
+      <option value="">Activity…</option>
+      <option value="watch">Watched</option>
+      <option value="read">Read</option>
+      <option value="listen">Listened to</option>
+      <option value="play">Played</option>
+      <option value="eat">Ate</option>
+    </select>
+    <input type="text" name="object_name" placeholder="Title…" aria-label="Activity title" maxlength="200" />
+    <input type="url" name="object_url" placeholder="URL (optional)" aria-label="Activity URL" />
+    <select name="rating" aria-label="Rating">
+      <option value="">No rating</option>
+      <option value="5">★★★★★</option>
+      <option value="4">★★★★☆</option>
+      <option value="3">★★★☆☆</option>
+      <option value="2">★★☆☆☆</option>
+      <option value="1">★☆☆☆☆</option>
+    </select>
+  </div>
+
+  <div class="editor">
+    <textarea name="content" placeholder="What's happening? #hashtags become tags." aria-label="Content" required maxlength="20000"></textarea>
+    <RichEditor target="content" kind="note" />
+  </div>
+
+  <div class="slug">
+    <span>/</span>
+    <input type="text" name="slug" placeholder="auto-generated from content" aria-label="URL slug" maxlength="80" />
+  </div>
+
+  <div class="footer">
+    <label class="tool attach" title="Attach a photo">
+      {icon('paperclip')}
+      <span class="sr-only">Attach a photo</span>
+      <input type="file" name="photo" accept="image/*" />
+    </label>
+    <input class="alt" type="text" name="photo_alt" placeholder="Photo description (needed with a photo)" aria-label="Photo description" maxlength="500" />
+    <select name="visibility" aria-label="Who can read">
+      {visibilities.map((v) => (
+        <option value={v.value} selected={v.value === 'public'}>{v.label}</option>
+      ))}
+    </select>
+    <button type="submit">Post</button>
+  </div>
+</form>
+
+<style>
+  .composer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-3);
+  }
+
+  .kinds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .kinds label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition);
+  }
+
+  .kinds label:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-text-tertiary);
+  }
+
+  .kinds label:has(input:checked) {
+    color: var(--color-text-link);
+    border-color: var(--color-text-link);
+    background-color: var(--color-brand-muted);
+  }
+
+  .kinds label:has(input:focus-visible) {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  .kinds input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .kinds :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+
+  .field {
+    display: none;
+  }
+
+  .composer:has(input[value='reply']:checked) .kind-reply,
+  .composer:has(input[value='like']:checked) .kind-like,
+  .composer:has(input[value='bookmark']:checked) .kind-bookmark,
+  .composer:has(input[value='repost']:checked) .kind-repost {
+    display: block;
+  }
+
+  .composer:has(input[value='activity']:checked) .kind-activity {
+    display: flex;
+  }
+
+  .verb-fields {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .verb-fields input {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  input[type='url'],
+  input[type='text'],
+  select,
+  textarea {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font: inherit;
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: border-color var(--transition);
+  }
+
+  .verb-fields select {
+    width: auto;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--color-text-link);
+  }
+
+  textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  .slug {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .slug input {
+    flex: 1;
+    padding: var(--space-1) var(--space-2) var(--space-1) 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: transparent;
+    border: none;
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .footer select {
+    width: auto;
+  }
+
+  .tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+  }
+
+  .tool:hover,
+  .tool:has(input:focus-visible) {
+    color: var(--color-text-secondary);
+    border-color: var(--color-text-tertiary);
+  }
+
+  .tool :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+
+  .attach input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .footer .alt {
+    flex: 1;
+    width: auto;
+    min-width: 8rem;
+  }
+
+  button[type='submit'] {
+    margin-left: auto;
+    padding: var(--space-2) var(--space-5);
+    background-color: var(--color-text-link);
+    color: var(--color-text-on-brand);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  button[type='submit']:hover {
+    opacity: 0.9;
+  }
+</style>

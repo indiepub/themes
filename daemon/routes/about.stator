@@ -1,0 +1,89 @@
+---
+import { raw } from '@statorjs/stator/template'
+import { getAuthor, socialLinks } from '@indiepub/stator/server/entries'
+import { renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { hostname } from '../lib/format.ts'
+import { viewerOf } from '../lib/viewer.ts'
+import HCard from '../templates/h-card.stator'
+import Layout from '../templates/layout.stator'
+
+const viewer = viewerOf(Stator.request, Stator.response)
+const author = getAuthor()
+const links = socialLinks()
+---
+<Layout title="About" path="/about" viewer={viewer}>
+  <article>
+    <HCard variant="hero" />
+
+    <div class="body">
+      {author.bio ? (
+        <section aria-labelledby="bio-heading">
+          <h2 id="bio-heading">About</h2>
+          <p>{raw(renderInlineMarkdown(author.bio))}</p>
+        </section>
+      ) : null}
+
+      <section aria-labelledby="elsewhere-heading">
+        <h2 id="elsewhere-heading">Elsewhere</h2>
+        <ul>
+          {author.url ? (
+            <li>
+              <a href={author.url} class="u-url" rel="me noopener" target="_blank">{hostname(author.url)}</a>
+            </li>
+          ) : null}
+          {links.map((link) => (
+            <li>
+              <a href={link.url} class="u-url" rel="me noopener" target="_blank">{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="site-heading">
+        <h2 id="site-heading">This site</h2>
+        <p>
+          Built with <a href="https://indiepub.dev">IndiePub</a>. Posts are available via <a href="/feed.xml">RSS</a>,
+          <a href="/feed.atom">Atom</a>, and <a href="/feed.json">JSON Feed</a>, or <a href="/subscribe">by email</a>.
+          <a href="https://en.wikipedia.org/wiki/Webmention">Webmentions</a> are supported.
+        </p>
+      </section>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    max-width: var(--max-width-content);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  h2 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+  }
+
+  p {
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  li a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+</style>

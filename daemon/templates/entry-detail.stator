@@ -1,0 +1,189 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import type { InteractionGroups } from '@indiepub/stator/server/entries'
+import { count, renderBodyMarkdown, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { SITE_ORIGIN } from '@indiepub/stator/server/site'
+import { formatDate, hostname } from '../lib/format.ts'
+import GatedNote from './gated-note.stator'
+import HCard from './h-card.stator'
+import Icon from './icon.stator'
+import PhotoCarousel from './photo-carousel.stator'
+import Responses from './responses.stator'
+import SyndicationLinks from './syndication-links.stator'
+import TagList from './tag-list.stator'
+import VerbCallout from './verb-callout.stator'
+
+const { entry, groups } = Stator.props<{ entry: Shown; groups: InteractionGroups }>()
+const pubDate = entry.publishedAt ?? entry.createdAt
+const updated = entry.updatedAt && entry.updatedAt.getTime() - pubDate.getTime() > 60_000 ? entry.updatedAt : null
+const isBookmark = entry.type === 'bookmark' && !!entry.bookmarkOf
+const counts = [
+  { icon: 'heart', text: count(groups.likes.length, 'like'), n: groups.likes.length },
+  { icon: 'repeat-2', text: count(groups.reposts.length, 'repost'), n: groups.reposts.length },
+  { icon: 'message-square', text: count(groups.comments.length, 'comment'), n: groups.comments.length },
+].filter((c) => c.n > 0)
+---
+<article class="h-entry">
+  <header>
+    {entry.name && !isBookmark ? <h1 class="p-name">{entry.name}</h1> : null}
+    {isBookmark ? (
+      <h1 class="p-name bookmark">
+        🔖{' '}
+        <a href={entry.bookmarkOf} class="u-bookmark-of" rel="noopener" target="_blank">
+          {entry.name ?? hostname(entry.bookmarkOf ?? '')}
+          <Icon name="external-link" />
+        </a>
+      </h1>
+    ) : null}
+    <div class="meta">
+      <a href={`/${entry.slug}`} class="u-url permalink">
+        <time class="dt-published" datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+      </a>
+      {updated ? (
+        <span class="updated">
+          Updated <time class="dt-updated" datetime={updated.toISOString()}>{formatDate(updated)}</time>
+        </span>
+      ) : null}
+    </div>
+    <VerbCallout entry={entry} size="large" />
+  </header>
+
+  {entry.gated ? (
+    <>
+      {entry.summary ? <p class="p-summary teaser">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+      <GatedNote entry={entry} size="large" />
+    </>
+  ) : (
+    <>
+      {(entry.attachments?.length ?? 0) > 0 || entry.photo ? (
+        <div class="media">
+          <PhotoCarousel entry={entry} eager />
+        </div>
+      ) : null}
+      {entry.video ? (
+        <p class="video">
+          ▶️ <a href={entry.video} class="u-video" rel="noopener" target="_blank">Watch on {hostname(entry.video)}</a>
+        </p>
+      ) : null}
+      {entry.content ? (
+        <div class="e-content prose prose--article">
+          {raw(renderBodyMarkdown(entry.content))}
+        </div>
+      ) : null}
+    </>
+  )}
+
+  <footer>
+    <TagList tags={entry.tags} />
+    <SyndicationLinks urls={entry.syndicationUrls} variant="detail" />
+    {counts.length > 0 ? (
+      <div class="counts">
+        {counts.map((c) => (
+          <span>
+            <Icon name={c.icon} />
+            {c.text}
+          </span>
+        ))}
+      </div>
+    ) : null}
+    <div class="p-author">
+      <HCard variant="compact" />
+    </div>
+  </footer>
+  <a href={`${SITE_ORIGIN}/${entry.slug}`} class="u-url sr-only">Permalink</a>
+</article>
+
+<Responses groups={groups} />
+
+<style>
+  article {
+    max-width: var(--max-width-content);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  h1 {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .bookmark {
+    font-size: var(--text-2xl);
+  }
+
+  .bookmark a {
+    --icon-size: 1rem;
+    color: var(--color-text-primary);
+  }
+
+  .bookmark a:hover {
+    color: var(--color-text-link);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .permalink {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .permalink:hover {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .updated {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .teaser {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  .media {
+    margin-bottom: var(--space-6);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .video {
+    margin-bottom: var(--space-6);
+  }
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .counts {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .counts > span {
+    --icon-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+</style>

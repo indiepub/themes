@@ -1,0 +1,88 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import { renderInlineMarkdown, markdownText } from '@indiepub/stator/server/render'
+import { formatDateCompact, hostname } from '../lib/format.ts'
+import type { Counts } from '../lib/types.ts'
+import Icon from './icon.stator'
+import InteractionBar from './interaction-bar.stator'
+
+const { entry, counts } = Stator.props<{ entry: Shown; counts?: Counts }>()
+const url = entry.bookmarkOf ?? ''
+const pubDate = entry.publishedAt ?? entry.createdAt
+const note = entry.summary ?? (entry.content ? markdownText(entry.content) : '')
+---
+<div class="bookmark-card">
+  <h2 class="p-name">
+    <a href={url} class="u-bookmark-of" rel="noopener" target="_blank">
+      {entry.name ?? url}
+      <Icon name="external-link" />
+    </a>
+  </h2>
+  <p class="source">{hostname(url)}</p>
+  {note ? <p class="p-summary">{raw(renderInlineMarkdown(note))}</p> : null}
+  <div class="meta">
+    <a href={`/${entry.slug}`} class="u-url">
+      <time class="dt-published" datetime={pubDate.toISOString()}>{formatDateCompact(pubDate)}</time>
+    </a>
+    <InteractionBar counts={counts} />
+  </div>
+</div>
+
+<style>
+  .bookmark-card {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  h2 {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+  }
+
+  h2 a {
+    --icon-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--color-text-link);
+  }
+
+  h2 a > :last-child {
+    color: var(--color-text-tertiary);
+  }
+
+  .source {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .p-summary {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .meta a {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .meta a:hover {
+    color: var(--color-text-link);
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import type { Counts } from '../lib/types.ts'
+import ArticleCard from './article-card.stator'
+import BookmarkCard from './bookmark-card.stator'
+import NoteCard from './note-card.stator'
+import PhotoCard from './photo-card.stator'
+
+const { entry, counts, eager = false } = Stator.props<{ entry: Shown; counts?: Counts; eager?: boolean }>()
+const hasPhotos = (entry.attachments?.length ?? 0) > 0 || !!entry.photo
+---
+<article class={`h-entry entry-card entry-card--${entry.type}`} itemscope itemtype="https://schema.org/BlogPosting">
+  {entry.type === 'article' ? (
+    <ArticleCard entry={entry} counts={counts} />
+  ) : entry.type === 'photo' && hasPhotos ? (
+    <PhotoCard entry={entry} counts={counts} eager={eager} />
+  ) : entry.type === 'bookmark' && entry.bookmarkOf ? (
+    <BookmarkCard entry={entry} counts={counts} />
+  ) : (
+    <NoteCard entry={entry} counts={counts} />
+  )}
+</article>
+
+<style>
+  article {
+    background-color: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+</style>

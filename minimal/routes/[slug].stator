@@ -1,8 +1,6 @@
 ---
 import { raw } from '@statorjs/stator/template'
-import { audienceOf, forAudience } from '@indiepub/stator/server/access'
-import { entryBySlug } from '@indiepub/stator/server/entries'
-import { listInteractions, type InteractionRow } from '@indiepub/stator/server/mentions-db'
+import { interactionsFor, readEntry } from '@indiepub/stator/server/entries'
 import { count, entrySummary, entryTitle, renderBodyMarkdown, renderReply } from '@indiepub/stator/server/render'
 import { SITE_ORIGIN } from '@indiepub/stator/server/site'
 import { longDate, shortDate } from '../lib/format.ts'
@@ -10,22 +8,15 @@ import GatedNote from '../templates/gated-note.stator'
 import KindLine from '../templates/kind-line.stator'
 import Layout from '../templates/layout.stator'
 
-const found = entryBySlug(String(Stator.request.params.slug))
-const audience =
-  found && found.visibility !== 'public'
-    ? audienceOf(Stator.request.claims() as { role?: string; subscriberId?: string } | undefined)
-    : 'public'
-const entry = found && (found.visibility !== 'private' || audience === 'owner') ? forAudience(found, audience) : null
-if (!entry) Stator.response.status = 404
-if (found && found.visibility !== 'public') Stator.response.headers.set('Cache-Control', 'private, no-cache')
-
-const interactions = entry ? listInteractions({ entryId: entry.id, status: 'approved', limit: 500 }) : []
-const ofType = (type: string): InteractionRow[] => interactions.filter((i) => i.type === type)
-const groups = [
-  { heading: (n: number) => count(n, 'Like'), items: ofType('like') },
-  { heading: (n: number) => count(n, 'Repost'), items: ofType('repost') },
-  { heading: (n: number) => count(n, 'Reply', 'Replies'), items: ofType('comment') },
-].filter((g) => g.items.length > 0)
+const entry = readEntry(String(Stator.request.params.slug), Stator.request, Stator.response)
+const interactions = entry ? interactionsFor(entry.id) : null
+const groups = interactions
+  ? [
+      { heading: (n: number) => count(n, 'Like'), items: interactions.likes },
+      { heading: (n: number) => count(n, 'Repost'), items: interactions.reposts },
+      { heading: (n: number) => count(n, 'Reply', 'Replies'), items: interactions.comments },
+    ].filter((g) => g.items.length > 0)
+  : []
 ---
 <Layout
   title={entry ? entryTitle(entry) : 'Not found'}
@@ -35,11 +26,11 @@ const groups = [
 >
   {entry ? (
     <>
-      <article class="h-entry">
+      <article class="h-entry" itemscope itemtype="https://schema.org/Article">
         <header>
-          {entry.name && entry.type !== 'bookmark' ? <h1 class="p-name">{entry.name}</h1> : null}
+          {entry.name && entry.type !== 'bookmark' ? <h1 class="p-name" itemprop="headline">{entry.name}</h1> : null}
           {entry.publishedAt ? (
-            <time class="dt-published" datetime={entry.publishedAt.toISOString()}>
+            <time class="dt-published" itemprop="datePublished" datetime={entry.publishedAt.toISOString()}>
               {longDate(entry.publishedAt)}
             </time>
           ) : null}
@@ -84,8 +75,8 @@ const groups = [
                     )}
                     {i.type === 'comment' && i.content ? <div class="p-content">{raw(renderReply(i.content))}</div> : null}
                     {i.type === 'comment' ? (
-                      <time class="dt-published" datetime={new Date(i.createdAt * 1000).toISOString()}>
-                        {shortDate(new Date(i.createdAt * 1000))}
+                      <time class="dt-published" datetime={i.createdAt.toISOString()}>
+                        {shortDate(i.createdAt)}
                       </time>
                     ) : null}
                   </li>

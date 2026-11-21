@@ -1,0 +1,76 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import { renderBodyMarkdown, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { formatDateCompact } from '../lib/format.ts'
+import type { Counts } from '../lib/types.ts'
+import InteractionBar from './interaction-bar.stator'
+import PhotoCarousel from './photo-carousel.stator'
+import TagList from './tag-list.stator'
+
+const { entry, counts, eager = false } = Stator.props<{ entry: Shown; counts?: Counts; eager?: boolean }>()
+const pubDate = entry.publishedAt ?? entry.createdAt
+---
+<div class="photo-card">
+  <PhotoCarousel entry={entry} sizes="(min-width: 640px) 50vw, 100vw" eager={eager} />
+  <div class="body">
+    {entry.summary ? (
+      <p class="p-summary">{raw(renderInlineMarkdown(entry.summary))}</p>
+    ) : entry.content ? (
+      <div class="e-content prose preview">{raw(renderBodyMarkdown(entry.content))}</div>
+    ) : null}
+    <div class="meta">
+      <TagList tags={entry.tags} />
+      <InteractionBar counts={counts} />
+      <a href={`/${entry.slug}`} class="u-url permalink">
+        <time class="dt-published" datetime={pubDate.toISOString()}>{formatDateCompact(pubDate)}</time>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .photo-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .body {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .p-summary {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .preview {
+    font-size: var(--text-sm);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .permalink {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .permalink:hover {
+    color: var(--color-text-link);
+  }
+</style>

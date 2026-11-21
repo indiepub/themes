@@ -1,0 +1,43 @@
+---
+import { adminPath } from '@indiepub/stator/server/site'
+import type { Viewer } from '../lib/viewer.ts'
+
+/** The owner's way to the desk's composer, where the theme once had its own. */
+const { viewer, label = 'Write a note' } = Stator.props<{ viewer?: Viewer; label?: string }>()
+---
+{viewer?.audience === 'owner' ? (
+  <a href={adminPath()} class="compose">
+    <span aria-hidden="true">✏️</span>
+    <span>{label}</span>
+    <span class="go">Open the desk →</span>
+  </a>
+) : null}
+
+<style>
+  .compose {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    max-width: 640px;
+    margin-bottom: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-1);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .compose:hover {
+    border-color: var(--color-brand);
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .go {
+    margin-left: auto;
+    font-weight: var(--weight-medium);
+    color: var(--color-text-link);
+  }
+</style>

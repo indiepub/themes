@@ -23,6 +23,14 @@
   --color-text-link: var(--accent);
   --radius-md: var(--radius);
   --radius-sm: var(--radius);
+
+  /* Package subscribe form and confirm button */
+  --subscribe-text-muted: var(--text-muted);
+  --subscribe-surface: var(--bg);
+  --subscribe-border: var(--border);
+  --subscribe-accent: var(--accent);
+  --subscribe-accent-text: var(--button-text);
+  --subscribe-radius: var(--radius);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -297,18 +305,6 @@ nav[aria-label*="Pagination"] {
   font-size: 0.875rem;
 }
 
-/* ── Subscribe form ────────────────────────────────────────── */
-
-form[action*="subscribe"] {
-  flex-direction: row;
-  align-items: end;
-  gap: 0.5rem;
-}
-
-form[action*="subscribe"] input[type="email"] {
-  flex: 1;
-}
-
 /* ── Archive list ──────────────────────────────────────────── */
 
 dl dt {
@@ -431,4 +427,3 @@ dl dd time {
 }
 
 /* Subscribe-form honeypot */
-.hp { position: absolute; left: -9999px; }

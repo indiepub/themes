@@ -1,0 +1,184 @@
+---
+import { raw } from '@statorjs/stator/template'
+import { reader } from '@indiepub/stator/server/access'
+import { getAuthor, listEntries } from '@indiepub/stator/server/entries'
+import { entryTitle, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { SITE_NAME } from '@indiepub/stator/server/site'
+import { longDate } from '../lib/format.ts'
+import Layout from '../templates/layout.stator'
+
+const audience = reader(Stator.request, Stator.response)
+const author = getAuthor()
+const articles = listEntries({ types: ['article'], limit: 6, audience })
+---
+<Layout path="/">
+  <section class="masthead">
+    <h1>{SITE_NAME}</h1>
+    {author.bio ? <p>{raw(renderInlineMarkdown(author.bio))}</p> : null}
+    <a href="/subscribe">Subscribe — it's free</a>
+  </section>
+
+  <hr />
+
+  {articles.length > 0 ? (
+    <section class="chronicle h-feed" aria-label="Recent articles">
+      <ol>
+        {articles.map((entry) => (
+          <li>
+            <article class="h-entry">
+              <div class="meta">
+                {entry.publishedAt ? (
+                  <time class="dt-published" datetime={entry.publishedAt.toISOString()}>{longDate(entry.publishedAt)}</time>
+                ) : null}
+              </div>
+              <div class="body">
+                <h2>
+                  <a href={`/${entry.slug}`} class="p-name u-url">{entryTitle(entry) || 'Untitled'}</a>
+                </h2>
+                {entry.summary ? <p class="p-summary">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+                <a href={`/${entry.slug}`} class="more" aria-hidden="true" tabindex="-1">
+                  {entry.gated ? 'For subscribers →' : 'Read →'}
+                </a>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ol>
+      <div class="all">
+        <a href="/articles">All articles &rarr;</a>
+      </div>
+    </section>
+  ) : (
+    <p class="empty">No articles yet.</p>
+  )}
+</Layout>
+
+<style>
+  .masthead {
+    padding: var(--space-16) 0 var(--space-12);
+    text-align: center;
+    max-width: var(--max-width-prose);
+    margin-inline: auto;
+  }
+
+  .masthead h1 {
+    font-size: clamp(var(--text-4xl), 6vw, var(--text-5xl));
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-5);
+  }
+
+  .masthead p {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+  }
+
+  .masthead > a {
+    display: inline-block;
+    padding: var(--space-3) var(--space-8);
+    background-color: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font-weight: var(--weight-semibold);
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition);
+  }
+
+  .masthead > a:hover {
+    background-color: var(--color-accent-hover);
+    color: var(--color-text-on-accent);
+    text-decoration: none;
+  }
+
+  ol {
+    list-style: none;
+  }
+
+  li {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  article {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    padding: var(--space-8) 0;
+  }
+
+  .meta {
+    padding-top: 0.4em;
+  }
+
+  .meta time {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .body h2 {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-snug);
+  }
+
+  .body h2 a {
+    color: var(--color-text-primary);
+  }
+
+  .body h2 a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .body p {
+    color: var(--color-text-secondary);
+  }
+
+  .more {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    align-self: flex-start;
+  }
+
+  .more:hover {
+    text-decoration: none;
+  }
+
+  .all {
+    padding: var(--space-6) 0;
+    text-align: right;
+  }
+
+  .all a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+  }
+
+  .all a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  .empty {
+    color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 640px) {
+    article {
+      grid-template-columns: 12ch 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    .meta time {
+      display: block;
+      text-align: right;
+    }
+  }
+</style>

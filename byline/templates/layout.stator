@@ -1,0 +1,112 @@
+---
+import IndiewebHead from '@indiepub/stator/components/indieweb-head.stator'
+import { getAuthor } from '@indiepub/stator/server/entries'
+import { SITE_NAME, SITE_ORIGIN } from '@indiepub/stator/server/site'
+import SiteFooter from './site-footer.stator'
+import SiteHeader from './site-header.stator'
+
+const { title, description, path, ogImage, width = 'content', noindex = false } = Stator.props<{
+  title?: string
+  description?: string
+  /** The page's own path: the canonical link and the current nav item. */
+  path?: string
+  ogImage?: string
+  /** `narrow` is the reading column. */
+  width?: 'content' | 'narrow'
+  noindex?: boolean
+}>()
+
+const PALETTES = ['ivory', 'slate', 'midnight', 'sepia']
+const palette = PALETTES.includes(process.env.SITE_PALETTE ?? '') ? process.env.SITE_PALETTE : undefined
+const accent = /^[#\w(),.%\s-]+$/.test(process.env.SITE_ACCENT ?? '') ? process.env.SITE_ACCENT : undefined
+const accentStyle = accent
+  ? [
+      `--color-accent: ${accent}`,
+      `--color-accent-hover: color-mix(in oklch, ${accent} 80%, black)`,
+      `--color-accent-muted: color-mix(in oklch, ${accent} 18%, white)`,
+      `--color-text-link: ${accent}`,
+      `--color-text-link-hover: color-mix(in oklch, ${accent} 80%, black)`,
+      `--color-text-on-accent: color-mix(in oklch, ${accent} 8%, white)`,
+      `--color-rule: ${accent}`,
+    ].join('; ')
+  : undefined
+
+const author = getAuthor()
+const pageTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME
+const pageDescription = description ?? author.bio ?? ''
+const canonical = path ? `${SITE_ORIGIN}${path}` : undefined
+const image = ogImage ? `${SITE_ORIGIN}${ogImage}` : undefined
+---
+<!doctype html>
+<html lang="en" data-palette={palette} style={accentStyle}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {pageDescription ? <meta name="description" content={pageDescription} /> : null}
+    {noindex ? <meta name="robots" content="noindex" /> : null}
+    {canonical ? <link rel="canonical" href={canonical} /> : null}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
+    />
+    <link rel="stylesheet" href="/static/global.css" />
+    <link rel="stylesheet" href="/highlight.css" />
+
+    <meta property="og:title" content={pageTitle} />
+    {pageDescription ? <meta property="og:description" content={pageDescription} /> : null}
+    {canonical ? <meta property="og:url" content={canonical} /> : null}
+    <meta property="og:type" content={ogImage ? 'article' : 'website'} />
+    {image ? <meta property="og:image" content={image} /> : null}
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={pageTitle} />
+    {pageDescription ? <meta name="twitter:description" content={pageDescription} /> : null}
+    {image ? <meta name="twitter:image" content={image} /> : null}
+
+    <IndiewebHead />
+  </head>
+  <body>
+    <div class="page">
+      <SiteHeader path={path} />
+      <main class={width}>
+        <children />
+      </main>
+      <SiteFooter />
+    </div>
+  </body>
+</html>
+
+<style>
+  .page {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: var(--max-width-content);
+    margin-inline: auto;
+    padding: var(--space-8) var(--space-4);
+  }
+
+  main.narrow {
+    max-width: var(--max-width-prose);
+  }
+
+  @media (min-width: 640px) {
+    main {
+      padding-inline: var(--space-6);
+    }
+  }
+
+  @media (min-width: 768px) {
+    main {
+      padding: var(--space-16) var(--space-8);
+    }
+  }
+</style>

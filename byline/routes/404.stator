@@ -1,0 +1,22 @@
+---
+import Layout from '../templates/layout.stator'
+---
+<Layout title="Not found" width="narrow">
+  <div class="missing">
+    <h1>Not found</h1>
+    <p>There's nothing at this address. <a href="/">Go to the front page</a> or browse the <a href="/archive">archive</a>.</p>
+  </div>
+</Layout>
+
+<style>
+  .missing {
+    padding-block: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  p {
+    color: var(--color-text-secondary);
+  }
+</style>
