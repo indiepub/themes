@@ -18,7 +18,8 @@ const { query } = Stator.request
       <h1>Subscribe</h1>
       <p>
         Get new posts from {SITE_NAME} delivered to your inbox. No spam, unsubscribe any time. Already subscribed? The
-        same form sends you a sign-in link for posts that are just for subscribers.
+        same form sends you a sign-in link for posts that are just for subscribers. Read
+        <a href="/newsletter">past issues</a>.
         {subscribers > 0 ? ` Join ${subscribers} ${subscribers === 1 ? 'subscriber' : 'subscribers'}.` : ''}
       </p>
     </div>

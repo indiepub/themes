@@ -1,1 +1,1 @@
-export { POST } from '@indiepub/stator/routes/subscribe/unsubscribe';
+export { GET, POST } from '@indiepub/stator/routes/subscribe/unsubscribe';
