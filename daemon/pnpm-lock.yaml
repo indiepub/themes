@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@indiepub/stator':
-        specifier: 1.0.0-beta.78
-        version: 1.0.0-beta.78(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.3(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 1.0.0-beta.79
+        version: 1.0.0-beta.79(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.3(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@statorjs/stator':
         specifier: ^3.0.3
         version: 3.0.3(@types/node@24.19.2)
@@ -387,11 +387,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@indiepub/atproto@1.0.0-beta.78':
-    resolution: {integrity: sha512-srV5BAT+WzJfOuSjruBbagH9Q2IJXtccNfDz2VWUjpSdeL2jQG09ZB7EbW64miUnotm7Bs1r/J/LLP2yGz8Sww==}
+  '@indiepub/atproto@1.0.0-beta.79':
+    resolution: {integrity: sha512-wmyt//7afviSzM8ex5XvhuPedDwG7qmE298ObeqPhNTZOpg/icsiiRnCGrx4OMCglB2IWRJyS/50be1JeQUedQ==}
 
-  '@indiepub/core@1.0.0-beta.78':
-    resolution: {integrity: sha512-1NMgizZ3NiDU9vFffV88+Td8ijhV4Deu5Wwd6+S1TE1Db0/MQur/gV7GX+8dhYwDxySJEbEz4nC9EqvjVRhXXA==}
+  '@indiepub/core@1.0.0-beta.79':
+    resolution: {integrity: sha512-cKdA/jg4PNdLOtXGj9UiyMJuyLPwGc8acDdEU8SRMWyUnGaoh0aMtkkupWhX9ShlVxzFnlZmtA5rQDfYGb0wAQ==}
 
   '@indiepub/db@1.0.0-beta.78':
     resolution: {integrity: sha512-azbvyZtbqIHZ6Ja8ZGpXR+8uOknxwIauNO8IveK6cSaBEbyBfKX80t3XvgYqgas1nX4IvFvbau6I+KCXOdmXqg==}
@@ -400,17 +400,17 @@ packages:
   '@indiepub/editor@1.0.0-beta.74':
     resolution: {integrity: sha512-ZAUX7cos4oAdjb5Z/yCKF6nLm/HH0cbYOwQc6UDf5LGxqPfg8YDgfPcyQ3esvqYbyIdOpZCXdSoGm8WlLihuOg==}
 
-  '@indiepub/email@1.0.0-beta.78':
-    resolution: {integrity: sha512-aC+P4U2LyU8FtnORIP10rSIOz6mv0c/cNeKK82k19GEFKlF2Po/Wolk+IIabo/1As9OD1ZXYAXLyRyZA9jw6ww==}
+  '@indiepub/email@1.0.0-beta.79':
+    resolution: {integrity: sha512-NOpOM17gpaOIIMCiPY4LZ4ozY0zOBFSzW68e4CvQtyNYAYKW3ngjULCq7nzUfCQPRSQ2/bQdlSW4zqpbyWig7w==}
 
-  '@indiepub/mastodon@1.0.0-beta.78':
-    resolution: {integrity: sha512-a+XZzZs8cchzGUIEr1ajvLTFxnbxVKdYyVCqpfVz10AJYPX668De91FCU08JxpSIRsyu6lJnXBWQ+xSPJuiOBg==}
+  '@indiepub/mastodon@1.0.0-beta.79':
+    resolution: {integrity: sha512-m0vm11z9pYQLn7GNVziVMjzSnRFJrUJF4nWnSxCTUPFSVZG4JDLBO3jHVGhZphlKkNeK0CEhOZ7KeAhNltDXJQ==}
 
   '@indiepub/og@1.0.0-beta.61':
     resolution: {integrity: sha512-2gwBemg8SECnBagNYQ+op27ctGcS0AIDy8t2T8pUAxZJdkVn2QHE46Io0WKtayax5B6EAFeUM054G2pOHKhinQ==}
 
-  '@indiepub/stator@1.0.0-beta.78':
-    resolution: {integrity: sha512-Ug3o8jyxuCubsrx9boKkZP6ZTZxzgG0CfHilViWv5d6cm+adUMFMUoeSurjpVpaQRn7eiQvBhUTTJXlla3wcBg==}
+  '@indiepub/stator@1.0.0-beta.79':
+    resolution: {integrity: sha512-6eOpE73qJIw1nXJW5YHYBnGQIBD7D3uKojglyzUQ9sqJHXQMpPiDn4mQrrIhGXwbk1mW72V2R9AT4ZqFAkNz+g==}
     peerDependencies:
       '@statorjs/stator': ^3.0.0
 
@@ -1429,15 +1429,15 @@ snapshots:
   '@img/sharp-win32-x64@0.35.5':
     optional: true
 
-  '@indiepub/atproto@1.0.0-beta.78':
+  '@indiepub/atproto@1.0.0-beta.79':
     dependencies:
       '@atproto/api': 0.13.35
       '@atproto/xrpc': 0.6.12
-      '@indiepub/core': 1.0.0-beta.78
+      '@indiepub/core': 1.0.0-beta.79
       '@indiepub/types': 1.0.0-beta.78
       marked: 17.0.6
 
-  '@indiepub/core@1.0.0-beta.78':
+  '@indiepub/core@1.0.0-beta.79':
     dependencies:
       '@indiepub/types': 1.0.0-beta.78
       marked: 17.0.6
@@ -1465,18 +1465,18 @@ snapshots:
       - '@floating-ui/dom'
       - '@tiptap/extensions'
 
-  '@indiepub/email@1.0.0-beta.78(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@indiepub/email@1.0.0-beta.79(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@indiepub/core': 1.0.0-beta.78
+      '@indiepub/core': 1.0.0-beta.79
       '@indiepub/types': 1.0.0-beta.78
       resend: 4.8.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     transitivePeerDependencies:
       - react
       - react-dom
 
-  '@indiepub/mastodon@1.0.0-beta.78':
+  '@indiepub/mastodon@1.0.0-beta.79':
     dependencies:
-      '@indiepub/core': 1.0.0-beta.78
+      '@indiepub/core': 1.0.0-beta.79
       '@indiepub/types': 1.0.0-beta.78
       marked: 17.0.6
 
@@ -1485,14 +1485,14 @@ snapshots:
       '@resvg/resvg-js': 2.6.2
       satori: 0.33.5
 
-  '@indiepub/stator@1.0.0-beta.78(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.3(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@indiepub/stator@1.0.0-beta.79(@floating-ui/dom@1.8.0)(@statorjs/stator@3.0.3(@types/node@24.19.2))(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@indiepub/atproto': 1.0.0-beta.78
-      '@indiepub/core': 1.0.0-beta.78
+      '@indiepub/atproto': 1.0.0-beta.79
+      '@indiepub/core': 1.0.0-beta.79
       '@indiepub/db': 1.0.0-beta.78
       '@indiepub/editor': 1.0.0-beta.74(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.34.0(@tiptap/core@3.34.0(@tiptap/pm@3.34.0))(@tiptap/pm@3.34.0))
-      '@indiepub/email': 1.0.0-beta.78(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@indiepub/mastodon': 1.0.0-beta.78
+      '@indiepub/email': 1.0.0-beta.79(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@indiepub/mastodon': 1.0.0-beta.79
       '@indiepub/og': 1.0.0-beta.61
       '@indiepub/types': 1.0.0-beta.78
       '@indiepub/webmentions': 1.0.0-beta.78
