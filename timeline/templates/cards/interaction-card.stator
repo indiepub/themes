@@ -1,0 +1,58 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import { renderBodyMarkdown } from '@indiepub/stator/server/render'
+import { hostname, pubDate } from '../../lib/format.ts'
+import CardFooter from '../card-footer.stator'
+import CardHeader from './card-header.stator'
+
+const { entry, href, badge } = Stator.props<{ entry: Shown; href: string; badge?: string | undefined }>()
+const target = entry.likeOf ?? entry.repostOf ?? entry.inReplyTo
+const mf2 = entry.likeOf ? 'u-like-of' : entry.repostOf ? 'u-repost-of' : 'u-in-reply-to'
+const verb = entry.type === 'like' ? 'liked' : entry.type === 'repost' ? 'reposted' : 'replied to'
+---
+<div class="card">
+  <CardHeader entry={entry} badge={badge}>
+    <span class="verb text-sm text-secondary">{verb}</span>
+  </CardHeader>
+  {target ? (
+    <blockquote>
+      <a href={target} class={mf2} rel="noopener" target="_blank">{hostname(target)}</a>
+    </blockquote>
+  ) : null}
+  {entry.type === 'reply' && !entry.gated && entry.content ? (
+    <div class="e-content prose">{raw(renderBodyMarkdown(entry.content))}</div>
+  ) : null}
+  <CardFooter href={href} date={pubDate(entry)} />
+</div>
+
+<style>
+  .card {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .verb {
+    font-style: italic;
+  }
+
+  blockquote {
+    border-left: 3px solid var(--color-border-strong);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background-color: var(--color-surface-2);
+  }
+
+  blockquote a {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    text-decoration: none;
+  }
+
+  blockquote a:hover {
+    text-decoration: underline;
+  }
+</style>

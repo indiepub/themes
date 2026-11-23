@@ -1,0 +1,50 @@
+---
+import SubscribeForm from '@indiepub/stator/components/subscribe-form.stator'
+import { subscriberCount } from '@indiepub/stator/server/subscribe'
+import MemberMachine from '../machines/member.ts'
+import Layout from '../templates/layout.stator'
+
+const [member] = Stator.reads([MemberMachine])
+const subscribers = subscriberCount()
+const { query } = Stator.request
+---
+<Layout title="Subscribe" description="New issues delivered to your inbox." path="/subscribe">
+  <div class="subscribe-page">
+    <h1>Subscribe</h1>
+    <p class="desc">
+      New issues delivered to your inbox. No spam, unsubscribe anytime. Already subscribed? The same form sends you a
+      sign-in link.
+    </p>
+    {subscribers > 0 ? (
+      <p class="text-sm text-secondary">
+        Join {subscribers} other {subscribers === 1 ? 'subscriber' : 'subscribers'}
+      </p>
+    ) : null}
+    <SubscribeForm query={query} member={member} />
+    <p class="text-sm text-secondary">
+      You can also follow via <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a>, or
+      <a href="/feed.json">JSON Feed</a>. Past issues are in the <a href="/newsletter">archive</a>.
+    </p>
+  </div>
+</Layout>
+
+<style>
+  .subscribe-page {
+    max-width: 28rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6) 0;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .desc {
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+</style>

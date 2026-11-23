@@ -1,0 +1,55 @@
+---
+import { requiredAudience, type Audience, type Shown } from '@indiepub/stator/server/access'
+
+const { entry, audience = 'public' } = Stator.props<{
+  entry: Shown
+  /** Who is reading, when the page knows. */
+  audience?: Audience
+}>()
+const paid = requiredAudience(entry.visibility) === 'paid'
+const signedIn = audience === 'members'
+---
+<div class="gate">
+  <p class="label">{paid ? 'For paid subscribers' : 'For subscribers'}</p>
+  {paid && signedIn ? (
+    <p>This post is for paid subscribers. Your subscription doesn't include it yet.</p>
+  ) : paid ? (
+    <p>
+      The rest of this post is for paid subscribers. <a href="/subscribe">Subscribe</a>, or sign in there with the
+      address you subscribed with.
+    </p>
+  ) : (
+    <p>
+      The rest of this post is for subscribers. <a href="/subscribe">Subscribe free to read it</a>; the link in your
+      inbox signs you in.
+    </p>
+  )}
+</div>
+
+<style>
+  .gate {
+    margin-top: var(--space-6);
+    padding: var(--space-5) var(--space-6);
+    background-color: var(--color-surface-2);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+
+  .label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  p:not(.label) {
+    color: var(--color-text-secondary);
+  }
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>

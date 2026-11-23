@@ -1,0 +1,54 @@
+---
+import { interactionsFor, readEntry } from '@indiepub/stator/server/entries'
+import { entrySummary, entryTitle } from '@indiepub/stator/server/render'
+import { sectionOf } from '../lib/format.ts'
+import { viewerOf } from '../lib/viewer.ts'
+import EntryDetail from '../templates/entry-detail.stator'
+import Layout from '../templates/layout.stator'
+
+const entry = readEntry(String(Stator.request.params.slug), Stator.request, Stator.response)
+const viewer = viewerOf(Stator.request, Stator.response)
+const groups = entry ? interactionsFor(entry.id) : null
+const back = entry ? sectionOf(entry.type) : null
+---
+<Layout
+  title={entry ? entryTitle(entry) || (entry.gated ? 'For subscribers' : 'Post') : 'Not found'}
+  description={entry ? entrySummary(entry) || undefined : undefined}
+  path={entry ? `/${entry.slug}` : undefined}
+  ogImage={entry ? `/og/${entry.slug}.png` : undefined}
+  hideSidebar
+  viewer={viewer}
+>
+  {entry && groups && back ? (
+    <>
+      <nav class="back">
+        <a href={back.href}>← {back.label}</a>
+      </nav>
+      <EntryDetail entry={entry} groups={groups} />
+    </>
+  ) : (
+    <div class="page-header">
+      <h1>Not found</h1>
+      <p class="text-secondary">There's no post here. <a href="/">Go home</a>.</p>
+    </div>
+  )}
+</Layout>
+
+<style>
+  .back {
+    margin-bottom: var(--space-6);
+  }
+
+  .back a {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .back a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+</style>

@@ -1,0 +1,10 @@
+---
+import SubscribeConfirm from '@indiepub/stator/components/subscribe-confirm.stator'
+import Layout from '../../templates/layout.stator'
+
+const { query } = Stator.request
+---
+<Layout title="Confirm your email">
+  <h1>Confirm your email</h1>
+  <SubscribeConfirm query={query} />
+</Layout>

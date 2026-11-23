@@ -1,0 +1,21 @@
+---
+const { title, lede } = Stator.props<{ title: string; lede?: string | undefined }>()
+---
+<div class="page-heading">
+  <h1>{title}</h1>
+  {lede ? <p class="text-secondary text-sm">{lede}</p> : null}
+</div>
+
+<style>
+  .page-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-6);
+  }
+
+  h1 {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+  }
+</style>

@@ -1,0 +1,24 @@
+---
+import SubscribeForm from '@indiepub/stator/components/subscribe-form.stator'
+import { subscriberCount } from '@indiepub/stator/server/subscribe'
+import MemberMachine from '../machines/member.ts'
+import Layout from '../templates/layout.stator'
+
+const [member] = Stator.reads([MemberMachine])
+const subscribers = subscriberCount()
+const { query } = Stator.request
+---
+<Layout title="Subscribe" description="Follow this site by email or feed." path="/subscribe">
+  <h1>Subscribe</h1>
+  <p>
+    New issues delivered to your inbox. Already subscribed? The same form sends you a sign-in link.
+    {subscribers > 0 ? ` Join ${subscribers} ${subscribers === 1 ? 'subscriber' : 'subscribers'}.` : ''}
+  </p>
+
+  <SubscribeForm query={query} member={member} />
+
+  <p class="subscribe-hint">
+    You can also follow via <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a>, or
+    <a href="/feed.json">JSON Feed</a>. Past issues are in the <a href="/newsletter">archive</a>.
+  </p>
+</Layout>

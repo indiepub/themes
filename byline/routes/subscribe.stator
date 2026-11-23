@@ -1,0 +1,79 @@
+---
+import SubscribeForm from '@indiepub/stator/components/subscribe-form.stator'
+import { getAuthor } from '@indiepub/stator/server/entries'
+import { SITE_NAME } from '@indiepub/stator/server/site'
+import { subscriberCount } from '@indiepub/stator/server/subscribe'
+import MemberMachine from '../machines/member.ts'
+import { compactCount } from '../lib/format.ts'
+import Layout from '../templates/layout.stator'
+
+const [member] = Stator.reads([MemberMachine])
+const author = getAuthor()
+const readers = subscriberCount()
+const { query } = Stator.request
+---
+<Layout title="Subscribe" description={`Join readers of ${SITE_NAME}.`} path="/subscribe">
+  <div class="subscribe">
+    <header>
+      {author.photo ? <img src={author.photo} alt={author.name} width="72" height="72" /> : null}
+      <h1>Subscribe to {SITE_NAME}</h1>
+      {readers > 0 ? <p class="count">Join {compactCount(readers)} reader{readers === 1 ? '' : 's'}</p> : null}
+      <p class="desc">
+        New issues delivered to your inbox. Written by {author.name}. No spam, unsubscribe any time. Already
+        subscribed? The same form sends you a sign-in link.
+      </p>
+    </header>
+
+    <SubscribeForm query={query} member={member} placeholder="your@email.com" />
+
+    <p class="feeds">
+      Read <a href="/newsletter">past issues</a>, or follow by <a href="/feed.xml">RSS</a>, <a href="/feed.atom">Atom</a>
+      or <a href="/feed.json">JSON Feed</a>.
+    </p>
+  </div>
+</Layout>
+
+<style>
+  .subscribe {
+    max-width: 36rem;
+    margin-inline: auto;
+    padding-block: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    text-align: center;
+  }
+
+  img {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    margin-inline: auto;
+    margin-bottom: var(--space-5);
+  }
+
+  h1 {
+    font-size: clamp(var(--text-3xl), 5vw, var(--text-4xl));
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-5);
+  }
+
+  .count {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-accent);
+    letter-spacing: 0.02em;
+    margin-bottom: var(--space-3);
+  }
+
+  .desc {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+  }
+
+  .feeds {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+</style>

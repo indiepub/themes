@@ -1,0 +1,128 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { Shown } from '@indiepub/stator/server/access'
+import { getAuthor } from '@indiepub/stator/server/entries'
+import { renderBodyMarkdown, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { formatDateCompact, hostname } from '../lib/format.ts'
+import type { Counts } from '../lib/types.ts'
+import GatedNote from './gated-note.stator'
+import InteractionBar from './interaction-bar.stator'
+import PhotoCarousel from './photo-carousel.stator'
+import SyndicationLinks from './syndication-links.stator'
+import TagList from './tag-list.stator'
+import VerbCallout from './verb-callout.stator'
+
+const { entry, counts } = Stator.props<{ entry: Shown; counts?: Counts }>()
+const author = getAuthor()
+const pubDate = entry.publishedAt ?? entry.createdAt
+const hasPhotos = (entry.attachments?.length ?? 0) > 0 || !!entry.photo
+---
+<div class="note-card">
+  <header>
+    <a href="/about" class="author p-author h-card" rel="author">
+      {author.photo ? <img class="u-photo" src={author.photo} alt={author.name} width="36" height="36" /> : null}
+      <span class="p-name">{author.name}</span>
+    </a>
+    <a href={`/${entry.slug}`} class="time u-url">
+      <time class="dt-published" datetime={pubDate.toISOString()}>{formatDateCompact(pubDate)}</time>
+    </a>
+  </header>
+  <VerbCallout entry={entry} />
+  {entry.gated ? (
+    <>
+      {entry.summary ? <p class="p-summary">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+      <GatedNote entry={entry} />
+    </>
+  ) : entry.content ? (
+    <div class="e-content prose">{raw(renderBodyMarkdown(entry.content))}</div>
+  ) : null}
+  {entry.video ? (
+    <p class="video">
+      ▶️ <a href={entry.video} class="u-video" rel="noopener" target="_blank">Video on {hostname(entry.video)}</a>
+    </p>
+  ) : null}
+  {hasPhotos ? (
+    <div class="media">
+      <PhotoCarousel entry={entry} sizes="(min-width: 640px) 50vw, 100vw" />
+    </div>
+  ) : null}
+  <footer>
+    <TagList tags={entry.tags} />
+    <InteractionBar counts={counts} />
+    <SyndicationLinks urls={entry.syndicationUrls} />
+  </footer>
+</div>
+
+<style>
+  .note-card {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+  }
+
+  .author:hover {
+    text-decoration: none;
+  }
+
+  .author img {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .author span {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  .time {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .time:hover {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .p-summary {
+    color: var(--color-text-secondary);
+  }
+
+  .video {
+    font-size: var(--text-sm);
+  }
+
+  .media {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>

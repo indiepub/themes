@@ -1,0 +1,143 @@
+---
+import IndiewebHead from '@indiepub/stator/components/indieweb-head.stator'
+import { siteSetting, socialLinks } from '@indiepub/stator/server/entries'
+import { SITE_NAME, SITE_ORIGIN } from '@indiepub/stator/server/site'
+import type { Viewer } from '../lib/viewer.ts'
+import Header from './header.stator'
+import Icon from './icon.stator'
+import Sidebar from './sidebar.stator'
+
+const { title, description, path, ogImage, hideSidebar = false, viewer } = Stator.props<{
+  title?: string
+  description?: string
+  /** The page's own path: the canonical link and the current nav item. */
+  path?: string
+  ogImage?: string
+  hideSidebar?: boolean
+  viewer?: Viewer
+}>()
+
+
+const links = socialLinks()
+const favicon = siteSetting('favicon_url')
+const og = ogImage ?? siteSetting('og_image_url') ?? undefined
+const pageTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME
+const canonical = path ? `${SITE_ORIGIN}${path}` : undefined
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description ? <meta name="description" content={description} /> : null}
+    {canonical ? <link rel="canonical" href={canonical} /> : null}
+    {favicon ? <link rel="icon" href={favicon} /> : null}
+    <meta property="og:title" content={pageTitle} />
+    {description ? <meta property="og:description" content={description} /> : null}
+    {canonical ? <meta property="og:url" content={canonical} /> : null}
+    <meta property="og:type" content="website" />
+    {og ? <meta property="og:image" content={og.startsWith('http') ? og : `${SITE_ORIGIN}${og}`} /> : null}
+    <meta name="twitter:card" content={og ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={pageTitle} />
+    {description ? <meta name="twitter:description" content={description} /> : null}
+    <script src="/static/theme-boot.js"></script>
+    <link rel="stylesheet" href="/static/global.css" />
+    <link rel="stylesheet" href="/highlight.css" />
+    <script src="/static/daemon.js" defer></script>
+    <IndiewebHead />
+  </head>
+  <body>
+    <div class="site">
+      <Header path={path} viewer={viewer} />
+      <div class={hideSidebar ? 'body' : 'body with-sidebar'}>
+        <main>
+          <children />
+        </main>
+        {hideSidebar ? null : (
+          <aside>
+            <Sidebar path={path} />
+          </aside>
+        )}
+      </div>
+      <footer>
+        <div class="footer-inner">
+          {links.length > 0 ? (
+            <nav class="social" aria-label="Social links">
+              {links.map((link) => (
+                <a href={link.url} rel="me noopener" target="_blank" aria-label={link.label}>
+                  <Icon name={link.icon} social />
+                </a>
+              ))}
+            </nav>
+          ) : null}
+          <p class="text-sm text-secondary">
+            Powered by <a href="https://indiepub.dev">IndiePub</a>
+          </p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  .site {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .body {
+    flex: 1;
+    width: 100%;
+    max-width: var(--max-width-site);
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .with-sidebar {
+      grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
+    }
+  }
+
+  main,
+  aside {
+    min-width: 0;
+  }
+
+  footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .social {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .social a {
+    --icon-size: 1.125rem;
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-text-secondary);
+    transition: color var(--transition);
+  }
+
+  .social a:hover {
+    color: var(--color-text-link);
+  }
+</style>

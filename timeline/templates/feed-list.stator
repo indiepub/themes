@@ -1,0 +1,25 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import { interactionCounts } from '@indiepub/stator/server/entries'
+import FeedCard from './feed-card.stator'
+
+const { entries, label, empty } = Stator.props<{ entries: Shown[]; label: string; empty: string }>()
+const counts = interactionCounts(entries.map((e) => e.id))
+---
+<div class="h-feed feed-list" aria-label={label}>
+  {entries.map((entry) => <FeedCard entry={entry} counts={counts.get(entry.id)} />)}
+  {entries.length === 0 ? <p class="empty-state text-secondary">{empty}</p> : null}
+</div>
+
+<style>
+  .feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .empty-state {
+    padding: var(--space-8) 0;
+    text-align: center;
+  }
+</style>

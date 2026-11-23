@@ -1,0 +1,92 @@
+---
+import { raw } from '@statorjs/stator/template'
+import type { InteractionCounts } from '../../lib/types.ts'
+import type { Shown } from '@indiepub/stator/server/access'
+import { renderBodyMarkdown, renderInlineMarkdown } from '@indiepub/stator/server/render'
+import { icon } from '../../lib/icons.ts'
+import { hostname, pubDate } from '../../lib/format.ts'
+import CardFooter from '../card-footer.stator'
+import CardHeader from './card-header.stator'
+import GatedTeaser from './gated-teaser.stator'
+
+const { entry, counts, href, badge } = Stator.props<{
+  entry: Shown
+  counts?: InteractionCounts | undefined
+  href: string
+  badge?: string | undefined
+}>()
+const target = entry.bookmarkOf ?? ''
+---
+<div class="card">
+  <CardHeader entry={entry} badge={badge} />
+  <p class="domain text-sm text-secondary">{icon('bookmark')}{hostname(target)}</p>
+  <h2 class="p-name">
+    <a href={target} class="u-bookmark-of" rel="noopener" target="_blank">
+      {entry.name ?? target}
+      {icon('external-link')}
+    </a>
+  </h2>
+  {entry.gated ? <GatedTeaser entry={entry} href={href} /> : null}
+  {!entry.gated && entry.summary ? <p class="p-summary">{raw(renderInlineMarkdown(entry.summary))}</p> : null}
+  {!entry.gated && !entry.summary && entry.content ? (
+    <div class="e-content prose">{raw(renderBodyMarkdown(entry.content))}</div>
+  ) : null}
+  <CardFooter href={href} date={pubDate(entry)} counts={counts} syndicationUrls={entry.syndicationUrls} />
+</div>
+
+<style>
+  .card {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .domain {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .domain :global(svg) {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+  }
+
+  h2 a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--color-text-link);
+    text-decoration: none;
+  }
+
+  h2 :global(svg) {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+  }
+
+  .p-summary {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .prose {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+</style>

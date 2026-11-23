@@ -1,0 +1,23 @@
+---
+import { reader } from '@indiepub/stator/server/access'
+import { listEntries } from '@indiepub/stator/server/entries'
+import { pageOf, paginate } from '../lib/format.ts'
+import EntryCard from '../templates/entry-card.stator'
+import Layout from '../templates/layout.stator'
+import Pagination from '../templates/pagination.stator'
+
+const audience = reader(Stator.request, Stator.response)
+const page = pageOf(Stator.request.query)
+const { items, hasPrev, hasNext } = paginate(
+  (limit, offset) => listEntries({ types: ['article'], limit, offset, audience }),
+  page,
+)
+---
+<Layout title="Articles" path="/articles">
+  <section class="h-feed">
+    <h1>Articles</h1>
+    {items.map((entry) => <EntryCard entry={entry} />)}
+    {items.length === 0 ? <p>No articles yet.</p> : null}
+  </section>
+  <Pagination base="/articles" page={page} hasPrev={hasPrev} hasNext={hasNext} />
+</Layout>

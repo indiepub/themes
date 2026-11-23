@@ -1,0 +1,18 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import { requiredAudience } from '@indiepub/stator/server/access'
+
+const { entry, href } = Stator.props<{ entry: Shown; href: string }>()
+const paid = entry.visibility === 'paid' && requiredAudience(entry.visibility) === 'paid'
+---
+<p class="gated text-sm text-secondary">
+  {entry.summary ? <span class="p-summary">{entry.summary} </span> : null}
+  {paid ? 'The rest is for paid subscribers.' : 'The rest is for subscribers.'}{' '}
+  <a href={href}>Read on</a> or <a href="/subscribe">subscribe</a>.
+</p>
+
+<style>
+  .gated {
+    line-height: var(--leading-relaxed);
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+const { rating, size = 'lg' } = Stator.props<{ rating: number; size?: 'lg' | 'xl' }>()
+---
+<span class={`stars stars--${size}`} role="img" aria-label={`Rating: ${rating} out of 5`}>
+  {[1, 2, 3, 4, 5].map((n) => (
+    <span class={n <= rating ? 'filled' : undefined} aria-hidden="true">{n <= rating ? '★' : '☆'}</span>
+  ))}
+</span>
+
+<style>
+  .stars {
+    display: flex;
+    gap: 0.125rem;
+  }
+
+  .stars--lg {
+    font-size: var(--text-lg);
+  }
+
+  .stars--xl {
+    font-size: var(--text-xl);
+  }
+
+  span span {
+    color: var(--color-border-strong);
+  }
+
+  span .filled {
+    color: var(--color-text-link);
+  }
+</style>

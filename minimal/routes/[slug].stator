@@ -1,0 +1,91 @@
+---
+import { raw } from '@statorjs/stator/template'
+import { interactionsFor, readEntry } from '@indiepub/stator/server/entries'
+import { count, entrySummary, entryTitle, renderBodyMarkdown, renderReply } from '@indiepub/stator/server/render'
+import { SITE_ORIGIN } from '@indiepub/stator/server/site'
+import { longDate, shortDate } from '../lib/format.ts'
+import GatedNote from '../templates/gated-note.stator'
+import KindLine from '../templates/kind-line.stator'
+import Layout from '../templates/layout.stator'
+
+const entry = readEntry(String(Stator.request.params.slug), Stator.request, Stator.response)
+const interactions = entry ? interactionsFor(entry.id) : null
+const groups = interactions
+  ? [
+      { heading: (n: number) => count(n, 'Like'), items: interactions.likes },
+      { heading: (n: number) => count(n, 'Repost'), items: interactions.reposts },
+      { heading: (n: number) => count(n, 'Reply', 'Replies'), items: interactions.comments },
+    ].filter((g) => g.items.length > 0)
+  : []
+---
+<Layout
+  title={entry ? entryTitle(entry) : 'Not found'}
+  description={entry ? entrySummary(entry) : undefined}
+  path={entry ? `/${entry.slug}` : undefined}
+  ogImage={entry ? `/og/${entry.slug}.png` : undefined}
+>
+  {entry ? (
+    <>
+      <article class="h-entry" itemscope itemtype="https://schema.org/Article">
+        <header>
+          {entry.name && entry.type !== 'bookmark' ? <h1 class="p-name" itemprop="headline">{entry.name}</h1> : null}
+          {entry.publishedAt ? (
+            <time class="dt-published" itemprop="datePublished" datetime={entry.publishedAt.toISOString()}>
+              {longDate(entry.publishedAt)}
+            </time>
+          ) : null}
+        </header>
+        <KindLine entry={entry} />
+        {entry.gated ? <GatedNote entry={entry} /> : null}
+        {entry.content ? <div class="e-content">{raw(renderBodyMarkdown(entry.content))}</div> : null}
+        {(entry.tags ?? []).length > 0 ? (
+          <footer>
+            {(entry.tags ?? []).map((tag) => (
+              <>
+                <a href={`/tags/${tag}`} rel="tag" class="p-category">{tag}</a>{' '}
+              </>
+            ))}
+          </footer>
+        ) : null}
+        {(entry.syndicationUrls ?? []).length > 0 ? (
+          <p class="syndication">
+            Also on{' '}
+            {(entry.syndicationUrls ?? []).map((u) => (
+              <>
+                <a class="u-syndication" rel="syndication" href={u}>{new URL(u).hostname}</a>{' '}
+              </>
+            ))}
+          </p>
+        ) : null}
+        <a href={`${SITE_ORIGIN}/${entry.slug}`} class="u-url visually-hidden">Permalink</a>
+      </article>
+
+      {groups.length > 0 ? (
+        <section class="interactions">
+          {groups.map((group) => (
+            <>
+              <h2>{group.heading(group.items.length)}</h2>
+              <ol>
+                {group.items.map((i) => (
+                  <li class={i.type === 'comment' ? 'p-comment h-cite' : undefined}>
+                    {i.authorUrl ? (
+                      <a href={i.authorUrl} class="p-author h-card" rel="nofollow">{i.authorName ?? 'Someone'}</a>
+                    ) : (
+                      <span class="p-author h-card">{i.authorName ?? 'Someone'}</span>
+                    )}
+                    {i.type === 'comment' && i.content ? <div class="p-content">{raw(renderReply(i.content))}</div> : null}
+                    {i.type === 'comment' ? (
+                      <time class="dt-published" datetime={i.createdAt.toISOString()}>
+                        {shortDate(i.createdAt)}
+                      </time>
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
+            </>
+          ))}
+        </section>
+      ) : null}
+    </>
+  ) : null}
+</Layout>

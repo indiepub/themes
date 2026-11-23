@@ -1,0 +1,23 @@
+---
+import type { Shown } from '@indiepub/stator/server/access'
+import { kindLine, stars } from '@indiepub/stator/server/render'
+
+const { entry } = Stator.props<{ entry: Shown }>()
+const kind = kindLine(entry)
+---
+{kind ? (
+  <p class="verb-callout">
+    {kind.glyph} {kind.label}{' '}
+    {kind.url ? (
+      <a href={kind.url} class={kind.mf2} rel="noopener" target="_blank"><strong>{kind.cite ?? kind.url}</strong></a>
+    ) : kind.cite ? (
+      <strong>{kind.cite}</strong>
+    ) : null}
+    {kind.rating ? <span class="rating" aria-label={`${kind.rating} of 5`}> {stars(kind.rating)}</span> : null}
+  </p>
+) : entry.bookmarkOf ? (
+  <p class="verb-callout">
+    🔖 bookmarked{' '}
+    <a href={entry.bookmarkOf} class="u-bookmark-of" rel="noopener" target="_blank"><strong>{entry.name ?? entry.bookmarkOf}</strong></a>
+  </p>
+) : null}

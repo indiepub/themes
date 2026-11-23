@@ -1,0 +1,28 @@
+---
+import { interactionCounts, listEntries } from '@indiepub/stator/server/entries'
+import { NOTE_TYPES } from '../lib/sections.ts'
+import { viewerOf } from '../lib/viewer.ts'
+import EntryCard from '../templates/entry-card.stator'
+import Layout from '../templates/layout.stator'
+import OwnerCompose from '../templates/owner-compose.stator'
+
+const viewer = viewerOf(Stator.request, Stator.response)
+const entries = listEntries({ types: NOTE_TYPES, limit: 30, audience: viewer.audience })
+const counts = interactionCounts(entries.map((e) => e.id))
+---
+<Layout title="Notes" path="/notes" viewer={viewer}>
+  <div class="page-header">
+    <h1>Notes</h1>
+    <p class="text-secondary">Short posts, thoughts, and replies.</p>
+  </div>
+
+  <OwnerCompose viewer={viewer} label="Write a note" />
+
+  {entries.length > 0 ? (
+    <div class="h-feed entry-feed" aria-label="Notes feed">
+      {entries.map((entry) => <EntryCard entry={entry} counts={counts.get(entry.id)} />)}
+    </div>
+  ) : (
+    <p class="text-secondary">No notes yet.</p>
+  )}
+</Layout>

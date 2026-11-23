@@ -1,0 +1,25 @@
+---
+import { interactionCounts, listEntries } from '@indiepub/stator/server/entries'
+import { viewerOf } from '../../lib/viewer.ts'
+import EntryCard from '../../templates/entry-card.stator'
+import Layout from '../../templates/layout.stator'
+
+const tag = decodeURIComponent(String(Stator.request.params.tag))
+const viewer = viewerOf(Stator.request, Stator.response)
+const entries = listEntries({ tag, limit: 50, audience: viewer.audience })
+const counts = interactionCounts(entries.map((e) => e.id))
+---
+<Layout title={`#${tag}`} path={`/tags/${encodeURIComponent(tag)}`} viewer={viewer}>
+  <div class="page-header">
+    <h1>#{tag}</h1>
+    <p class="text-secondary">{entries.length} {entries.length === 1 ? 'post' : 'posts'}</p>
+  </div>
+
+  {entries.length > 0 ? (
+    <div class="h-feed entry-feed" aria-label={`Posts tagged ${tag}`}>
+      {entries.map((entry) => <EntryCard entry={entry} counts={counts.get(entry.id)} />)}
+    </div>
+  ) : (
+    <p class="text-secondary">No posts tagged #{tag}.</p>
+  )}
+</Layout>

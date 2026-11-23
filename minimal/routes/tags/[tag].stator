@@ -1,0 +1,27 @@
+---
+import { reader } from '@indiepub/stator/server/access'
+import { listEntries } from '@indiepub/stator/server/entries'
+import { entryTitle } from '@indiepub/stator/server/render'
+import { shortDate } from '../../lib/format.ts'
+import Layout from '../../templates/layout.stator'
+
+const tag = String(Stator.request.params.tag)
+const audience = reader(Stator.request, Stator.response)
+const entries = listEntries({ tag, limit: 100, audience })
+---
+<Layout title={`#${tag}`} path={`/tags/${tag}`}>
+  <h1>#{tag}</h1>
+  <section class="h-feed">
+    {entries.map((entry) => (
+      <article class="h-entry">
+        <header>
+          <a href={`/${entry.slug}`} class={entry.name ? 'p-name u-url' : 'u-url'}>{entryTitle(entry) || '(untitled)'}</a>
+          {entry.publishedAt ? (
+            <time class="dt-published" datetime={entry.publishedAt.toISOString()}> {shortDate(entry.publishedAt)}</time>
+          ) : null}
+        </header>
+      </article>
+    ))}
+    {entries.length === 0 ? <p>No posts tagged #{tag}.</p> : null}
+  </section>
+</Layout>
